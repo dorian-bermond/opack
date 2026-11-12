@@ -64,10 +64,23 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
   return null;
 }
 
-/// The picture of [artwork] for [card] (see [CardData.artwork]): Scryfall's
-/// normal picture of that print for MtG, YGOPRODeck's image for Yu-Gi-Oh!.
-/// With [small], the thumbnail instead (for choosing among artworks).
+/// The picture of [artwork] for [card] (see [CardData.artwork]): a wiki scan
+/// when it is a URL, else Scryfall's normal picture of that print for MtG,
+/// YGOPRODeck's image for Yu-Gi-Oh!. With [small], the thumbnail instead
+/// (for choosing among scans).
 ImageSource artworkImageSource(CardData card, String artwork, {bool small = false}) {
+  if (artwork.startsWith('http')) {
+    final url = Uri.parse(artwork);
+    // Fandom files: `…/File.png/revision/latest?cb=…`; a width-limited
+    // thumbnail is made on demand under `revision/latest`.
+    final revision = url.pathSegments.indexOf('revision');
+    final file = revision > 0 ? url.pathSegments[revision - 1] : url.pathSegments.lastOrNull ?? artwork;
+    final name = file.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+    final thumbnail = small && revision > 0 && url.pathSegments.length == revision + 2
+        ? url.replace(pathSegments: [...url.pathSegments, 'scale-to-width-down', '200'])
+        : url;
+    return ImageSource(small ? 'scan-$name-small' : 'scan-$name', thumbnail);
+  }
   if (card.scryfallId != null) {
     return ImageSource(
       small ? 'scryfall-$artwork-small' : 'scryfall-$artwork',

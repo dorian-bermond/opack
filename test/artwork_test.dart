@@ -11,7 +11,10 @@ import 'package:opack/shared/images/card_image_cache.dart';
 
 void main() {
   const mtg = CardData(id: 'DMU-1', names: {'en': 'A'}, rarity: Rarity.rare, scryfallId: 'abc');
-  const ygo = CardData(id: 'CIBR-EN001', names: {'en': 'B'}, rarity: Rarity.common, passcode: '89631139');
+  const ygo = CardData(
+      id: 'CIBR-FR077', names: {'en': 'Gearfried the Iron Knight'}, rarity: Rarity.common, passcode: '00423705');
+  const scan = 'https://static.wikia.nocookie.net/yugioh/images/a/ab/GearfriedtheIronKnight-CIBR-FR-C-1E.png'
+      '/revision/latest?cb=1';
 
   test('a chosen artwork replaces the picture, in every language, without fallback', () {
     final own = cardImageSource(mtg, language: 'fr')!;
@@ -27,6 +30,15 @@ void main() {
     expect(ygoSwapped.url.toString(), 'https://images.ygoprodeck.com/images/cards/89631140.jpg');
     expect(artworkImageSource(ygo, '89631140', small: true).url.path, '/images/cards_small/89631140.jpg');
     expect(artworkImageSource(mtg, 'def', small: true).url.queryParameters['version'], 'small');
+
+    // A wiki scan is fetched as given; its thumbnail is made on demand.
+    final wiki = cardImageSource(ygo.withArtwork(scan), language: 'fr')!;
+    expect(wiki.key, 'scan-GearfriedtheIronKnight-CIBR-FR-C-1E.png');
+    expect(wiki.url.toString(), scan);
+    final thumb = artworkImageSource(ygo, scan, small: true);
+    expect(thumb.key, 'scan-GearfriedtheIronKnight-CIBR-FR-C-1E.png-small');
+    expect(thumb.url.path, endsWith('/revision/latest/scale-to-width-down/200'));
+    expect(thumb.url.queryParameters['cb'], '1');
 
     // Clearing restores the card's own print, and the foil flag survives.
     expect(mtg.withArtwork('def').withArtwork(null).artwork, isNull);
@@ -50,7 +62,7 @@ void main() {
     expect(play.tagCards[rarityTag(Rarity.rare)]!.single.artwork, 'def');
   });
 
-  test('lists every Scryfall print of an MtG card, its own first', () async {
+  test('lists every Scryfall print of an MtG card in every language, its own first', () async {
     final search = ArtworkSearch(
       client: MockClient((request) async {
         if (request.url.path == '/cards/abc') {
@@ -60,12 +72,15 @@ void main() {
           }), 200);
         }
         if (request.url.path == '/cards/search' && request.url.queryParameters['page'] == null) {
+          expect(request.url.queryParameters['include_multilingual'], 'true');
+          expect(request.url.queryParameters['unique'], 'prints');
           return http.Response(jsonEncode({
             'has_more': true,
             'next_page': 'https://api.scryfall.com/cards/search?q=oracleid%3Ao1&unique=prints&page=2',
             'data': [
-              {'id': 'old', 'set': 'lea', 'collector_number': '1', 'set_name': 'Alpha'},
-              {'id': 'abc', 'set': 'dmu', 'collector_number': '1', 'set_name': 'Dominaria United'},
+              {'id': 'old', 'set': 'lea', 'collector_number': '1', 'set_name': 'Alpha', 'lang': 'en'},
+              {'id': 'abc', 'set': 'dmu', 'collector_number': '1', 'set_name': 'Dominaria United', 'lang': 'en'},
+              {'id': 'abcfr', 'set': 'dmu', 'collector_number': '1', 'set_name': 'Dominaria United', 'lang': 'fr'},
             ],
           }), 200);
         }
@@ -81,23 +96,38 @@ void main() {
       }),
     );
     final found = await search.alternatives(mtg);
-    expect(found.map((a) => a.key), ['abc', 'old', 'new']);
+    expect(found.map((a) => a.key), ['abc', 'old', 'abcfr', 'new']);
     expect(found.first.own, isTrue);
     expect(found[1].label, 'LEA 1 · Alpha');
-    expect(found[2].label, 'PLST DMU-1');
+    expect(found[2].label, 'DMU 1 · FR · Dominaria United');
+    expect(found[3].label, 'PLST DMU-1');
   });
 
-  test('lists every YGOPRODeck picture of a Yu-Gi-Oh! card', () async {
+  test('lists every wiki scan of a Yu-Gi-Oh! card, then YGOPRODeck pictures', () async {
     final search = ArtworkSearch(
       client: MockClient((request) async {
-        expect(request.url.queryParameters['id'], '89631139');
+        if (request.url.host == 'yugioh.fandom.com') {
+          expect(request.url.queryParameters['aiprefix'], 'GearfriedtheIronKnight-');
+          return http.Response(jsonEncode({
+            'query': {
+              'allimages': [
+                {'name': 'GearfriedtheIronKnight-PSV-EN-C-1E.png', 'url': 'https://w/PSV-EN.png'},
+                {'name': 'GearfriedtheIronKnight-CIBR-FR-C-1E.png', 'url': scan},
+                {'name': 'GearfriedtheIronKnight-CIBR-FR-OP.png', 'url': 'https://w/CIBR-FR-OP.png'},
+                {'name': 'GearfriedtheIronKnight-JP-Anime-DM.png', 'url': 'https://w/anime.png'},
+                {'name': 'GearfriedtheIronKnightSwordmaster-SOI-EN-C-1E.png', 'url': 'https://w/other.png'},
+              ],
+            },
+          }), 200);
+        }
+        expect(request.url.queryParameters['id'], '423705');
         return http.Response(jsonEncode({
           'data': [
             {
-              'id': 89631139,
+              'id': 423705,
               'card_images': [
-                {'id': 89631140, 'image_url': 'x'},
-                {'id': 89631139, 'image_url': 'y'},
+                {'id': 423705, 'image_url': 'x'},
+                {'id': 423706, 'image_url': 'y'},
               ],
             },
           ],
@@ -105,9 +135,18 @@ void main() {
       }),
     );
     final found = await search.alternatives(ygo);
-    expect(found.map((a) => a.key), ['89631139', '89631140']);
-    expect(found.first.own, isTrue);
-    expect(found.last.label, '#1');
+    expect(found.map((a) => a.key), [scan, 'https://w/PSV-EN.png', 'https://w/CIBR-FR-OP.png', '423705', '423706']);
+    expect(found.first.own, isTrue, reason: "the scan of the card's own print code");
+    expect(found.map((a) => a.label), ['CIBR-FR · C · 1E', 'PSV-EN · C · 1E', 'CIBR-FR · OP', 'YGOPRODeck #1', 'YGOPRODeck #2']);
+  });
+
+  test('scan file names of other cards sharing the prefix are left out', () {
+    const name = 'GearfriedtheIronKnight';
+    expect(ArtworkSearch.scanLabel('$name-CIBR-FR-C-1E.png', name), 'CIBR-FR · C · 1E');
+    expect(ArtworkSearch.scanLabel('$name-TP1-FR.png', name), 'TP1-FR');
+    expect(ArtworkSearch.scanLabel('${name}Swordmaster-SOI-EN-C-1E.png', name), isNull);
+    expect(ArtworkSearch.scanLabel('$name-JP-Anime-DM.png', name), isNull);
+    expect(ArtworkSearch.wikiFileName('Cocoon of Ultra Evolution (Skill Card)'), 'CocoonofUltraEvolution');
   });
 
   test('a card without an online key has no artworks; a missing card none either', () async {
