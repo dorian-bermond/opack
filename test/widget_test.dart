@@ -16,6 +16,7 @@ import 'package:opack/features/cube/data/cube_repository.dart';
 import 'package:opack/features/cube/domain/cube.dart';
 import 'package:opack/features/pools/data/pool_repository.dart';
 import 'package:opack/features/pools/domain/pool.dart';
+import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 import 'package:opack/shared/widgets/card_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,7 @@ Future<ProviderContainer> startApp(WidgetTester tester, {Locale? locale}) async 
       cardInfoFetcherProvider.overrideWithValue(null),
       cardInfoStoreProvider.overrideWithValue(MemoryCardInfoStore()),
       cardSearchProvider.overrideWithValue(null),
+      artworkSearchProvider.overrideWithValue(null),
     ],
   );
   addTearDown(container.dispose);

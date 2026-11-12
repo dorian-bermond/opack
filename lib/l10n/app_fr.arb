@@ -405,5 +405,10 @@
   "textVersionsCount": "{count} versions — touchez-en une pour l'utiliser pour cette carte",
   "textVersionNumber": "Version {number}",
   "textVersionLatest": "Dernière",
-  "useDefaultVersion": "Par défaut"
+  "useDefaultVersion": "Par défaut",
+  "swapArtwork": "Changer l'illustration",
+  "artworkOwn": "Illustration d'origine",
+  "artworkChosen": "Choisie",
+  "noOtherArtwork": "Aucune autre illustration trouvée pour cette carte.",
+  "artworkLoadFailed": "Impossible de charger les illustrations : {error}"
 }

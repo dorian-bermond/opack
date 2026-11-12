@@ -33,6 +33,7 @@ class CardData {
     this.score,
     this.passcode,
     this.scryfallId,
+    this.artwork,
   });
 
   factory CardData.fromJson(Map<String, dynamic> json) => CardData(
@@ -43,6 +44,7 @@ class CardData {
         score: (json['score'] as num?)?.toDouble(),
         passcode: json['passcode'] as String?,
         scryfallId: json['scryfallId'] as String?,
+        artwork: json['artwork'] as String?,
       );
 
   Map<String, Object?> toJson() => {
@@ -53,6 +55,7 @@ class CardData {
         'score': ?score,
         'passcode': ?passcode,
         'scryfallId': ?scryfallId,
+        'artwork': ?artwork,
       };
 
   /// Printed code, e.g. `DMU-123` or `CIBR-FR077`.
@@ -75,6 +78,10 @@ class CardData {
   /// Scryfall id of this MtG print, the key of its picture.
   final String? scryfallId;
 
+  /// Another print's picture chosen for this card: a Scryfall id (MtG) or
+  /// a YGOPRODeck image id (Yu-Gi-Oh!). See [withArtwork].
+  final String? artwork;
+
   String nameFor(String languageCode) =>
       names[languageCode] ?? names['en'] ?? id;
 
@@ -87,6 +94,20 @@ class CardData {
         score: score,
         passcode: passcode,
         scryfallId: scryfallId,
+        artwork: artwork,
+      );
+
+  /// This card shown with [artwork]'s picture (`null` for its own print's).
+  CardData withArtwork(String? artwork) => CardData(
+        id: id,
+        names: names,
+        rarity: rarity,
+        colors: colors,
+        foil: foil,
+        score: score,
+        passcode: passcode,
+        scryfallId: scryfallId,
+        artwork: artwork,
       );
 }
 

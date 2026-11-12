@@ -8,8 +8,22 @@ import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
 
+/// The pool a screen belongs to, for actions on a card that edit the pool
+/// (choosing its artwork). `null` outside of a pool screen.
+class PoolScope extends InheritedWidget {
+  const PoolScope({super.key, required this.poolId, required super.child});
+
+  final String poolId;
+
+  static String? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<PoolScope>()?.poolId;
+
+  @override
+  bool updateShouldNotify(PoolScope oldWidget) => oldWidget.poolId != poolId;
+}
+
 /// Finds the saved pool [poolId] and loads its sets and cubes, then builds
-/// [builder] with it ready to deal.
+/// [builder] with it ready to deal, under a [PoolScope].
 class PoolLoader extends ConsumerWidget {
   const PoolLoader({super.key, required this.poolId, required this.builder});
 
@@ -33,11 +47,16 @@ class PoolLoader extends ConsumerWidget {
     return ref.watch(poolSetsProvider(poolSetsKey(pool))).when(
           loading: () => const _Loading(),
           error: (error, _) => _Failed('$error'),
-          data: (sets) => builder(
-            context,
-            PlayPool.resolve(pool, sets: sets, cubes: {
-              for (final Cube cube in cubes.value!) cube.id: cube,
-            }),
+          data: (sets) => PoolScope(
+            poolId: pool.id,
+            child: Builder(
+              builder: (context) => builder(
+                context,
+                PlayPool.resolve(pool, sets: sets, cubes: {
+                  for (final Cube cube in cubes.value!) cube.id: cube,
+                }),
+              ),
+            ),
           ),
         );
   }

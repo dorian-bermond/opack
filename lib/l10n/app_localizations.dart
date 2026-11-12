@@ -1663,6 +1663,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use default'**
   String get useDefaultVersion;
+
+  /// No description provided for @swapArtwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap artwork'**
+  String get swapArtwork;
+
+  /// No description provided for @artworkOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Own artwork'**
+  String get artworkOwn;
+
+  /// No description provided for @artworkChosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Chosen'**
+  String get artworkChosen;
+
+  /// No description provided for @noOtherArtwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No other artwork found for this card.'**
+  String get noOtherArtwork;
+
+  /// No description provided for @artworkLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the artworks: {error}'**
+  String artworkLoadFailed(String error);
 }
 
 class _AppLocalizationsDelegate

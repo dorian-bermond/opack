@@ -34,6 +34,8 @@ class ImageSource {
 /// through an `allimages` lookup, see [wikiScanLookup]), then YGOPRODeck by
 /// passcode. `null` when the card has no usable key.
 ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
+  // A chosen artwork is one precise picture: no language variant, no fallback.
+  if (card.artwork case final artwork?) return artworkImageSource(card, artwork);
   if (card.scryfallId case final id?) {
     const query = {'format': 'image', 'version': 'normal'};
     final english = Uri.https('api.scryfall.com', '/cards/$id', query);
@@ -60,6 +62,23 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
     return ImageSource('ygo-${card.id}-$language', lookup, fallback: english);
   }
   return null;
+}
+
+/// The picture of [artwork] for [card] (see [CardData.artwork]): Scryfall's
+/// normal picture of that print for MtG, YGOPRODeck's image for Yu-Gi-Oh!.
+/// With [small], the thumbnail instead (for choosing among artworks).
+ImageSource artworkImageSource(CardData card, String artwork, {bool small = false}) {
+  if (card.scryfallId != null) {
+    return ImageSource(
+      small ? 'scryfall-$artwork-small' : 'scryfall-$artwork',
+      Uri.https('api.scryfall.com', '/cards/$artwork',
+          {'format': 'image', 'version': small ? 'small' : 'normal'}),
+    );
+  }
+  return ImageSource(
+    small ? 'ygo-$artwork-small' : 'ygo-$artwork',
+    Uri.https('images.ygoprodeck.com', '/images/cards${small ? '_small' : ''}/$artwork.jpg'),
+  );
 }
 
 /// The picture of a set's booster pack, in [language] when the wiki has that

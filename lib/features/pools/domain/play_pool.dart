@@ -45,8 +45,10 @@ class PlayPool {
     required Map<String, Cube> cubes,
   }) {
     final byId = <String, PoolEntry>{};
-    void add(CardData card) => byId.update(card.id, (e) => (card: e.card, listed: e.listed + 1),
-        ifAbsent: () => (card: card, listed: 1));
+    void add(CardData listed) {
+      final card = saved.withChosenArtwork(listed);
+      byId.update(card.id, (e) => (card: e.card, listed: e.listed + 1), ifAbsent: () => (card: card, listed: 1));
+    }
     for (final source in saved.sources) {
       switch (source) {
         case SetSource(:final code):

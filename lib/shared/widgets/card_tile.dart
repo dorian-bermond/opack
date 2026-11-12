@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/settings/card_languages.dart';
 import '../../features/card_text/presentation/card_details_sheet.dart';
 import '../../features/catalog/domain/models.dart';
+import '../../features/pools/presentation/pool_loader.dart';
 import '../../l10n/app_localizations.dart';
 import '../images/card_image_cache.dart';
 
@@ -63,7 +64,7 @@ class CardTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final language = dataLanguage(ref, context);
     final name = shownVersion(ref, card, language)?.name ?? card.nameFor(language);
-    void details() => showCardDetails(context, card);
+    void details() => showCardDetails(context, card, poolId: PoolScope.of(context));
     final source = cardImageSource(card, language: pictureLanguage(ref, context));
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
 

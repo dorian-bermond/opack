@@ -452,6 +452,7 @@ class Pool {
     this.tags = const {},
     this.boosters = const [],
     this.formats = const [],
+    this.artworks = const {},
   });
 
   factory Pool.fromJson(Map<String, dynamic> json) => Pool(
@@ -486,6 +487,7 @@ class Pool {
           for (final format in json['formats'] as List? ?? const [])
             PlayFormat.fromJson(format as Map<String, dynamic>),
         ],
+        artworks: (json['artworks'] as Map<String, dynamic>? ?? const {}).cast<String, String>(),
       );
 
   /// A set's booster print run: every card unlimited, tags and slots
@@ -545,6 +547,7 @@ class Pool {
         if (tags.isNotEmpty) 'tags': {for (final MapEntry(:key, :value) in tags.entries) key: value.toJson()},
         if (boosters.isNotEmpty) 'boosters': [for (final booster in boosters) booster.toJson()],
         if (formats.isNotEmpty) 'formats': [for (final format in formats) format.toJson()],
+        if (artworks.isNotEmpty) 'artworks': artworks,
       };
 
   final String id;
@@ -563,6 +566,23 @@ class Pool {
 
   /// The ways to play the pool; empty means the game's defaults.
   final List<PlayFormat> formats;
+
+  /// Another print's picture chosen for a card, by card id (see
+  /// [CardData.artwork]); applied when the pool is resolved.
+  final Map<String, String> artworks;
+
+  /// Shows [cardId] with [artwork]'s picture, or its own again with `null`.
+  Pool withArtwork(String cardId, String? artwork) => copyWith(artworks: {
+        for (final MapEntry(:key, :value) in artworks.entries)
+          if (key != cardId) key: value,
+        cardId: ?artwork,
+      });
+
+  /// [card] with the artwork chosen for it, if any.
+  CardData withChosenArtwork(CardData card) => switch (artworks[card.id]) {
+        final artwork? => card.withArtwork(artwork),
+        null => card,
+      };
 
   /// The slots of the default booster.
   List<PackSlot> get slots => boosters.firstOrNull?.slots ?? const [];
@@ -670,6 +690,7 @@ class Pool {
     List<BoosterDef>? boosters,
     List<PlayFormat>? formats,
     List<PackSlot>? slots,
+    Map<String, String>? artworks,
   }) {
     var kinds = boosters ?? this.boosters;
     if (slots != null) {
@@ -689,6 +710,7 @@ class Pool {
       tags: tags ?? this.tags,
       boosters: kinds,
       formats: formats ?? this.formats,
+      artworks: artworks ?? this.artworks,
     );
   }
 

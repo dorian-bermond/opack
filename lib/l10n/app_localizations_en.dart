@@ -982,4 +982,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get useDefaultVersion => 'Use default';
+
+  @override
+  String get swapArtwork => 'Swap artwork';
+
+  @override
+  String get artworkOwn => 'Own artwork';
+
+  @override
+  String get artworkChosen => 'Chosen';
+
+  @override
+  String get noOtherArtwork => 'No other artwork found for this card.';
+
+  @override
+  String artworkLoadFailed(String error) {
+    return 'Could not load the artworks: $error';
+  }
 }

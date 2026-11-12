@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/images/artwork_picker.dart';
 import '../../../shared/images/card_image_cache.dart';
 import '../../../shared/widgets/card_tile.dart';
 import '../../catalog/domain/models.dart';
@@ -10,13 +11,16 @@ import '../data/card_text_repository.dart';
 import '../data/scryfall_text.dart';
 import '../domain/card_text.dart';
 
-Future<void> showCardDetails(BuildContext context, CardData card) => showModalBottomSheet<void>(
+/// Shows [card]'s picture and text; within the pool [poolId], its artwork
+/// can be swapped from there.
+Future<void> showCardDetails(BuildContext context, CardData card, {String? poolId}) =>
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (context) => SizedBox(
         height: MediaQuery.sizeOf(context).height * 0.75,
-        child: CardDetailsSheet(card: card),
+        child: CardDetailsSheet(card: card, poolId: poolId),
       ),
     );
 
@@ -40,9 +44,12 @@ TextVersion? shownVersion(WidgetRef ref, CardData card, String lang) {
 /// (tapping a version makes it this card's text in that language), the
 /// printed rules and flavor text from Scryfall for MtG.
 class CardDetailsSheet extends ConsumerWidget {
-  const CardDetailsSheet({super.key, required this.card});
+  const CardDetailsSheet({super.key, required this.card, this.poolId});
 
   final CardData card;
+
+  /// The pool the card is seen in, enabling the artwork swap.
+  final String? poolId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -61,6 +68,23 @@ class CardDetailsSheet extends ConsumerWidget {
               style: theme.textTheme.titleLarge),
           Text('${card.id} · ${card.rarity.label(l10n)}${card.foil ? ' · ${l10n.foil}' : ''}',
               style: theme.textTheme.bodySmall),
+          if (poolId case final poolId? when source != null)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.brush_outlined),
+                  label: Text(l10n.swapArtwork),
+                  onPressed: () async {
+                    // The sheet holds the card as it was: once the pool
+                    // changed, close it so the screen shows the new picture.
+                    final changed = await pickArtwork(context, poolId: poolId, card: card);
+                    if (changed && context.mounted) Navigator.pop(context);
+                  },
+                ),
+              ),
+            ),
         ],
       ),
     );

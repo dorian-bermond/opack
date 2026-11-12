@@ -983,4 +983,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get useDefaultVersion => 'Par défaut';
+
+  @override
+  String get swapArtwork => 'Changer l\'illustration';
+
+  @override
+  String get artworkOwn => 'Illustration d\'origine';
+
+  @override
+  String get artworkChosen => 'Choisie';
+
+  @override
+  String get noOtherArtwork =>
+      'Aucune autre illustration trouvée pour cette carte.';
+
+  @override
+  String artworkLoadFailed(String error) {
+    return 'Impossible de charger les illustrations : $error';
+  }
 }

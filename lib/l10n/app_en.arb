@@ -467,5 +467,11 @@
     "placeholders": { "number": { "type": "int" } }
   },
   "textVersionLatest": "Latest",
-  "useDefaultVersion": "Use default"
+  "useDefaultVersion": "Use default",
+  "swapArtwork": "Swap artwork",
+  "artworkOwn": "Own artwork",
+  "artworkChosen": "Chosen",
+  "noOtherArtwork": "No other artwork found for this card.",
+  "artworkLoadFailed": "Could not load the artworks: {error}",
+  "@artworkLoadFailed": { "placeholders": { "error": { "type": "String" } } }
 }
