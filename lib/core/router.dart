@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 
 import '../features/catalog/domain/models.dart';
-import '../features/catalog/presentation/home_screen.dart';
 import '../features/cube/presentation/cube_list.dart';
 import '../features/draft/presentation/draft_screen.dart';
 import '../features/packs/presentation/pack_opening_screen.dart';
@@ -11,31 +10,34 @@ import '../features/pools/presentation/pool_formats_screen.dart';
 import '../features/pools/presentation/pools_screen.dart';
 import '../features/sealed/presentation/sealed_screen.dart';
 
-/// `/game/<game>`: the pools of a game, the app's main screen.
-String gamePath(Game game) => '/game/${game.name}';
+/// `/`: every pool of every game, the app's main screen.
+const poolsPath = '/';
 
-/// `/game/<game>/cubes`: the imported cubes, to manage them.
-String cubesPath(Game game) => '${gamePath(game)}/cubes';
+/// `/cubes`: the imported cubes of every game, to manage them.
+const cubesPath = '/cubes';
 
 /// `/game/<game>/pool/<id>/<mode>`, mode being `open`, `sealed`, `draft`
-/// or `edit`.
+/// or `edit`. The game segment keeps pool ids unique per game.
 String poolModePath(Game game, String poolId, String mode) =>
-    '${gamePath(game)}/pool/${Uri.encodeComponent(poolId)}/$mode';
+    '/game/${game.name}/pool/${Uri.encodeComponent(poolId)}/$mode';
 
 final router = GoRouter(
   routes: [
     GoRoute(
-      path: '/',
-      builder: (context, state) => const HomeScreen(),
+      path: poolsPath,
+      builder: (context, state) => const PoolsScreen(),
       routes: [
         GoRoute(
+          path: 'cubes',
+          builder: (context, state) => const CubesScreen(),
+        ),
+        GoRoute(
           path: 'game/:game',
-          builder: (context, state) => PoolsScreen(game: _game(state)),
+          // The game is no longer chosen up front: its pools live on the root.
+          redirect: (context, state) =>
+              state.fullPath == '/game/:game' ? poolsPath : null,
+          builder: (context, state) => const PoolsScreen(),
           routes: [
-            GoRoute(
-              path: 'cubes',
-              builder: (context, state) => CubesScreen(game: _game(state)),
-            ),
             GoRoute(
               path: 'pool/:pool/open',
               builder: (context, state) =>

@@ -9,25 +9,36 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/settings_menu.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
+import '../../catalog/presentation/home_screen.dart';
 import '../../pools/domain/pool.dart';
 import '../../pools/presentation/pool_list.dart';
 import '../data/cube_repository.dart';
 import '../domain/cube.dart';
 
-/// The cubes of one game: import, delete, start a pool from one.
+/// The cubes of every game, one tab each: import, delete, start a pool
+/// from one.
 class CubesScreen extends StatelessWidget {
-  const CubesScreen({super.key, required this.game});
-
-  final Game game;
+  const CubesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return DefaultTabController(
+      length: Game.values.length,
+      child: Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context).tabCubes),
+          title: Text(l10n.tabCubes),
           actions: const [SettingsMenu()],
+          bottom: TabBar(
+            tabs: [for (final game in Game.values) Tab(text: game.label(l10n))],
+          ),
         ),
-        body: CubeList(game: game),
-      );
+        body: TabBarView(
+          children: [for (final game in Game.values) CubeList(game: game)],
+        ),
+      ),
+    );
+  }
 }
 
 /// The imported cubes of one game, with the import action.

@@ -6,6 +6,7 @@ import '../../../core/router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
+import '../../catalog/presentation/home_screen.dart';
 import '../../cube/data/cube_repository.dart';
 import '../data/pool_repository.dart';
 import '../domain/pool.dart';
@@ -40,9 +41,12 @@ Future<void> createPool(
   if (context.mounted) context.go(poolModePath(game, pool.id, 'edit'));
 }
 
-/// Asks how to start a pool (empty, from a set, from a cube) and creates it.
-Future<void> startPool(BuildContext context, WidgetRef ref, Game game) async {
+/// Asks which game, then how to start a pool (empty, from a set, from a
+/// cube), and creates it.
+Future<void> startPool(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
+  final game = await pickGame(context);
+  if (game == null || !context.mounted) return;
   final choice = await showModalBottomSheet<_Start>(
     context: context,
     builder: (context) => SafeArea(
@@ -75,11 +79,9 @@ Future<void> startPool(BuildContext context, WidgetRef ref, Game game) async {
 
 enum _Start { empty, set, cube }
 
-/// The saved pools of one game.
+/// The saved pools of every game.
 class PoolList extends ConsumerWidget {
-  const PoolList({super.key, required this.game});
-
-  final Game game;
+  const PoolList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -88,13 +90,13 @@ class PoolList extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
         label: Text(l10n.newPool),
-        onPressed: () => startPool(context, ref, game),
+        onPressed: () => startPool(context, ref),
       ),
       body: ref.watch(poolsProvider).when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => Center(child: Text('$error')),
             data: (all) {
-              final mine = all.where((p) => p.game == game).toList();
+              final mine = all;
               if (mine.isEmpty) {
                 return Center(
                   child: Padding(
@@ -164,6 +166,14 @@ class _PoolTile extends ConsumerWidget {
             Row(
               children: [
                 Expanded(child: Text(pool.name, style: theme.textTheme.titleMedium)),
+                Tooltip(
+                  message: pool.game.label(l10n),
+                  child: Chip(
+                    label: Text(pool.game.shortLabel),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
                 PopupMenuButton<void>(
                   itemBuilder: (context) => [
                     PopupMenuItem(

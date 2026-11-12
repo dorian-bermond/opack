@@ -64,11 +64,13 @@ Future<void> settleLoading(WidgetTester tester) async {
   }
 }
 
-/// From the Yu-Gi-Oh! pools screen, creates a pool from the set matching
+/// From the pools screen, creates a Yu-Gi-Oh! pool from the set matching
 /// [search] and lands in its editor.
 Future<void> createPoolFromSet(WidgetTester tester, String search,
     {required String newPool, required String fromSet}) async {
   await tester.tap(find.text(newPool));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Yu-Gi-Oh!'));
   await tester.pumpAndSettle();
   await tester.tap(find.text(fromSet));
   await tester.pumpAndSettle();
@@ -81,9 +83,6 @@ Future<void> createPoolFromSet(WidgetTester tester, String search,
 void main() {
   testWidgets('French: a pool from a set, then a pack opened from it', (tester) async {
     await startApp(tester, locale: const Locale('fr'));
-
-    await tester.tap(find.text('Yu-Gi-Oh!'));
-    await tester.pumpAndSettle();
     expect(find.textContaining('Aucun pool'), findsOneWidget);
 
     await createPoolFromSet(tester, 'coupe-circuit',
@@ -105,10 +104,7 @@ void main() {
 
   testWidgets('English: create a pool from a set, edit it, play it', (tester) async {
     await startApp(tester, locale: const Locale('en'));
-    expect(find.text('Choose a game'), findsOneWidget);
-
-    await tester.tap(find.text('Yu-Gi-Oh!'));
-    await tester.pumpAndSettle();
+    expect(find.text('Opack'), findsOneWidget);
     await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
     expect(find.text('Cards from'), findsOneWidget);
     expect(find.text('Unlimited packs'), findsOneWidget);
@@ -227,10 +223,10 @@ void main() {
 
   testWidgets('an empty pool cannot be played until it has a source', (tester) async {
     await startApp(tester, locale: const Locale('en'));
-    await tester.tap(find.text('Yu-Gi-Oh!'));
-    await tester.pumpAndSettle();
 
     await tester.tap(find.text('New pool'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Yu-Gi-Oh!'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Empty pool'));
     await settleLoading(tester);
@@ -261,7 +257,7 @@ void main() {
     tester.platformDispatcher.localesTestValue = const [Locale('fr', 'FR')];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
     await startApp(tester);
-    expect(find.text('Choisissez un jeu'), findsOneWidget);
+    expect(find.text('Nouveau pool'), findsOneWidget);
   });
 }
 
