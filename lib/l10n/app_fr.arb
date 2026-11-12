@@ -1,0 +1,409 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Opack",
+  "chooseGame": "Choisissez un jeu",
+  "chooseSet": "Choisissez une extension",
+  "gameMtg": "Magic: The Gathering",
+  "gameYgo": "Yu-Gi-Oh!",
+  "language": "Langue",
+  "languageSystem": "Système",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "pictureLanguage": "Langue des images de cartes",
+  "dataLanguage": "Langue des noms et textes de cartes",
+  "modeOpen": "Ouvrir un booster",
+  "modeSealed": "Scellé",
+  "modeDraft": "Draft",
+  "tapToOpen": "Touchez le booster pour l'ouvrir",
+  "revealAll": "Tout révéler",
+  "openAnother": "Ouvrir un autre",
+  "openingModeSetting": "Ouverture des boosters",
+  "openingGrid": "Grille : touchez chaque carte",
+  "openingSwipe": "Pile : glissez carte par carte",
+  "swipeToReveal": "Glissez la carte pour voir la suivante",
+  "cardsLeft": "{count, plural, =1{1 carte restante} other{{count} cartes restantes}}",
+  "@cardsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dealAgain": "Redistribuer",
+  "newPool": "Nouveau pool",
+  "sealedPool": "Pool scellé",
+  "cardsCount": "{count, plural, =1{1 carte} other{{count} cartes}}",
+  "packsCount": "{count, plural, =1{1 booster} other{{count} boosters}}",
+  "draftHeader": "Ronde {round}/{rounds} · Choix {pick}",
+  "draftDone": "Draft terminé",
+  "yourPool": "Votre pool",
+  "restart": "Recommencer",
+  "rarityCommon": "Commune",
+  "rarityUncommon": "Peu commune",
+  "rarityRare": "Rare",
+  "rarityMythic": "Rare mythique",
+  "raritySuperRare": "Super rare",
+  "rarityUltraRare": "Ultra rare",
+  "raritySecretRare": "Secret rare",
+  "raritySpecial": "Spéciale",
+  "foil": "Premium",
+  "searchSets": "Rechercher une extension",
+  "boosterPlay": "Booster de jeu",
+  "boosterDraft": "Booster de draft",
+  "boosterStandard": "Booster",
+  "boosterSet": "Booster d'extension",
+  "boosterCollector": "Booster collector",
+  "tabSets": "Extensions",
+  "tabCubes": "Cubes",
+  "importCubeCobra": "Importer depuis CubeCobra",
+  "importCubeFile": "Importer une liste",
+  "cubeCobraIdLabel": "ID ou lien du cube CubeCobra",
+  "noCubesMtg": "Aucun cube. Importez-en un depuis CubeCobra avec son ID (ex. « vintage ») ; il est ensuite enregistré sur cet appareil et jouable hors ligne.",
+  "noCubesYgo": "Aucun cube. Importez un fichier .ydk ou un fichier texte avec un nom de carte par ligne (français ou anglais).",
+  "cubeImported": "Cube « {name} » importé : {count} cartes",
+  "unresolvedCards": "{count} lignes non reconnues : {examples}",
+  "importFailed": "Échec de l'import : {error}",
+  "poolTooSmall": "Ce pool peut fournir {packs} boosters de {packSize} cartes ; ce mode en demande {needed}. Donnez plus d'exemplaires aux cartes limitées, ou rendez-en certaines illimitées.",
+  "poolOpen": "Ouvert",
+  "poolClosed": "Fermé",
+  "poolCustom": "Personnalisé",
+  "poolOpenDescription": "Préréglage : toutes les cartes en illimité, comme dans des boosters",
+  "poolClosedDescription": "Préréglage : chaque carte un nombre fixe de fois, comme dans un cube. Chaque emplacement pioche dans les exemplaires restants, donc le plus rare limite le nombre de boosters",
+  "copiesPerCard": "{count} × chaque carte",
+  "editPool": "Modifier",
+  "tabPools": "Pools",
+  "createPool": "Créer un pool",
+  "noPools": "Aucun pool pour l'instant. Un pool est la liste de cartes dont on ouvre les boosters et avec laquelle on joue en scellé et en draft : créez-en un vide, à partir d'une extension ou d'un cube, puis ajustez-le dans son éditeur.",
+  "poolEmpty": "Pool vide",
+  "poolFromSet": "À partir d'une extension",
+  "poolFromCube": "À partir d'un cube",
+  "poolNoSources": "Aucune carte pour l'instant",
+  "poolEmptyHint": "Ce pool n'a pas encore de cartes. Modifiez-le pour ajouter une extension ou un cube.",
+  "packsLeft": "{count, plural, =1{1 booster restant} other{{count} boosters restants}}",
+  "@packsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "duplicatePool": "Dupliquer",
+  "deletePool": "Supprimer le pool",
+  "copyOf": "{name} (copie)",
+  "renamePool": "Renommer",
+  "apply": "Appliquer",
+  "addSource": "Ajouter une extension ou un cube",
+  "poolSources": "Cartes de",
+  "packLayout": "Composition des boosters",
+  "poolCopies": "Exemplaires",
+  "randomPacks": "Boosters aléatoires",
+  "cardsPerPack": "{count} cartes par booster",
+  "cardsUnplaced": "{count, plural, =1{1 carte ne correspond à aucun emplacement} other{{count} cartes ne correspondent à aucun emplacement}}",
+  "presetDropsChanges": "{count, plural, =1{Ce préréglage annule la carte que vous avez modifiée.} other{Ce préréglage annule les {count} cartes que vous avez modifiées.}}",
+  "resetCards": "Remettre toutes les cartes au préréglage",
+  "packsUnlimited": "Boosters illimités",
+  "packsAvailable": "{count, plural, =1{1 booster} other{{count} boosters}} de {packSize} cartes disponibles",
+  "cardsChanged": "{count, plural, =1{1 carte modifiée} other{{count} cartes modifiées}}",
+  "searchCards": "Rechercher des cartes",
+  "listedTimes": "listée {count} ×",
+  "unlimitedCopies": "Exemplaires illimités",
+  "copiesCount": "{count, plural, =0{Exclue} =1{1 exemplaire} other{{count} exemplaires}}",
+  "deleteCube": "Supprimer le cube",
+  "cancel": "Annuler",
+  "import": "Importer",
+  "settings": "Paramètres",
+  "cardImagesSetting": "Images des cartes",
+  "cardImagesOnline": "Télécharger en ligne",
+  "sortBy": "Trier par",
+  "sortName": "Nom",
+  "sortRarity": "Rareté",
+  "sortManaValue": "Valeur de mana",
+  "sortColor": "Couleur",
+  "sortType": "Type",
+  "sortPower": "Force",
+  "sortToughness": "Endurance",
+  "sortCollector": "Numéro de collection",
+  "sortLevel": "Niveau / Rang",
+  "sortAtk": "ATK",
+  "sortDef": "DEF",
+  "sortAttribute": "Attribut",
+  "sortRace": "Type de monstre",
+  "sortArchetype": "Archétype",
+  "filters": "Filtres",
+  "clearFilters": "Effacer les filtres",
+  "poolStats": "Statistiques",
+  "cardsShown": "{shown} cartes sur {total}",
+  "@cardsShown": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "cardDataMissing": "{count, plural, =1{1 carte sans détails} other{{count} cartes sans détails}}",
+  "@cardDataMissing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fetchCardData": "Télécharger les détails des cartes",
+  "fetchingCardData": "Téléchargement des détails…",
+  "fetchCardDataFailed": "Téléchargement impossible. Vérifiez la connexion et réessayez.",
+  "averageValue": "Moyenne {value}",
+  "@averageValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "highestValue": "Maximum {value}",
+  "@highestValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "knownOf": "{count, plural, =1{1 carte avec une valeur} other{{count} cartes avec une valeur}}",
+  "@knownOf": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "facetRarity": "Rareté",
+  "facetColor": "Couleur",
+  "facetColorIdentity": "Identité de couleur",
+  "facetType": "Type",
+  "facetSubtype": "Sous-type",
+  "facetKeyword": "Mot-clé",
+  "facetManaValue": "Valeur de mana",
+  "facetSet": "Extension",
+  "facetKind": "Genre de carte",
+  "facetCategory": "Catégorie de monstre",
+  "facetAttribute": "Attribut",
+  "facetRace": "Type de monstre",
+  "facetProperty": "Propriété Magie / Piège",
+  "facetArchetype": "Archétype",
+  "facetLevel": "Niveau / Rang",
+  "facetLinkRating": "Classification Lien",
+  "facetAtk": "ATK",
+  "facetDef": "DEF",
+  "metricManaCurve": "Courbe de mana",
+  "metricColors": "Couleurs",
+  "metricColorIdentity": "Identité de couleur",
+  "metricColorCount": "Mono, multi, incolore",
+  "metricDevotion": "Dévotion (symboles de mana colorés)",
+  "metricTypes": "Types de carte",
+  "metricSubtypes": "Sous-types principaux",
+  "metricKeywords": "Mots-clés principaux",
+  "metricCreatureSize": "Tailles des créatures (force/endurance)",
+  "metricRarity": "Rareté",
+  "metricFoil": "Premium",
+  "metricSets": "Extensions",
+  "metricKind": "Monstres, Magies, Pièges",
+  "metricCategories": "Catégories de monstres",
+  "metricLevels": "Niveaux",
+  "metricRanks": "Rangs",
+  "metricLinkRatings": "Classifications Lien",
+  "metricAttributes": "Attributs",
+  "metricRaces": "Types de monstres",
+  "metricAtk": "ATK",
+  "metricDef": "DEF",
+  "metricArchetypes": "Archétypes principaux",
+  "metricProperties": "Propriétés des Magies et Pièges",
+  "colorWhite": "Blanc",
+  "colorBlue": "Bleu",
+  "colorBlack": "Noir",
+  "colorRed": "Rouge",
+  "colorGreen": "Vert",
+  "colorless": "Incolore",
+  "monoColored": "Monocolore",
+  "multiColored": "Multicolore",
+  "kindMonster": "Monstre",
+  "kindSpell": "Magie",
+  "kindTrap": "Piège",
+  "noArchetype": "Sans archétype",
+  "nonFoil": "Non premium",
+  "addCards": "Ajouter des cartes",
+  "pickedCards": "{count, plural, =1{1 carte choisie} other{{count} cartes choisies}}",
+  "@pickedCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchOnline": "Rechercher des cartes en ligne",
+  "searchHint": "Nom ou texte",
+  "searchButton": "Rechercher",
+  "noResults": "Aucune carte trouvée.",
+  "moreResults": "Il y a d'autres résultats : affinez la recherche.",
+  "selectedCount": "{count, plural, =0{Aucune sélection} =1{1 sélectionnée} other{{count} sélectionnées}}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addSelected": "Ajouter au pool",
+  "searchFailed": "Recherche impossible : {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "viewList": "Liste",
+  "viewGallery": "Galerie",
+  "viewStacks": "Piles",
+  "viewSpoiler": "Spoiler",
+  "facetTag": "Étiquette",
+  "metricTags": "Étiquettes",
+  "allCards": "Toutes les cartes",
+  "boosterComposition": "Composition du booster",
+  "slotRow": "{count} × {tag}",
+  "@slotRow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "slotCards": "{count, plural, =0{aucune carte} =1{1 carte} other{{count} cartes}}",
+  "@slotCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "slotLocked": "Emplacement de l'extension",
+  "addSlot": "Ajouter un emplacement",
+  "slotPullsFrom": "Tirer parmi",
+  "slotCount": "Cartes par booster",
+  "poolTags": "Étiquettes",
+  "newTag": "Nouvelle étiquette",
+  "tagName": "Nom de l'étiquette",
+  "deleteTag": "Supprimer l'étiquette",
+  "tagCardsAction": "Étiqueter des cartes",
+  "taggingTitle": "Étiquetage : {tag}",
+  "@taggingTitle": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "taggingHint": "Touchez les cartes pour ajouter ou retirer l'étiquette. Vert : ajoutée, rouge : retirée, bleu : conservée, gris : sans étiquette.",
+  "cardTags": "Étiquettes de cette carte",
+  "noTags": "Aucune étiquette pour l'instant. Les étiquettes regroupent des cartes pour vos propres emplacements de booster.",
+  "userSlots": "Vos emplacements",
+  "noUserSlots": "Aucun emplacement à vous pour l'instant. Un emplacement tire des cartes d'une ou plusieurs étiquettes, chacune avec sa probabilité.",
+  "editSlot": "Modifier l'emplacement",
+  "deleteSlot": "Supprimer l'emplacement",
+  "slotOptions": "Tirer parmi (au hasard)",
+  "addOption": "Ajouter une option",
+  "editComposition": "Modifier la composition",
+  "groupBy": "Grouper par",
+  "groupNone": "Sans regroupement",
+  "thenBy": "Puis par",
+  "setTags": "Étiquettes de l'extension",
+  "resetTag": "Rétablir l'extension",
+  "noTagGroup": "Sans étiquette",
+  "deleteTagTitle": "Supprimer l'étiquette {tag} ?",
+  "@deleteTagTitle": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteTagAffects": "Ces emplacements de booster en tirent des cartes et vont changer :",
+  "prefillFrom": "Préremplir à nouveau",
+  "prefillHint": "Remplace toutes les étiquettes et tous les emplacements par le booster d'une extension ou des boosters aléatoires. Vos étiquettes et emplacements sont perdus.",
+  "prefillTitle": "Remplacer les étiquettes et emplacements ?",
+  "prefillWarning": "Le pool reçoit {slots} emplacements et {tags} étiquettes de ce préremplissage ; les actuels sont abandonnés.",
+  "@prefillWarning": {
+    "placeholders": {
+      "slots": {
+        "type": "int"
+      },
+      "tags": {
+        "type": "int"
+      }
+    }
+  },
+  "formats": "Formats",
+  "editFormats": "Formats",
+  "newFormat": "Nouveau format",
+  "formatName": "Nom du format",
+  "formatKind": "Joué en",
+  "deleteFormat": "Supprimer le format",
+  "chooseFormat": "Choisissez un format",
+  "rounds": "Boosters, dans l'ordre",
+  "addRound": "Ajouter un booster",
+  "roundNumber": "Booster {number}",
+  "@roundNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "picksPerPass": "Cartes prises par passage",
+  "burnPerPass": "Cartes brûlées par passage",
+  "seats": "Joueurs",
+  "boosterKind": "Booster",
+  "boosterKinds": "Boosters",
+  "newBooster": "Nouveau booster",
+  "boosterName": "Nom du booster",
+  "deleteBooster": "Supprimer le booster",
+  "pickPhase": "{count, plural, =1{Prenez 1 carte} other{Prenez {count} cartes}}",
+  "@pickPhase": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "burnPhase": "{count, plural, =1{Brûlez 1 carte} other{Brûlez {count} cartes}}",
+  "@burnPhase": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "formatSummary": "{kind} · {packs, plural, =1{1 booster} other{{packs} boosters}}",
+  "@formatSummary": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "packs": {
+        "type": "int"
+      }
+    }
+  },
+  "cardTextSetting": "Texte des cartes",
+  "textModePrinted": "Tel qu'imprimé dans l'extension",
+  "textModeLatest": "Dernière version (errata)",
+  "noCardText": "Aucun texte disponible pour cette carte.",
+  "textVersionsCount": "{count} versions — touchez-en une pour l'utiliser pour cette carte",
+  "textVersionNumber": "Version {number}",
+  "textVersionLatest": "Dernière",
+  "useDefaultVersion": "Par défaut"
+}

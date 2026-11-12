@@ -1,0 +1,6713 @@
+[
+ {
+  "code": "10E",
+  "game": "mtg",
+  "names": {
+   "en": "Tenth Edition",
+   "fr": "Dixième édition"
+  },
+  "releaseDate": "2007-07-13",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 508,
+  "path": "assets/sets/mtg/10E.json"
+ },
+ {
+  "code": "2ED",
+  "game": "mtg",
+  "names": {
+   "en": "Unlimited Edition"
+  },
+  "releaseDate": "1993-12-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 302,
+  "path": "assets/sets/mtg/2ED.json"
+ },
+ {
+  "code": "2X2",
+  "game": "mtg",
+  "names": {
+   "en": "Double Masters 2022",
+   "fr": "Double Masters 2022"
+  },
+  "releaseDate": "2022-07-08",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 577,
+  "path": "assets/sets/mtg/2X2.json"
+ },
+ {
+  "code": "2XM",
+  "game": "mtg",
+  "names": {
+   "en": "Double Masters",
+   "fr": "Double Masters"
+  },
+  "releaseDate": "2020-08-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 332,
+  "path": "assets/sets/mtg/2XM.json"
+ },
+ {
+  "code": "3ED",
+  "game": "mtg",
+  "names": {
+   "en": "Revised Edition"
+  },
+  "releaseDate": "1994-04-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 306,
+  "path": "assets/sets/mtg/3ED.json"
+ },
+ {
+  "code": "4ED",
+  "game": "mtg",
+  "names": {
+   "en": "Fourth Edition",
+   "fr": "Quatrième Edition"
+  },
+  "releaseDate": "1995-04-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 363,
+  "path": "assets/sets/mtg/4ED.json"
+ },
+ {
+  "code": "5DN",
+  "game": "mtg",
+  "names": {
+   "en": "Fifth Dawn",
+   "fr": "La Cinquième Aube"
+  },
+  "releaseDate": "2004-06-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/5DN.json"
+ },
+ {
+  "code": "5ED",
+  "game": "mtg",
+  "names": {
+   "en": "Fifth Edition",
+   "fr": "Cinquième Edition"
+  },
+  "releaseDate": "1997-03-24",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 429,
+  "path": "assets/sets/mtg/5ED.json"
+ },
+ {
+  "code": "6ED",
+  "game": "mtg",
+  "names": {
+   "en": "Classic Sixth Edition"
+  },
+  "releaseDate": "1999-04-21",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 330,
+  "path": "assets/sets/mtg/6ED.json"
+ },
+ {
+  "code": "7ED",
+  "game": "mtg",
+  "names": {
+   "en": "Seventh Edition",
+   "fr": "Septième Edition"
+  },
+  "releaseDate": "2001-04-11",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 700,
+  "path": "assets/sets/mtg/7ED.json"
+ },
+ {
+  "code": "8ED",
+  "game": "mtg",
+  "names": {
+   "en": "Eighth Edition",
+   "fr": "Huitième Edition"
+  },
+  "releaseDate": "2003-07-28",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 700,
+  "path": "assets/sets/mtg/8ED.json"
+ },
+ {
+  "code": "9ED",
+  "game": "mtg",
+  "names": {
+   "en": "Ninth Edition",
+   "fr": "Neuvième Edition"
+  },
+  "releaseDate": "2005-07-29",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 700,
+  "path": "assets/sets/mtg/9ED.json"
+ },
+ {
+  "code": "A25",
+  "game": "mtg",
+  "names": {
+   "en": "Masters 25",
+   "fr": "Masters 25"
+  },
+  "releaseDate": "2018-03-16",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/A25.json"
+ },
+ {
+  "code": "ACR",
+  "game": "mtg",
+  "names": {
+   "en": "Assassin's Creed"
+  },
+  "releaseDate": "2024-07-05",
+  "boosterTypes": [
+   "collector",
+   "standard"
+  ],
+  "cardCount": 275,
+  "path": "assets/sets/mtg/ACR.json"
+ },
+ {
+  "code": "AER",
+  "game": "mtg",
+  "names": {
+   "en": "Aether Revolt",
+   "fr": "La révolte éthérique"
+  },
+  "releaseDate": "2017-01-20",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 223,
+  "path": "assets/sets/mtg/AER.json"
+ },
+ {
+  "code": "AFR",
+  "game": "mtg",
+  "names": {
+   "en": "Adventures in the Forgotten Realms",
+   "fr": "Forgotten Realms: Aventures dans les Royaumes Oubliés"
+  },
+  "releaseDate": "2021-07-23",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 751,
+  "path": "assets/sets/mtg/AFR.json"
+ },
+ {
+  "code": "AKH",
+  "game": "mtg",
+  "names": {
+   "en": "Amonkhet",
+   "fr": "Amonkhet"
+  },
+  "releaseDate": "2017-04-28",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 299,
+  "path": "assets/sets/mtg/AKH.json"
+ },
+ {
+  "code": "ALA",
+  "game": "mtg",
+  "names": {
+   "en": "Shards of Alara",
+   "fr": "Les éclats d'Alara"
+  },
+  "releaseDate": "2008-10-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/ALA.json"
+ },
+ {
+  "code": "ALL",
+  "game": "mtg",
+  "names": {
+   "en": "Alliances",
+   "fr": "Alliances"
+  },
+  "releaseDate": "1996-06-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 199,
+  "path": "assets/sets/mtg/ALL.json"
+ },
+ {
+  "code": "APC",
+  "game": "mtg",
+  "names": {
+   "en": "Apocalypse",
+   "fr": "Apocalypse"
+  },
+  "releaseDate": "2001-06-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/APC.json"
+ },
+ {
+  "code": "ARB",
+  "game": "mtg",
+  "names": {
+   "en": "Alara Reborn",
+   "fr": "La Renaissance d'Alara"
+  },
+  "releaseDate": "2009-04-30",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/ARB.json"
+ },
+ {
+  "code": "ARN",
+  "game": "mtg",
+  "names": {
+   "en": "Arabian Nights",
+   "fr": "Arabian Nights"
+  },
+  "releaseDate": "1993-12-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 92,
+  "path": "assets/sets/mtg/ARN.json"
+ },
+ {
+  "code": "ATQ",
+  "game": "mtg",
+  "names": {
+   "en": "Antiquities",
+   "fr": "Antiquities"
+  },
+  "releaseDate": "1994-03-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/mtg/ATQ.json"
+ },
+ {
+  "code": "AVR",
+  "game": "mtg",
+  "names": {
+   "en": "Avacyn Restored",
+   "fr": "Avacyn ressuscitée"
+  },
+  "releaseDate": "2012-05-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 244,
+  "path": "assets/sets/mtg/AVR.json"
+ },
+ {
+  "code": "BBD",
+  "game": "mtg",
+  "names": {
+   "en": "Battlebond",
+   "fr": "Battlebond"
+  },
+  "releaseDate": "2018-06-08",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 256,
+  "path": "assets/sets/mtg/BBD.json"
+ },
+ {
+  "code": "BCHR",
+  "game": "mtg",
+  "names": {
+   "en": "Chronicles Foreign Black Border"
+  },
+  "releaseDate": "1995-07-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 125,
+  "path": "assets/sets/mtg/BCHR.json"
+ },
+ {
+  "code": "BFZ",
+  "game": "mtg",
+  "names": {
+   "en": "Battle for Zendikar",
+   "fr": "La bataille de Zendikar"
+  },
+  "releaseDate": "2015-10-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 299,
+  "path": "assets/sets/mtg/BFZ.json"
+ },
+ {
+  "code": "BLB",
+  "game": "mtg",
+  "names": {
+   "en": "Bloomburrow"
+  },
+  "releaseDate": "2024-08-02",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 446,
+  "path": "assets/sets/mtg/BLB.json"
+ },
+ {
+  "code": "BNG",
+  "game": "mtg",
+  "names": {
+   "en": "Born of the Gods",
+   "fr": "Créations divines"
+  },
+  "releaseDate": "2014-02-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 185,
+  "path": "assets/sets/mtg/BNG.json"
+ },
+ {
+  "code": "BOK",
+  "game": "mtg",
+  "names": {
+   "en": "Betrayers of Kamigawa",
+   "fr": "Traîtres de Kamigawa"
+  },
+  "releaseDate": "2005-02-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/BOK.json"
+ },
+ {
+  "code": "BRO",
+  "game": "mtg",
+  "names": {
+   "en": "The Brothers' War",
+   "fr": "La Guerre Fratricide"
+  },
+  "releaseDate": "2022-11-18",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 954,
+  "path": "assets/sets/mtg/BRO.json"
+ },
+ {
+  "code": "CHK",
+  "game": "mtg",
+  "names": {
+   "en": "Champions of Kamigawa",
+   "fr": "Guerriers de Kamigawa"
+  },
+  "releaseDate": "2004-10-01",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 307,
+  "path": "assets/sets/mtg/CHK.json"
+ },
+ {
+  "code": "CHR",
+  "game": "mtg",
+  "names": {
+   "en": "Chronicles",
+   "fr": "Chronicles"
+  },
+  "releaseDate": "1995-07-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 125,
+  "path": "assets/sets/mtg/CHR.json"
+ },
+ {
+  "code": "CLB",
+  "game": "mtg",
+  "names": {
+   "en": "Commander Legends: Battle for Baldur's Gate",
+   "fr": "Commander Légendes : la bataille de la Porte de Baldur"
+  },
+  "releaseDate": "2022-06-10",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 965,
+  "path": "assets/sets/mtg/CLB.json"
+ },
+ {
+  "code": "CLU",
+  "game": "mtg",
+  "names": {
+   "en": "Ravnica: Clue Edition"
+  },
+  "releaseDate": "2024-02-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 257,
+  "path": "assets/sets/mtg/CLU.json"
+ },
+ {
+  "code": "CMM",
+  "game": "mtg",
+  "names": {
+   "en": "Commander Masters",
+   "fr": "Commander Masters"
+  },
+  "releaseDate": "2023-08-04",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 1048,
+  "path": "assets/sets/mtg/CMM.json"
+ },
+ {
+  "code": "CMR",
+  "game": "mtg",
+  "names": {
+   "en": "Commander Legends",
+   "fr": "Commander Legends"
+  },
+  "releaseDate": "2020-11-20",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 566,
+  "path": "assets/sets/mtg/CMR.json"
+ },
+ {
+  "code": "CN2",
+  "game": "mtg",
+  "names": {
+   "en": "Conspiracy: Take the Crown",
+   "fr": "Conspiracy: Take the Crown"
+  },
+  "releaseDate": "2016-08-26",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 222,
+  "path": "assets/sets/mtg/CN2.json"
+ },
+ {
+  "code": "CNS",
+  "game": "mtg",
+  "names": {
+   "en": "Conspiracy",
+   "fr": "Conspiration"
+  },
+  "releaseDate": "2014-06-06",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 210,
+  "path": "assets/sets/mtg/CNS.json"
+ },
+ {
+  "code": "CON",
+  "game": "mtg",
+  "names": {
+   "en": "Conflux",
+   "fr": "Conflux"
+  },
+  "releaseDate": "2009-02-06",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/CON_.json"
+ },
+ {
+  "code": "CSP",
+  "game": "mtg",
+  "names": {
+   "en": "Coldsnap",
+   "fr": "Souffle glaciaire"
+  },
+  "releaseDate": "2006-07-21",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 155,
+  "path": "assets/sets/mtg/CSP.json"
+ },
+ {
+  "code": "DBL",
+  "game": "mtg",
+  "names": {
+   "en": "Innistrad: Double Feature",
+   "fr": "Innistrad : Double Programme"
+  },
+  "releaseDate": "2022-01-28",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 534,
+  "path": "assets/sets/mtg/DBL.json"
+ },
+ {
+  "code": "DFT",
+  "game": "mtg",
+  "names": {
+   "en": "Aetherdrift"
+  },
+  "releaseDate": "2025-02-14",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 446,
+  "path": "assets/sets/mtg/DFT.json"
+ },
+ {
+  "code": "DGM",
+  "game": "mtg",
+  "names": {
+   "en": "Dragon's Maze",
+   "fr": "Le labyrinthe du dragon"
+  },
+  "releaseDate": "2013-05-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 166,
+  "path": "assets/sets/mtg/DGM.json"
+ },
+ {
+  "code": "DIS",
+  "game": "mtg",
+  "names": {
+   "en": "Dissension",
+   "fr": "Discorde"
+  },
+  "releaseDate": "2006-05-05",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 180,
+  "path": "assets/sets/mtg/DIS.json"
+ },
+ {
+  "code": "DKA",
+  "game": "mtg",
+  "names": {
+   "en": "Dark Ascension",
+   "fr": "Obscure Ascension"
+  },
+  "releaseDate": "2012-02-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 173,
+  "path": "assets/sets/mtg/DKA.json"
+ },
+ {
+  "code": "DMR",
+  "game": "mtg",
+  "names": {
+   "en": "Dominaria Remastered",
+   "fr": "Dominaria Remastered"
+  },
+  "releaseDate": "2023-01-13",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 456,
+  "path": "assets/sets/mtg/DMR.json"
+ },
+ {
+  "code": "DMU",
+  "game": "mtg",
+  "names": {
+   "en": "Dominaria United",
+   "fr": "Dominaria Uni"
+  },
+  "releaseDate": "2022-09-09",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 1069,
+  "path": "assets/sets/mtg/DMU.json"
+ },
+ {
+  "code": "DOM",
+  "game": "mtg",
+  "names": {
+   "en": "Dominaria",
+   "fr": "Dominaria"
+  },
+  "releaseDate": "2018-04-27",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 269,
+  "path": "assets/sets/mtg/DOM.json"
+ },
+ {
+  "code": "DRK",
+  "game": "mtg",
+  "names": {
+   "en": "The Dark",
+   "fr": "The Dark"
+  },
+  "releaseDate": "1994-08-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 119,
+  "path": "assets/sets/mtg/DRK.json"
+ },
+ {
+  "code": "DSK",
+  "game": "mtg",
+  "names": {
+   "en": "Duskmourn: House of Horror"
+  },
+  "releaseDate": "2024-09-27",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 455,
+  "path": "assets/sets/mtg/DSK.json"
+ },
+ {
+  "code": "DST",
+  "game": "mtg",
+  "names": {
+   "en": "Darksteel",
+   "fr": "Sombracier"
+  },
+  "releaseDate": "2004-02-06",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/DST.json"
+ },
+ {
+  "code": "DTK",
+  "game": "mtg",
+  "names": {
+   "en": "Dragons of Tarkir",
+   "fr": "Les Dragons de Tarkir"
+  },
+  "releaseDate": "2015-03-27",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 264,
+  "path": "assets/sets/mtg/DTK.json"
+ },
+ {
+  "code": "ECL",
+  "game": "mtg",
+  "names": {
+   "en": "Lorwyn Eclipsed"
+  },
+  "releaseDate": "2026-01-23",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 445,
+  "path": "assets/sets/mtg/ECL.json"
+ },
+ {
+  "code": "ELD",
+  "game": "mtg",
+  "names": {
+   "en": "Throne of Eldraine",
+   "fr": "Throne of Eldraine"
+  },
+  "releaseDate": "2019-10-04",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 391,
+  "path": "assets/sets/mtg/ELD.json"
+ },
+ {
+  "code": "EMA",
+  "game": "mtg",
+  "names": {
+   "en": "Eternal Masters",
+   "fr": "Eternal Masters"
+  },
+  "releaseDate": "2016-06-10",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/EMA.json"
+ },
+ {
+  "code": "EMN",
+  "game": "mtg",
+  "names": {
+   "en": "Eldritch Moon",
+   "fr": "La lune hermétique"
+  },
+  "releaseDate": "2016-07-22",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 220,
+  "path": "assets/sets/mtg/EMN.json"
+ },
+ {
+  "code": "EOE",
+  "game": "mtg",
+  "names": {
+   "en": "Edge of Eternities"
+  },
+  "releaseDate": "2025-08-01",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 606,
+  "path": "assets/sets/mtg/EOE.json"
+ },
+ {
+  "code": "EVE",
+  "game": "mtg",
+  "names": {
+   "en": "Eventide",
+   "fr": "Coucheciel"
+  },
+  "releaseDate": "2008-07-25",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 180,
+  "path": "assets/sets/mtg/EVE.json"
+ },
+ {
+  "code": "EXO",
+  "game": "mtg",
+  "names": {
+   "en": "Exodus",
+   "fr": "Exode"
+  },
+  "releaseDate": "1998-06-15",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/EXO.json"
+ },
+ {
+  "code": "FDN",
+  "game": "mtg",
+  "names": {
+   "en": "Foundations"
+  },
+  "releaseDate": "2024-11-15",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 497,
+  "path": "assets/sets/mtg/FDN.json"
+ },
+ {
+  "code": "FEM",
+  "game": "mtg",
+  "names": {
+   "en": "Fallen Empires",
+   "fr": "Fallen Empires"
+  },
+  "releaseDate": "1994-11-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 187,
+  "path": "assets/sets/mtg/FEM.json"
+ },
+ {
+  "code": "FIN",
+  "game": "mtg",
+  "names": {
+   "en": "Final Fantasy"
+  },
+  "releaseDate": "2025-06-13",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 748,
+  "path": "assets/sets/mtg/FIN.json"
+ },
+ {
+  "code": "FRA",
+  "game": "mtg",
+  "names": {
+   "en": "Reality Fracture"
+  },
+  "releaseDate": "2026-10-02",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 472,
+  "path": "assets/sets/mtg/FRA.json"
+ },
+ {
+  "code": "FRF",
+  "game": "mtg",
+  "names": {
+   "en": "Fate Reforged",
+   "fr": "Destin reforgé"
+  },
+  "releaseDate": "2015-01-23",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 196,
+  "path": "assets/sets/mtg/FRF.json"
+ },
+ {
+  "code": "FUT",
+  "game": "mtg",
+  "names": {
+   "en": "Future Sight",
+   "fr": "Vision de l'Avenir"
+  },
+  "releaseDate": "2007-05-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 180,
+  "path": "assets/sets/mtg/FUT.json"
+ },
+ {
+  "code": "GPT",
+  "game": "mtg",
+  "names": {
+   "en": "Guildpact",
+   "fr": "Le Pacte des Guildes"
+  },
+  "releaseDate": "2006-02-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/GPT.json"
+ },
+ {
+  "code": "GRN",
+  "game": "mtg",
+  "names": {
+   "en": "Guilds of Ravnica",
+   "fr": "Les Guildes de Ravnica"
+  },
+  "releaseDate": "2018-10-05",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 259,
+  "path": "assets/sets/mtg/GRN.json"
+ },
+ {
+  "code": "GTC",
+  "game": "mtg",
+  "names": {
+   "en": "Gatecrash",
+   "fr": "Insurrection"
+  },
+  "releaseDate": "2013-02-01",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 274,
+  "path": "assets/sets/mtg/GTC.json"
+ },
+ {
+  "code": "HML",
+  "game": "mtg",
+  "names": {
+   "en": "Homelands",
+   "fr": "Terres Natales"
+  },
+  "releaseDate": "1995-10-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 140,
+  "path": "assets/sets/mtg/HML.json"
+ },
+ {
+  "code": "HOB",
+  "game": "mtg",
+  "names": {
+   "en": "The Hobbit"
+  },
+  "releaseDate": "2026-08-14",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 418,
+  "path": "assets/sets/mtg/HOB.json"
+ },
+ {
+  "code": "HOU",
+  "game": "mtg",
+  "names": {
+   "en": "Hour of Devastation",
+   "fr": "L’âge de la destruction"
+  },
+  "releaseDate": "2017-07-14",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 223,
+  "path": "assets/sets/mtg/HOU.json"
+ },
+ {
+  "code": "ICE",
+  "game": "mtg",
+  "names": {
+   "en": "Ice Age",
+   "fr": "Ere Glaciaire"
+  },
+  "releaseDate": "1995-06-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 363,
+  "path": "assets/sets/mtg/ICE.json"
+ },
+ {
+  "code": "IKO",
+  "game": "mtg",
+  "names": {
+   "en": "Ikoria: Lair of Behemoths",
+   "fr": "Ikoria: Lair of Behemoths"
+  },
+  "releaseDate": "2020-04-24",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 449,
+  "path": "assets/sets/mtg/IKO.json"
+ },
+ {
+  "code": "IMA",
+  "game": "mtg",
+  "names": {
+   "en": "Iconic Masters",
+   "fr": "Iconic Masters"
+  },
+  "releaseDate": "2017-11-17",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/IMA.json"
+ },
+ {
+  "code": "INR",
+  "game": "mtg",
+  "names": {
+   "en": "Innistrad Remastered"
+  },
+  "releaseDate": "2025-01-24",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 491,
+  "path": "assets/sets/mtg/INR.json"
+ },
+ {
+  "code": "INV",
+  "game": "mtg",
+  "names": {
+   "en": "Invasion",
+   "fr": "Invasion"
+  },
+  "releaseDate": "2000-10-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 350,
+  "path": "assets/sets/mtg/INV.json"
+ },
+ {
+  "code": "ISD",
+  "game": "mtg",
+  "names": {
+   "en": "Innistrad",
+   "fr": "Innistrad"
+  },
+  "releaseDate": "2011-09-30",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 264,
+  "path": "assets/sets/mtg/ISD.json"
+ },
+ {
+  "code": "JOU",
+  "game": "mtg",
+  "names": {
+   "en": "Journey into Nyx",
+   "fr": "Incursion dans Nyx"
+  },
+  "releaseDate": "2014-05-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 195,
+  "path": "assets/sets/mtg/JOU.json"
+ },
+ {
+  "code": "JUD",
+  "game": "mtg",
+  "names": {
+   "en": "Judgment",
+   "fr": "Jugement"
+  },
+  "releaseDate": "2002-05-27",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/JUD.json"
+ },
+ {
+  "code": "KHM",
+  "game": "mtg",
+  "names": {
+   "en": "Kaldheim",
+   "fr": "Kaldheim"
+  },
+  "releaseDate": "2021-02-05",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 694,
+  "path": "assets/sets/mtg/KHM.json"
+ },
+ {
+  "code": "KLD",
+  "game": "mtg",
+  "names": {
+   "en": "Kaladesh",
+   "fr": "Kaladesh"
+  },
+  "releaseDate": "2016-09-30",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 294,
+  "path": "assets/sets/mtg/KLD.json"
+ },
+ {
+  "code": "KTK",
+  "game": "mtg",
+  "names": {
+   "en": "Khans of Tarkir",
+   "fr": "Les Khans de Tarkir"
+  },
+  "releaseDate": "2014-09-26",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 269,
+  "path": "assets/sets/mtg/KTK.json"
+ },
+ {
+  "code": "LCI",
+  "game": "mtg",
+  "names": {
+   "en": "The Lost Caverns of Ixalan"
+  },
+  "releaseDate": "2023-11-17",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 744,
+  "path": "assets/sets/mtg/LCI.json"
+ },
+ {
+  "code": "LEA",
+  "game": "mtg",
+  "names": {
+   "en": "Limited Edition Alpha"
+  },
+  "releaseDate": "1993-08-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 295,
+  "path": "assets/sets/mtg/LEA.json"
+ },
+ {
+  "code": "LEB",
+  "game": "mtg",
+  "names": {
+   "en": "Limited Edition Beta"
+  },
+  "releaseDate": "1993-10-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 302,
+  "path": "assets/sets/mtg/LEB.json"
+ },
+ {
+  "code": "LEG",
+  "game": "mtg",
+  "names": {
+   "en": "Legends",
+   "fr": "Legends"
+  },
+  "releaseDate": "1994-06-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 310,
+  "path": "assets/sets/mtg/LEG.json"
+ },
+ {
+  "code": "LGN",
+  "game": "mtg",
+  "names": {
+   "en": "Legions",
+   "fr": "Légions"
+  },
+  "releaseDate": "2003-02-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 145,
+  "path": "assets/sets/mtg/LGN.json"
+ },
+ {
+  "code": "LRW",
+  "game": "mtg",
+  "names": {
+   "en": "Lorwyn",
+   "fr": "Lorwyn"
+  },
+  "releaseDate": "2007-10-12",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 301,
+  "path": "assets/sets/mtg/LRW.json"
+ },
+ {
+  "code": "LTR",
+  "game": "mtg",
+  "names": {
+   "en": "The Lord of the Rings: Tales of Middle-earth",
+   "fr": "Le Seigneur des Anneaux : chroniques de la Terre du Milieu"
+  },
+  "releaseDate": "2023-06-23",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 886,
+  "path": "assets/sets/mtg/LTR.json"
+ },
+ {
+  "code": "M10",
+  "game": "mtg",
+  "names": {
+   "en": "Magic 2010",
+   "fr": "Magic 2010"
+  },
+  "releaseDate": "2009-07-17",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/M10.json"
+ },
+ {
+  "code": "M11",
+  "game": "mtg",
+  "names": {
+   "en": "Magic 2011",
+   "fr": "Magic 2011"
+  },
+  "releaseDate": "2010-07-16",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/M11.json"
+ },
+ {
+  "code": "M12",
+  "game": "mtg",
+  "names": {
+   "en": "Magic 2012",
+   "fr": "Magic 2012"
+  },
+  "releaseDate": "2011-07-15",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/M12.json"
+ },
+ {
+  "code": "M13",
+  "game": "mtg",
+  "names": {
+   "en": "Magic 2013",
+   "fr": "Magic 2013"
+  },
+  "releaseDate": "2012-07-13",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/M13.json"
+ },
+ {
+  "code": "M14",
+  "game": "mtg",
+  "names": {
+   "en": "Magic 2014",
+   "fr": "Magic 2014"
+  },
+  "releaseDate": "2013-07-19",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/M14.json"
+ },
+ {
+  "code": "M15",
+  "game": "mtg",
+  "names": {
+   "en": "Magic 2015",
+   "fr": "Magic 2015"
+  },
+  "releaseDate": "2014-07-18",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 269,
+  "path": "assets/sets/mtg/M15.json"
+ },
+ {
+  "code": "M19",
+  "game": "mtg",
+  "names": {
+   "en": "Core Set 2019"
+  },
+  "releaseDate": "2018-07-13",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 280,
+  "path": "assets/sets/mtg/M19.json"
+ },
+ {
+  "code": "M20",
+  "game": "mtg",
+  "names": {
+   "en": "Core Set 2020"
+  },
+  "releaseDate": "2019-07-12",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 280,
+  "path": "assets/sets/mtg/M20.json"
+ },
+ {
+  "code": "M21",
+  "game": "mtg",
+  "names": {
+   "en": "Core Set 2021"
+  },
+  "releaseDate": "2020-07-03",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 371,
+  "path": "assets/sets/mtg/M21.json"
+ },
+ {
+  "code": "MAT",
+  "game": "mtg",
+  "names": {
+   "en": "March of the Machine: The Aftermath",
+   "fr": "L'invasion des machines : le jour d'après"
+  },
+  "releaseDate": "2023-05-12",
+  "boosterTypes": [
+   "collector",
+   "standard"
+  ],
+  "cardCount": 228,
+  "path": "assets/sets/mtg/MAT.json"
+ },
+ {
+  "code": "MB1",
+  "game": "mtg",
+  "names": {
+   "en": "Mystery Booster",
+   "fr": "Mystery Booster"
+  },
+  "releaseDate": "2019-11-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 1815,
+  "path": "assets/sets/mtg/MB1.json"
+ },
+ {
+  "code": "MB2",
+  "game": "mtg",
+  "names": {
+   "en": "Mystery Booster 2"
+  },
+  "releaseDate": "2024-08-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 1836,
+  "path": "assets/sets/mtg/MB2.json"
+ },
+ {
+  "code": "MBC",
+  "game": "mtg",
+  "names": {
+   "en": "Mystery Booster Commander Edition"
+  },
+  "releaseDate": "2026-10-19",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 2346,
+  "path": "assets/sets/mtg/MBC.json"
+ },
+ {
+  "code": "MBS",
+  "game": "mtg",
+  "names": {
+   "en": "Mirrodin Besieged",
+   "fr": "Mirrodin assiégé"
+  },
+  "releaseDate": "2011-02-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 155,
+  "path": "assets/sets/mtg/MBS.json"
+ },
+ {
+  "code": "MH1",
+  "game": "mtg",
+  "names": {
+   "en": "Modern Horizons",
+   "fr": "Horizons du Modern"
+  },
+  "releaseDate": "2019-06-14",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 254,
+  "path": "assets/sets/mtg/MH1.json"
+ },
+ {
+  "code": "MH2",
+  "game": "mtg",
+  "names": {
+   "en": "Modern Horizons 2",
+   "fr": "Horizons du Modern 2"
+  },
+  "releaseDate": "2021-06-18",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 830,
+  "path": "assets/sets/mtg/MH2.json"
+ },
+ {
+  "code": "MH3",
+  "game": "mtg",
+  "names": {
+   "en": "Modern Horizons 3"
+  },
+  "releaseDate": "2024-06-14",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 611,
+  "path": "assets/sets/mtg/MH3.json"
+ },
+ {
+  "code": "MID",
+  "game": "mtg",
+  "names": {
+   "en": "Innistrad: Midnight Hunt",
+   "fr": "Innistrad : chasse de minuit"
+  },
+  "releaseDate": "2021-09-24",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 727,
+  "path": "assets/sets/mtg/MID.json"
+ },
+ {
+  "code": "MIR",
+  "game": "mtg",
+  "names": {
+   "en": "Mirage",
+   "fr": "Mirage"
+  },
+  "releaseDate": "1996-10-08",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 330,
+  "path": "assets/sets/mtg/MIR.json"
+ },
+ {
+  "code": "MKM",
+  "game": "mtg",
+  "names": {
+   "en": "Murders at Karlov Manor"
+  },
+  "releaseDate": "2024-02-09",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 528,
+  "path": "assets/sets/mtg/MKM.json"
+ },
+ {
+  "code": "MM2",
+  "game": "mtg",
+  "names": {
+   "en": "Modern Masters 2015",
+   "fr": "Modern Masters 2015"
+  },
+  "releaseDate": "2015-05-22",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/MM2.json"
+ },
+ {
+  "code": "MM3",
+  "game": "mtg",
+  "names": {
+   "en": "Modern Masters 2017",
+   "fr": "Modern Masters 2017"
+  },
+  "releaseDate": "2017-03-17",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/MM3.json"
+ },
+ {
+  "code": "MMA",
+  "game": "mtg",
+  "names": {
+   "en": "Modern Masters",
+   "fr": "Modern Masters"
+  },
+  "releaseDate": "2013-06-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 229,
+  "path": "assets/sets/mtg/MMA.json"
+ },
+ {
+  "code": "MMQ",
+  "game": "mtg",
+  "names": {
+   "en": "Mercadian Masques",
+   "fr": "Masques de Mercadia"
+  },
+  "releaseDate": "1999-10-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 350,
+  "path": "assets/sets/mtg/MMQ.json"
+ },
+ {
+  "code": "MOM",
+  "game": "mtg",
+  "names": {
+   "en": "March of the Machine",
+   "fr": "L'invasion des machines"
+  },
+  "releaseDate": "2023-04-21",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 1051,
+  "path": "assets/sets/mtg/MOM.json"
+ },
+ {
+  "code": "MOR",
+  "game": "mtg",
+  "names": {
+   "en": "Morningtide",
+   "fr": "Leveciel"
+  },
+  "releaseDate": "2008-02-01",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 150,
+  "path": "assets/sets/mtg/MOR.json"
+ },
+ {
+  "code": "MRD",
+  "game": "mtg",
+  "names": {
+   "en": "Mirrodin",
+   "fr": "Mirrodin"
+  },
+  "releaseDate": "2003-10-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 306,
+  "path": "assets/sets/mtg/MRD.json"
+ },
+ {
+  "code": "MSH",
+  "game": "mtg",
+  "names": {
+   "en": "Marvel Super Heroes"
+  },
+  "releaseDate": "2026-06-26",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 970,
+  "path": "assets/sets/mtg/MSH.json"
+ },
+ {
+  "code": "NEM",
+  "game": "mtg",
+  "names": {
+   "en": "Nemesis",
+   "fr": "Némésis"
+  },
+  "releaseDate": "2000-02-14",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/NEM.json"
+ },
+ {
+  "code": "NEO",
+  "game": "mtg",
+  "names": {
+   "en": "Kamigawa: Neon Dynasty",
+   "fr": "Kamigawa: La Dynastie Néon"
+  },
+  "releaseDate": "2022-02-18",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 852,
+  "path": "assets/sets/mtg/NEO.json"
+ },
+ {
+  "code": "NPH",
+  "game": "mtg",
+  "names": {
+   "en": "New Phyrexia",
+   "fr": "La Nouvelle Phyrexia"
+  },
+  "releaseDate": "2011-05-13",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 175,
+  "path": "assets/sets/mtg/NPH.json"
+ },
+ {
+  "code": "ODY",
+  "game": "mtg",
+  "names": {
+   "en": "Odyssey",
+   "fr": "Odyssée"
+  },
+  "releaseDate": "2001-10-01",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 350,
+  "path": "assets/sets/mtg/ODY.json"
+ },
+ {
+  "code": "OGW",
+  "game": "mtg",
+  "names": {
+   "en": "Oath of the Gatewatch",
+   "fr": "Le serment des Sentinelles"
+  },
+  "releaseDate": "2016-01-22",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 229,
+  "path": "assets/sets/mtg/OGW.json"
+ },
+ {
+  "code": "ONE",
+  "game": "mtg",
+  "names": {
+   "en": "Phyrexia: All Will Be One",
+   "fr": "Tous Phyrexians"
+  },
+  "releaseDate": "2023-02-10",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 692,
+  "path": "assets/sets/mtg/ONE.json"
+ },
+ {
+  "code": "ONS",
+  "game": "mtg",
+  "names": {
+   "en": "Onslaught",
+   "fr": "Carnage"
+  },
+  "releaseDate": "2002-10-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 351,
+  "path": "assets/sets/mtg/ONS.json"
+ },
+ {
+  "code": "ORI",
+  "game": "mtg",
+  "names": {
+   "en": "Magic Origins",
+   "fr": "Magic Origines"
+  },
+  "releaseDate": "2015-07-17",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 272,
+  "path": "assets/sets/mtg/ORI.json"
+ },
+ {
+  "code": "OTJ",
+  "game": "mtg",
+  "names": {
+   "en": "Outlaws of Thunder Junction"
+  },
+  "releaseDate": "2024-04-19",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 592,
+  "path": "assets/sets/mtg/OTJ.json"
+ },
+ {
+  "code": "PCY",
+  "game": "mtg",
+  "names": {
+   "en": "Prophecy",
+   "fr": "Prophétie"
+  },
+  "releaseDate": "2000-06-05",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/PCY.json"
+ },
+ {
+  "code": "PLC",
+  "game": "mtg",
+  "names": {
+   "en": "Planar Chaos",
+   "fr": "Chaos planaire"
+  },
+  "releaseDate": "2007-02-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/PLC.json"
+ },
+ {
+  "code": "PLS",
+  "game": "mtg",
+  "names": {
+   "en": "Planeshift",
+   "fr": "Planeshift"
+  },
+  "releaseDate": "2001-02-05",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 146,
+  "path": "assets/sets/mtg/PLS.json"
+ },
+ {
+  "code": "RAV",
+  "game": "mtg",
+  "names": {
+   "en": "Ravnica: City of Guilds",
+   "fr": "Ravnica: La Cité des Guildes"
+  },
+  "releaseDate": "2005-10-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 306,
+  "path": "assets/sets/mtg/RAV.json"
+ },
+ {
+  "code": "REN",
+  "game": "mtg",
+  "names": {
+   "en": "Renaissance",
+   "fr": "Renaissance"
+  },
+  "releaseDate": "1995-08-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 122,
+  "path": "assets/sets/mtg/REN.json"
+ },
+ {
+  "code": "RIN",
+  "game": "mtg",
+  "names": {
+   "en": "Rinascimento",
+   "fr": "Rinascimento"
+  },
+  "releaseDate": "1995-08-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 69,
+  "path": "assets/sets/mtg/RIN.json"
+ },
+ {
+  "code": "RIX",
+  "game": "mtg",
+  "names": {
+   "en": "Rivals of Ixalan",
+   "fr": "Les combattants d'Ixalan"
+  },
+  "releaseDate": "2018-01-19",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 196,
+  "path": "assets/sets/mtg/RIX.json"
+ },
+ {
+  "code": "RNA",
+  "game": "mtg",
+  "names": {
+   "en": "Ravnica Allegiance",
+   "fr": "L'allégeance de Ravnica"
+  },
+  "releaseDate": "2019-01-25",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 259,
+  "path": "assets/sets/mtg/RNA.json"
+ },
+ {
+  "code": "ROE",
+  "game": "mtg",
+  "names": {
+   "en": "Rise of the Eldrazi",
+   "fr": "L'ascension des Eldrazi"
+  },
+  "releaseDate": "2010-04-23",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 248,
+  "path": "assets/sets/mtg/ROE.json"
+ },
+ {
+  "code": "RTR",
+  "game": "mtg",
+  "names": {
+   "en": "Return to Ravnica",
+   "fr": "Retour à Ravnica"
+  },
+  "releaseDate": "2012-10-05",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 274,
+  "path": "assets/sets/mtg/RTR.json"
+ },
+ {
+  "code": "RVR",
+  "game": "mtg",
+  "names": {
+   "en": "Ravnica Remastered"
+  },
+  "releaseDate": "2024-01-12",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 530,
+  "path": "assets/sets/mtg/RVR.json"
+ },
+ {
+  "code": "SCG",
+  "game": "mtg",
+  "names": {
+   "en": "Scourge",
+   "fr": "Fléau"
+  },
+  "releaseDate": "2003-05-26",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/SCG.json"
+ },
+ {
+  "code": "SHM",
+  "game": "mtg",
+  "names": {
+   "en": "Shadowmoor",
+   "fr": "Sombrelande"
+  },
+  "releaseDate": "2008-05-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 302,
+  "path": "assets/sets/mtg/SHM.json"
+ },
+ {
+  "code": "SNC",
+  "game": "mtg",
+  "names": {
+   "en": "Streets of New Capenna",
+   "fr": "Les rues de la Nouvelle-Capenna"
+  },
+  "releaseDate": "2022-04-29",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 626,
+  "path": "assets/sets/mtg/SNC.json"
+ },
+ {
+  "code": "SOI",
+  "game": "mtg",
+  "names": {
+   "en": "Shadows over Innistrad",
+   "fr": "Ténèbres sur Innistrad"
+  },
+  "releaseDate": "2016-04-08",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 297,
+  "path": "assets/sets/mtg/SOI.json"
+ },
+ {
+  "code": "SOK",
+  "game": "mtg",
+  "names": {
+   "en": "Saviors of Kamigawa",
+   "fr": "Libérateurs de Kamigawa"
+  },
+  "releaseDate": "2005-06-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/SOK.json"
+ },
+ {
+  "code": "SOM",
+  "game": "mtg",
+  "names": {
+   "en": "Scars of Mirrodin",
+   "fr": "Cicatrices de Mirrodin"
+  },
+  "releaseDate": "2010-10-01",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/SOM.json"
+ },
+ {
+  "code": "SOS",
+  "game": "mtg",
+  "names": {
+   "en": "Secrets of Strixhaven"
+  },
+  "releaseDate": "2026-04-24",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 625,
+  "path": "assets/sets/mtg/SOS.json"
+ },
+ {
+  "code": "SPM",
+  "game": "mtg",
+  "names": {
+   "en": "Marvel's Spider-Man"
+  },
+  "releaseDate": "2025-09-26",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 349,
+  "path": "assets/sets/mtg/SPM.json"
+ },
+ {
+  "code": "STH",
+  "game": "mtg",
+  "names": {
+   "en": "Stronghold",
+   "fr": "Forteresse"
+  },
+  "releaseDate": "1998-03-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/STH.json"
+ },
+ {
+  "code": "STX",
+  "game": "mtg",
+  "names": {
+   "en": "Strixhaven: School of Mages",
+   "fr": "Strixhaven: l'Académie des Mages"
+  },
+  "releaseDate": "2021-04-23",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 881,
+  "path": "assets/sets/mtg/STX.json"
+ },
+ {
+  "code": "SUM",
+  "game": "mtg",
+  "names": {
+   "en": "Summer Magic / Edgar"
+  },
+  "releaseDate": "1994-06-21",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 306,
+  "path": "assets/sets/mtg/SUM.json"
+ },
+ {
+  "code": "TDM",
+  "game": "mtg",
+  "names": {
+   "en": "Tarkir: Dragonstorm"
+  },
+  "releaseDate": "2025-04-11",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 484,
+  "path": "assets/sets/mtg/TDM.json"
+ },
+ {
+  "code": "THB",
+  "game": "mtg",
+  "names": {
+   "en": "Theros Beyond Death",
+   "fr": "Theros Beyond Death"
+  },
+  "releaseDate": "2020-01-24",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 352,
+  "path": "assets/sets/mtg/THB.json"
+ },
+ {
+  "code": "THS",
+  "game": "mtg",
+  "names": {
+   "en": "Theros",
+   "fr": "Theros"
+  },
+  "releaseDate": "2013-09-27",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/THS.json"
+ },
+ {
+  "code": "TLA",
+  "game": "mtg",
+  "names": {
+   "en": "Avatar: The Last Airbender"
+  },
+  "releaseDate": "2025-11-21",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 656,
+  "path": "assets/sets/mtg/TLA.json"
+ },
+ {
+  "code": "TMP",
+  "game": "mtg",
+  "names": {
+   "en": "Tempest",
+   "fr": "Tempête"
+  },
+  "releaseDate": "1997-10-14",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 330,
+  "path": "assets/sets/mtg/TMP.json"
+ },
+ {
+  "code": "TMT",
+  "game": "mtg",
+  "names": {
+   "en": "Teenage Mutant Ninja Turtles"
+  },
+  "releaseDate": "2026-03-06",
+  "boosterTypes": [
+   "collector",
+   "play"
+  ],
+  "cardCount": 431,
+  "path": "assets/sets/mtg/TMT.json"
+ },
+ {
+  "code": "TOR",
+  "game": "mtg",
+  "names": {
+   "en": "Torment",
+   "fr": "Tourment"
+  },
+  "releaseDate": "2002-02-04",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/TOR.json"
+ },
+ {
+  "code": "TSP",
+  "game": "mtg",
+  "names": {
+   "en": "Time Spiral",
+   "fr": "Spirale Temporelle"
+  },
+  "releaseDate": "2006-10-06",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 422,
+  "path": "assets/sets/mtg/TSP.json"
+ },
+ {
+  "code": "TSR",
+  "game": "mtg",
+  "names": {
+   "en": "Time Spiral Remastered",
+   "fr": "Spirale Temporelle Remastered"
+  },
+  "releaseDate": "2021-03-19",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 410,
+  "path": "assets/sets/mtg/TSR.json"
+ },
+ {
+  "code": "UDS",
+  "game": "mtg",
+  "names": {
+   "en": "Urza's Destiny",
+   "fr": "Destinée d'Urza"
+  },
+  "releaseDate": "1999-06-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/UDS.json"
+ },
+ {
+  "code": "UGL",
+  "game": "mtg",
+  "names": {
+   "en": "Unglued",
+   "fr": "Unglued"
+  },
+  "releaseDate": "1998-08-11",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 88,
+  "path": "assets/sets/mtg/UGL.json"
+ },
+ {
+  "code": "ULG",
+  "game": "mtg",
+  "names": {
+   "en": "Urza's Legacy",
+   "fr": "Héritage d'Urza"
+  },
+  "releaseDate": "1999-02-15",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 143,
+  "path": "assets/sets/mtg/ULG.json"
+ },
+ {
+  "code": "UMA",
+  "game": "mtg",
+  "names": {
+   "en": "Ultimate Masters",
+   "fr": "Ultimate Masters"
+  },
+  "releaseDate": "2018-12-07",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 254,
+  "path": "assets/sets/mtg/UMA.json"
+ },
+ {
+  "code": "UNF",
+  "game": "mtg",
+  "names": {
+   "en": "Unfinity",
+   "fr": "Unfinity"
+  },
+  "releaseDate": "2022-10-07",
+  "boosterTypes": [
+   "collector",
+   "draft"
+  ],
+  "cardCount": 747,
+  "path": "assets/sets/mtg/UNF.json"
+ },
+ {
+  "code": "UNH",
+  "game": "mtg",
+  "names": {
+   "en": "Unhinged",
+   "fr": "Unhinged"
+  },
+  "releaseDate": "2004-11-19",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 168,
+  "path": "assets/sets/mtg/UNH.json"
+ },
+ {
+  "code": "USG",
+  "game": "mtg",
+  "names": {
+   "en": "Urza's Saga",
+   "fr": "Epopée d'Urza"
+  },
+  "releaseDate": "1998-10-12",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 330,
+  "path": "assets/sets/mtg/USG.json"
+ },
+ {
+  "code": "UST",
+  "game": "mtg",
+  "names": {
+   "en": "Unstable",
+   "fr": "Unstable"
+  },
+  "releaseDate": "2017-12-08",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 268,
+  "path": "assets/sets/mtg/UST.json"
+ },
+ {
+  "code": "VIS",
+  "game": "mtg",
+  "names": {
+   "en": "Visions",
+   "fr": "Visions"
+  },
+  "releaseDate": "1997-02-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 167,
+  "path": "assets/sets/mtg/VIS.json"
+ },
+ {
+  "code": "VOW",
+  "game": "mtg",
+  "names": {
+   "en": "Innistrad: Crimson Vow",
+   "fr": "Innistrad : noce écarlate"
+  },
+  "releaseDate": "2021-11-19",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 745,
+  "path": "assets/sets/mtg/VOW.json"
+ },
+ {
+  "code": "WAR",
+  "game": "mtg",
+  "names": {
+   "en": "War of the Spark",
+   "fr": "La guerre des Planeswalkers"
+  },
+  "releaseDate": "2019-05-03",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 264,
+  "path": "assets/sets/mtg/WAR.json"
+ },
+ {
+  "code": "WOE",
+  "game": "mtg",
+  "names": {
+   "en": "Wilds of Eldraine"
+  },
+  "releaseDate": "2023-09-08",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 718,
+  "path": "assets/sets/mtg/WOE.json"
+ },
+ {
+  "code": "WTH",
+  "game": "mtg",
+  "names": {
+   "en": "Weatherlight",
+   "fr": "Aquilon"
+  },
+  "releaseDate": "1997-06-09",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 167,
+  "path": "assets/sets/mtg/WTH.json"
+ },
+ {
+  "code": "WWK",
+  "game": "mtg",
+  "names": {
+   "en": "Worldwake",
+   "fr": "Worldwake"
+  },
+  "releaseDate": "2010-02-05",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 165,
+  "path": "assets/sets/mtg/WWK.json"
+ },
+ {
+  "code": "XLN",
+  "game": "mtg",
+  "names": {
+   "en": "Ixalan",
+   "fr": "Ixalan"
+  },
+  "releaseDate": "2017-09-29",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 279,
+  "path": "assets/sets/mtg/XLN.json"
+ },
+ {
+  "code": "ZEN",
+  "game": "mtg",
+  "names": {
+   "en": "Zendikar",
+   "fr": "Zendikar"
+  },
+  "releaseDate": "2009-10-02",
+  "boosterTypes": [
+   "draft"
+  ],
+  "cardCount": 249,
+  "path": "assets/sets/mtg/ZEN.json"
+ },
+ {
+  "code": "ZNR",
+  "game": "mtg",
+  "names": {
+   "en": "Zendikar Rising",
+   "fr": "Renaissance de Zendikar"
+  },
+  "releaseDate": "2020-09-25",
+  "boosterTypes": [
+   "collector",
+   "draft",
+   "set"
+  ],
+  "cardCount": 711,
+  "path": "assets/sets/mtg/ZNR.json"
+ },
+ {
+  "code": "25TH",
+  "prefix": "25TH",
+  "game": "ygo",
+  "names": {
+   "en": "Battle of Chaos",
+   "fr": "La Bataille du Chaos"
+  },
+  "releaseDate": "2022-02-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 102,
+  "path": "assets/sets/ygo/25TH.json"
+ },
+ {
+  "code": "ABPF",
+  "prefix": "ABPF",
+  "game": "ygo",
+  "names": {
+   "en": "Absolute Powerforce",
+   "fr": "Puissance Absolue"
+  },
+  "releaseDate": "2010-02-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/ABPF.json"
+ },
+ {
+  "code": "ABYR",
+  "prefix": "ABYR",
+  "game": "ygo",
+  "names": {
+   "en": "Abyss Rising",
+   "fr": "L’Ascension des Abysses"
+  },
+  "releaseDate": "2012-11-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/ABYR.json"
+ },
+ {
+  "code": "AGOV",
+  "prefix": "AGOV",
+  "game": "ygo",
+  "names": {
+   "en": "Age of Overlord",
+   "fr": "L'Ère du Seigneur Suprême"
+  },
+  "releaseDate": "2023-10-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/AGOV.json"
+ },
+ {
+  "code": "ALIN",
+  "prefix": "ALIN",
+  "game": "ygo",
+  "names": {
+   "en": "Alliance Insight",
+   "fr": "Intuition d'Alliance"
+  },
+  "releaseDate": "2025-05-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/ALIN.json"
+ },
+ {
+  "code": "AMDE",
+  "prefix": "AMDE",
+  "game": "ygo",
+  "names": {
+   "en": "Amazing Defenders",
+   "fr": "Incroyables Défenseurs"
+  },
+  "releaseDate": "2023-01-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/AMDE.json"
+ },
+ {
+  "code": "ANGU",
+  "prefix": "ANGU",
+  "game": "ygo",
+  "names": {
+   "en": "Ancient Guardians",
+   "fr": "Les Anciens Gardiens"
+  },
+  "releaseDate": "2021-05-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/ANGU.json"
+ },
+ {
+  "code": "ANPR",
+  "prefix": "ANPR",
+  "game": "ygo",
+  "names": {
+   "en": "Ancient Prophecy",
+   "fr": "Ancienne Prophétie"
+  },
+  "releaseDate": "2009-08-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/ANPR.json"
+ },
+ {
+  "code": "AP01",
+  "prefix": "AP01",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack One",
+   "fr": "Paquet Astral Un"
+  },
+  "releaseDate": "2012-11-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 25,
+  "path": "assets/sets/ygo/AP01.json"
+ },
+ {
+  "code": "AP02",
+  "prefix": "AP02",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack Two",
+   "fr": "Paquet Astral Deux"
+  },
+  "releaseDate": "2013-04-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 25,
+  "path": "assets/sets/ygo/AP02.json"
+ },
+ {
+  "code": "AP03",
+  "prefix": "AP03",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack Three",
+   "fr": "Paquet Astral Trois"
+  },
+  "releaseDate": "2013-09-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/AP03.json"
+ },
+ {
+  "code": "AP04",
+  "prefix": "AP04",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack Four",
+   "fr": "Paquet Astral Quatre"
+  },
+  "releaseDate": "2014-02-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/AP04.json"
+ },
+ {
+  "code": "AP05",
+  "prefix": "AP05",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack Five",
+   "fr": "Paquet Astral Cinq"
+  },
+  "releaseDate": "2014-07-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/AP05.json"
+ },
+ {
+  "code": "AP06",
+  "prefix": "AP06",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack Six",
+   "fr": "Paquet Astral Six"
+  },
+  "releaseDate": "2014-12-13",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 28,
+  "path": "assets/sets/ygo/AP06.json"
+ },
+ {
+  "code": "AP07",
+  "prefix": "AP07",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack Seven",
+   "fr": "Paquet Astral Sept"
+  },
+  "releaseDate": "2015-06-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/AP07.json"
+ },
+ {
+  "code": "AP08",
+  "prefix": "AP08",
+  "game": "ygo",
+  "names": {
+   "en": "Astral Pack Eight",
+   "fr": "Paquet Astral Huit"
+  },
+  "releaseDate": "2015-10-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/AP08.json"
+ },
+ {
+  "code": "AST",
+  "prefix": "AST",
+  "game": "ygo",
+  "names": {
+   "en": "Ancient Sanctuary",
+   "fr": "Sanctuaire Ancestra"
+  },
+  "releaseDate": "2004-06-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 112,
+  "path": "assets/sets/ygo/AST.json"
+ },
+ {
+  "code": "BLAR",
+  "prefix": "BLAR",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Armageddon",
+   "fr": "Batailles de Légende : Armageddon"
+  },
+  "releaseDate": "2020-07-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 94,
+  "path": "assets/sets/ygo/BLAR.json"
+ },
+ {
+  "code": "BLC1",
+  "prefix": "BLC1",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Chapter 1",
+   "fr": "Batailles de Légende : Chapitre 1"
+  },
+  "releaseDate": "2024-02-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 163,
+  "path": "assets/sets/ygo/BLC1.json"
+ },
+ {
+  "code": "BLCR",
+  "prefix": "BLCR",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Crystal Revenge",
+   "fr": "Batailles de Légende : la Vengeance du Cristal"
+  },
+  "releaseDate": "2022-11-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 105,
+  "path": "assets/sets/ygo/BLCR.json"
+ },
+ {
+  "code": "BLGG",
+  "prefix": "BLGG",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Glorious Gallery",
+   "fr": "Batailles de Légende: La Glorieuse Galerie"
+  },
+  "releaseDate": "2026-06-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 146,
+  "path": "assets/sets/ygo/BLGG.json"
+ },
+ {
+  "code": "BLHR",
+  "prefix": "BLHR",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Hero's Revenge",
+   "fr": "Batailles de Légende : La Vengeance du Héros"
+  },
+  "releaseDate": "2019-07-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 94,
+  "path": "assets/sets/ygo/BLHR.json"
+ },
+ {
+  "code": "BLLR",
+  "prefix": "BLLR",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Light's Revenge",
+   "fr": "Batailles de Légende : Vengeance de la Lumière"
+  },
+  "releaseDate": "2017-07-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 80,
+  "path": "assets/sets/ygo/BLLR.json"
+ },
+ {
+  "code": "BLMM",
+  "prefix": "BLMM",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Monster Mayhem",
+   "fr": "Batailles de Légende : le Tumulte des Monstres"
+  },
+  "releaseDate": "2025-08-28",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 177,
+  "path": "assets/sets/ygo/BLMM.json"
+ },
+ {
+  "code": "BLMR",
+  "prefix": "BLMR",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Monstrous Revenge",
+   "fr": "Batailles de Légende : la Vengeance Monstrueuse"
+  },
+  "releaseDate": "2023-06-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 104,
+  "path": "assets/sets/ygo/BLMR.json"
+ },
+ {
+  "code": "BLRR",
+  "prefix": "BLRR",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Relentless Revenge",
+   "fr": "Batailles de Légende : Vengeance Impitoyable"
+  },
+  "releaseDate": "2018-06-28",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 105,
+  "path": "assets/sets/ygo/BLRR.json"
+ },
+ {
+  "code": "BLTR",
+  "prefix": "BLTR",
+  "game": "ygo",
+  "names": {
+   "en": "Battles of Legend: Terminal Revenge",
+   "fr": "Batailles de Légende : la Vengeance du Terminal"
+  },
+  "releaseDate": "2024-06-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 118,
+  "path": "assets/sets/ygo/BLTR.json"
+ },
+ {
+  "code": "BLVO",
+  "prefix": "BLVO",
+  "game": "ygo",
+  "names": {
+   "en": "Blazing Vortex",
+   "fr": "Vortex Embrasé"
+  },
+  "releaseDate": "2021-02-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/BLVO.json"
+ },
+ {
+  "code": "BLZD",
+  "prefix": "BLZD",
+  "game": "ygo",
+  "names": {
+   "en": "Blazing Dominion",
+   "fr": "Territoire Embrasé"
+  },
+  "releaseDate": "2026-05-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/BLZD.json"
+ },
+ {
+  "code": "BODE",
+  "prefix": "BODE",
+  "game": "ygo",
+  "names": {
+   "en": "Burst of Destiny",
+   "fr": "Explosion de la Destinée"
+  },
+  "releaseDate": "2021-11-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/BODE.json"
+ },
+ {
+  "code": "BOSH",
+  "prefix": "BOSH",
+  "game": "ygo",
+  "names": {
+   "en": "Breakers of Shadow",
+   "fr": "Les Destructeurs de L'ombre"
+  },
+  "releaseDate": "2016-01-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/BOSH.json"
+ },
+ {
+  "code": "BP01",
+  "prefix": "BP01",
+  "game": "ygo",
+  "names": {
+   "en": "Battle Pack: Epic Dawn",
+   "fr": "Battle Pack: L’Aube Épique"
+  },
+  "releaseDate": "2012-05-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 220,
+  "path": "assets/sets/ygo/BP01.json"
+ },
+ {
+  "code": "BP02",
+  "prefix": "BP02",
+  "game": "ygo",
+  "names": {
+   "en": "Battle Pack 2: War of the Giants",
+   "fr": "Battle Pack 2: La Guerre des Géants"
+  },
+  "releaseDate": "2013-06-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 215,
+  "path": "assets/sets/ygo/BP02.json"
+ },
+ {
+  "code": "BP03",
+  "prefix": "BP03",
+  "game": "ygo",
+  "names": {
+   "en": "Battle Pack 3: Monster League",
+   "fr": "Battle Pack 3: La Ligue des Monstres"
+  },
+  "releaseDate": "2014-07-31",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 237,
+  "path": "assets/sets/ygo/BP03.json"
+ },
+ {
+  "code": "BPRO",
+  "prefix": "BPRO",
+  "game": "ygo",
+  "names": {
+   "en": "Burst Protocol",
+   "fr": "Protocole d'Explosion"
+  },
+  "releaseDate": "2026-02-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/BPRO.json"
+ },
+ {
+  "code": "BROL",
+  "prefix": "BROL",
+  "game": "ygo",
+  "names": {
+   "en": "Brothers of Legend",
+   "fr": "Frères de Légende"
+  },
+  "releaseDate": "2021-12-02",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 95,
+  "path": "assets/sets/ygo/BROL.json"
+ },
+ {
+  "code": "CBLZ",
+  "prefix": "CBLZ",
+  "game": "ygo",
+  "names": {
+   "en": "Cosmo Blazer",
+   "fr": "Le Feu du Cosmos"
+  },
+  "releaseDate": "2013-01-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CBLZ.json"
+ },
+ {
+  "code": "CDIP",
+  "prefix": "CDIP",
+  "game": "ygo",
+  "names": {
+   "en": "Cyberdark Impact",
+   "fr": "L'Impact des Cyberténèbres"
+  },
+  "releaseDate": "2006-11-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/CDIP.json"
+ },
+ {
+  "code": "CHIM",
+  "prefix": "CHIM",
+  "game": "ygo",
+  "names": {
+   "en": "Chaos Impact",
+   "fr": "Impact du Chaos"
+  },
+  "releaseDate": "2019-10-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CHIM.json"
+ },
+ {
+  "code": "CIBR",
+  "prefix": "CIBR",
+  "game": "ygo",
+  "names": {
+   "en": "Circuit Break",
+   "fr": "Le Coupe-Circuit"
+  },
+  "releaseDate": "2017-10-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CIBR.json"
+ },
+ {
+  "code": "CORE",
+  "prefix": "CORE",
+  "game": "ygo",
+  "names": {
+   "en": "Clash of Rebellions",
+   "fr": "Le Choc des Rébellions"
+  },
+  "releaseDate": "2015-08-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CORE.json"
+ },
+ {
+  "code": "CORI",
+  "prefix": "CORI",
+  "game": "ygo",
+  "names": {
+   "en": "Chaos Origins",
+   "fr": "Les Origines du Chaos"
+  },
+  "releaseDate": "2026-07-02",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 105,
+  "path": "assets/sets/ygo/CORI.json"
+ },
+ {
+  "code": "COTD",
+  "prefix": "COTD",
+  "game": "ygo",
+  "names": {
+   "en": "Code of the Duelist",
+   "fr": "Code des Duellistes"
+  },
+  "releaseDate": "2017-08-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/COTD.json"
+ },
+ {
+  "code": "CP01",
+  "prefix": "CP01",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game One",
+   "fr": "Paquet du Champion: 1éme Partie"
+  },
+  "releaseDate": "2006-11-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP01.json"
+ },
+ {
+  "code": "CP02",
+  "prefix": "CP02",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game Two",
+   "fr": "Paquet du Champion: 2éme Partie"
+  },
+  "releaseDate": "2007-02-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP02.json"
+ },
+ {
+  "code": "CP03",
+  "prefix": "CP03",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game Three",
+   "fr": "Paquet du Champion: 3éme Partie"
+  },
+  "releaseDate": "2007-05-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP03.json"
+ },
+ {
+  "code": "CP04",
+  "prefix": "CP04",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game Four",
+   "fr": "Paquet du Champion: 4éme Partie"
+  },
+  "releaseDate": "2007-09-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP04.json"
+ },
+ {
+  "code": "CP05",
+  "prefix": "CP05",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game Five",
+   "fr": "Paquet du Champion: 5éme Partie"
+  },
+  "releaseDate": "2008-01-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP05.json"
+ },
+ {
+  "code": "CP06",
+  "prefix": "CP06",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game Six",
+   "fr": "Paquet du Champion: 6éme Partie"
+  },
+  "releaseDate": "2008-05-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP06.json"
+ },
+ {
+  "code": "CP07",
+  "prefix": "CP07",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game Seven",
+   "fr": "Paquet du Champion: 7éme Partie"
+  },
+  "releaseDate": "2008-09-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP07.json"
+ },
+ {
+  "code": "CP08",
+  "prefix": "CP08",
+  "game": "ygo",
+  "names": {
+   "en": "Champion Pack: Game Eight",
+   "fr": "Paquet du Champion: 8éme Partie"
+  },
+  "releaseDate": "2009-01-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/CP08.json"
+ },
+ {
+  "code": "CRBR",
+  "prefix": "CRBR",
+  "game": "ygo",
+  "names": {
+   "en": "Crossover Breakers",
+   "fr": "Croisée Infernale"
+  },
+  "releaseDate": "2024-12-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/CRBR.json"
+ },
+ {
+  "code": "CRMS",
+  "prefix": "CRMS",
+  "game": "ygo",
+  "names": {
+   "en": "Crimson Crisis",
+   "fr": "La Crise Écarlate"
+  },
+  "releaseDate": "2009-03-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CRMS.json"
+ },
+ {
+  "code": "CROS",
+  "prefix": "CROS",
+  "game": "ygo",
+  "names": {
+   "en": "Crossed Souls",
+   "fr": "Les Âmes Croisées"
+  },
+  "releaseDate": "2015-05-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CROS.json"
+ },
+ {
+  "code": "CRV",
+  "prefix": "CRV",
+  "game": "ygo",
+  "names": {
+   "en": "Cybernetic Revolution",
+   "fr": "Révolution Cybernétique"
+  },
+  "releaseDate": "2005-08-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/CRV.json"
+ },
+ {
+  "code": "CSOC",
+  "prefix": "CSOC",
+  "game": "ygo",
+  "names": {
+   "en": "Crossroads of Chaos",
+   "fr": "La Croisée du Chaos"
+  },
+  "releaseDate": "2008-11-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CSOC.json"
+ },
+ {
+  "code": "CYAC",
+  "prefix": "CYAC",
+  "game": "ygo",
+  "names": {
+   "en": "Cyberstorm Access",
+   "fr": "Accès à la Cyber-Tempête"
+  },
+  "releaseDate": "2023-05-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/CYAC.json"
+ },
+ {
+  "code": "CYHO",
+  "prefix": "CYHO",
+  "game": "ygo",
+  "names": {
+   "en": "Cybernetic Horizon",
+   "fr": "Horizon Cybernétique"
+  },
+  "releaseDate": "2018-07-26",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/CYHO.json"
+ },
+ {
+  "code": "DABL",
+  "prefix": "DABL",
+  "game": "ygo",
+  "names": {
+   "en": "Darkwing Blast",
+   "fr": "Explosion del'aile des Ténèbres"
+  },
+  "releaseDate": "2022-10-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/DABL.json"
+ },
+ {
+  "code": "DAMA",
+  "prefix": "DAMA",
+  "game": "ygo",
+  "names": {
+   "en": "Dawn of Majesty",
+   "fr": "L'Aube de la Majesté"
+  },
+  "releaseDate": "2021-08-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/DAMA.json"
+ },
+ {
+  "code": "DANE",
+  "prefix": "DANE",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Neostorm",
+   "fr": "Néotempête des Ténèbres"
+  },
+  "releaseDate": "2019-05-02",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/DANE.json"
+ },
+ {
+  "code": "DASA",
+  "prefix": "DASA",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Saviors",
+   "fr": "Les Sauveurs des Ténèbres"
+  },
+  "releaseDate": "2018-05-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/DASA.json"
+ },
+ {
+  "code": "DB2",
+  "prefix": "DB2",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Beginning 2",
+   "fr": "Genèse Ténébreuse 2"
+  },
+  "releaseDate": "2005-07-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 250,
+  "path": "assets/sets/ygo/DB2.json"
+ },
+ {
+  "code": "DCR",
+  "prefix": "DCR",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Crisis (25th Anniversary Edition)",
+   "fr": "La Crise des Ténèbres (25e anniversaire)"
+  },
+  "releaseDate": "2023-04-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 106,
+  "path": "assets/sets/ygo/DCR.json"
+ },
+ {
+  "code": "DCR2",
+  "prefix": "DCR",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Crisis",
+   "fr": "La Crise des Ténèbres"
+  },
+  "releaseDate": "2007-12-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 106,
+  "path": "assets/sets/ygo/DCR2.json"
+ },
+ {
+  "code": "DESO",
+  "prefix": "DESO",
+  "game": "ygo",
+  "names": {
+   "en": "Destiny Soldiers",
+   "fr": "Les Soldats de la Destinée"
+  },
+  "releaseDate": "2016-11-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/DESO.json"
+ },
+ {
+  "code": "DIFO",
+  "prefix": "DIFO",
+  "game": "ygo",
+  "names": {
+   "en": "Dimension Force",
+   "fr": "Force Dimensionnelle"
+  },
+  "releaseDate": "2022-05-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/DIFO.json"
+ },
+ {
+  "code": "DOCS",
+  "prefix": "DOCS",
+  "game": "ygo",
+  "names": {
+   "en": "Dimension of Chaos",
+   "fr": "La Dimension du Chaos"
+  },
+  "releaseDate": "2015-11-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/DOCS.json"
+ },
+ {
+  "code": "DOOD",
+  "prefix": "DOOD",
+  "game": "ygo",
+  "names": {
+   "en": "Doom of Dimensions",
+   "fr": "Le Désastre des Dimensions"
+  },
+  "releaseDate": "2025-09-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/DOOD.json"
+ },
+ {
+  "code": "DP03",
+  "prefix": "DP03",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Jaden Yuki 2",
+   "fr": "Pack du Duelliste: Jaden Yuki 2"
+  },
+  "releaseDate": "2007-02-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP03.json"
+ },
+ {
+  "code": "DP04",
+  "prefix": "DP04",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Zane Truesdale",
+   "fr": "Pack du Duelliste: Zane Truesdale"
+  },
+  "releaseDate": "2007-03-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP04.json"
+ },
+ {
+  "code": "DP05",
+  "prefix": "DP05",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Aster Phoenix",
+   "fr": "Pack du Duelliste: Aster Phoenix"
+  },
+  "releaseDate": "2007-02-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP05.json"
+ },
+ {
+  "code": "DP06",
+  "prefix": "DP06",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Jaden Yuki 3",
+   "fr": "Pack du Duelliste: Jaden Yuki 3"
+  },
+  "releaseDate": "2008-01-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 25,
+  "path": "assets/sets/ygo/DP06.json"
+ },
+ {
+  "code": "DP07",
+  "prefix": "DP07",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Jesse Anderson",
+   "fr": "Pack du Duelliste: Jessie Anderson"
+  },
+  "releaseDate": "2008-01-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 25,
+  "path": "assets/sets/ygo/DP07.json"
+ },
+ {
+  "code": "DP08",
+  "prefix": "DP08",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Yusei",
+   "fr": "Pack du Duelliste: Yusei"
+  },
+  "releaseDate": "2009-02-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP08.json"
+ },
+ {
+  "code": "DP09",
+  "prefix": "DP09",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Yusei 2",
+   "fr": "Pack du Duelliste: Yusei 2"
+  },
+  "releaseDate": "2010-01-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP09.json"
+ },
+ {
+  "code": "DP1",
+  "prefix": "DP1",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Jaden Yuki",
+   "fr": "Pack du Duelliste: Jaden Yuki"
+  },
+  "releaseDate": "2006-02-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP1.json"
+ },
+ {
+  "code": "DP10",
+  "prefix": "DP10",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Yusei 3",
+   "fr": "Pack du Duelliste: Yusei 3"
+  },
+  "releaseDate": "2011-01-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP10.json"
+ },
+ {
+  "code": "DP11",
+  "prefix": "DP11",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Crow",
+   "fr": "Pack du Duelliste: Crow"
+  },
+  "releaseDate": "2011-05-26",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP11.json"
+ },
+ {
+  "code": "DP2",
+  "prefix": "DP2",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Chazz Princeton",
+   "fr": "Pack du Duelliste: Chazz Princeton"
+  },
+  "releaseDate": "2006-02-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DP2.json"
+ },
+ {
+  "code": "DPBC",
+  "prefix": "DPBC",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Battle City",
+   "fr": "Pack du Duelliste - Bataille-Ville"
+  },
+  "releaseDate": "2015-12-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 47,
+  "path": "assets/sets/ygo/DPBC.json"
+ },
+ {
+  "code": "DPDG",
+  "prefix": "DPDG",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Dimensional Guardians",
+   "fr": "Pack du Duelliste : Gardiens Dimensionnels"
+  },
+  "releaseDate": "2017-05-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 45,
+  "path": "assets/sets/ygo/DPDG.json"
+ },
+ {
+  "code": "DPKB",
+  "prefix": "DPKB",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Kaiba",
+   "fr": "Pack du Duelliste: Kaiba"
+  },
+  "releaseDate": "2010-04-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 40,
+  "path": "assets/sets/ygo/DPKB.json"
+ },
+ {
+  "code": "DPRP",
+  "prefix": "DPRP",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Rivals of the Pharaoh",
+   "fr": "Pack du Duelliste : les Rivaux du Pharaon"
+  },
+  "releaseDate": "2016-09-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 46,
+  "path": "assets/sets/ygo/DPRP.json"
+ },
+ {
+  "code": "DPYG",
+  "prefix": "DPYG",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Pack: Yugi",
+   "fr": "Pack du Duelliste: Yugi"
+  },
+  "releaseDate": "2009-07-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/DPYG.json"
+ },
+ {
+  "code": "DR1",
+  "prefix": "DR1",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Revelation Volume 1",
+   "fr": "Sombre Révélation 1"
+  },
+  "releaseDate": "2005-03-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 267,
+  "path": "assets/sets/ygo/DR1.json"
+ },
+ {
+  "code": "DR2",
+  "prefix": "DR2",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Revelation Volume 2",
+   "fr": "Sombre Révélation Volume 2"
+  },
+  "releaseDate": "2005-10-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 224,
+  "path": "assets/sets/ygo/DR2.json"
+ },
+ {
+  "code": "DR3",
+  "prefix": "DR3",
+  "game": "ygo",
+  "names": {
+   "en": "Dark Revelation Volume 3",
+   "fr": "Sombre Révélation Volume 3"
+  },
+  "releaseDate": "2006-11-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 240,
+  "path": "assets/sets/ygo/DR3.json"
+ },
+ {
+  "code": "DREV",
+  "prefix": "DREV",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Revolution",
+   "fr": "Révolution des Duellistes"
+  },
+  "releaseDate": "2010-08-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/DREV.json"
+ },
+ {
+  "code": "DRL2",
+  "prefix": "DRL2",
+  "game": "ygo",
+  "names": {
+   "en": "Dragons of Legend 2",
+   "fr": "Les Dragons de Légende 2"
+  },
+  "releaseDate": "2015-07-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 45,
+  "path": "assets/sets/ygo/DRL2.json"
+ },
+ {
+  "code": "DRL3",
+  "prefix": "DRL3",
+  "game": "ygo",
+  "names": {
+   "en": "Dragons of Legend: Unleashed",
+   "fr": "Le Déchaînement des Dragons de Légende"
+  },
+  "releaseDate": "2016-08-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 73,
+  "path": "assets/sets/ygo/DRL3.json"
+ },
+ {
+  "code": "DRLG",
+  "prefix": "DRLG",
+  "game": "ygo",
+  "names": {
+   "en": "Dragons of Legend",
+   "fr": "Les Dragons de Légende"
+  },
+  "releaseDate": "2014-04-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 51,
+  "path": "assets/sets/ygo/DRLG.json"
+ },
+ {
+  "code": "DUAD",
+  "prefix": "DUAD",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist's Advance",
+   "fr": "L'Évolution du Duelliste"
+  },
+  "releaseDate": "2025-07-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/DUAD.json"
+ },
+ {
+  "code": "DUEA",
+  "prefix": "DUEA",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Alliance",
+   "fr": "L'Alliance des Duellistes"
+  },
+  "releaseDate": "2014-08-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/DUEA.json"
+ },
+ {
+  "code": "DUNE",
+  "prefix": "DUNE",
+  "game": "ygo",
+  "names": {
+   "en": "Duelist Nexus",
+   "fr": "Nexus du Duelliste"
+  },
+  "releaseDate": "2023-07-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/DUNE.json"
+ },
+ {
+  "code": "EEN",
+  "prefix": "EEN",
+  "game": "ygo",
+  "names": {
+   "en": "Elemental Energy",
+   "fr": "Énergie Elémentaire"
+  },
+  "releaseDate": "2005-11-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/EEN.json"
+ },
+ {
+  "code": "EOJ",
+  "prefix": "EOJ",
+  "game": "ygo",
+  "names": {
+   "en": "Enemy of Justice",
+   "fr": "Ennemi du Bien"
+  },
+  "releaseDate": "2006-05-13",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/EOJ.json"
+ },
+ {
+  "code": "ETCO",
+  "prefix": "ETCO",
+  "game": "ygo",
+  "names": {
+   "en": "Eternity Code",
+   "fr": "Le Code de l'Éternité"
+  },
+  "releaseDate": "2020-04-30",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/ETCO.json"
+ },
+ {
+  "code": "EXFO",
+  "prefix": "EXFO",
+  "game": "ygo",
+  "names": {
+   "en": "Extreme Force",
+   "fr": "Force Extrême"
+  },
+  "releaseDate": "2018-02-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/EXFO.json"
+ },
+ {
+  "code": "EXVC",
+  "prefix": "EXVC",
+  "game": "ygo",
+  "names": {
+   "en": "Extreme Victory",
+   "fr": "Victoire Absolue"
+  },
+  "releaseDate": "2011-05-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/EXVC.json"
+ },
+ {
+  "code": "FET",
+  "prefix": "FET",
+  "game": "ygo",
+  "names": {
+   "en": "Flaming Eternity",
+   "fr": "Éternité Brûlante"
+  },
+  "releaseDate": "2005-03-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/FET.json"
+ },
+ {
+  "code": "FIGA",
+  "prefix": "FIGA",
+  "game": "ygo",
+  "names": {
+   "en": "Fists of the Gadgets",
+   "fr": "Les Poings Des Gadgets"
+  },
+  "releaseDate": "2019-08-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/FIGA.json"
+ },
+ {
+  "code": "FLOD",
+  "prefix": "FLOD",
+  "game": "ygo",
+  "names": {
+   "en": "Flames of Destruction",
+   "fr": "Les Flammes de la Destruction"
+  },
+  "releaseDate": "2018-05-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/FLOD.json"
+ },
+ {
+  "code": "FOTB",
+  "prefix": "FOTB",
+  "game": "ygo",
+  "names": {
+   "en": "Force of the Breaker",
+   "fr": "Force du Destructeur"
+  },
+  "releaseDate": "2007-05-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 69,
+  "path": "assets/sets/ygo/FOTB.json"
+ },
+ {
+  "code": "FUEN",
+  "prefix": "FUEN",
+  "game": "ygo",
+  "names": {
+   "en": "Fusion Enforcers",
+   "fr": "Les Executeurs Fusion"
+  },
+  "releaseDate": "2017-02-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/FUEN.json"
+ },
+ {
+  "code": "GAOV",
+  "prefix": "GAOV",
+  "game": "ygo",
+  "names": {
+   "en": "Galactic Overlord",
+   "fr": "Le Seigneur de la Galaxie"
+  },
+  "releaseDate": "2012-05-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/GAOV.json"
+ },
+ {
+  "code": "GEIM",
+  "prefix": "GEIM",
+  "game": "ygo",
+  "names": {
+   "en": "Genesis Impact",
+   "fr": "l'Impact de la Genèse"
+  },
+  "releaseDate": "2020-12-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/GEIM.json"
+ },
+ {
+  "code": "GENF",
+  "prefix": "GENF",
+  "game": "ygo",
+  "names": {
+   "en": "Generation Force",
+   "fr": "La Force des Générations"
+  },
+  "releaseDate": "2011-08-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/GENF.json"
+ },
+ {
+  "code": "GLAS",
+  "prefix": "GLAS",
+  "game": "ygo",
+  "names": {
+   "en": "Gladiator's Assault",
+   "fr": "L'Assaut du Gladiateur"
+  },
+  "releaseDate": "2007-11-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 95,
+  "path": "assets/sets/ygo/GLAS.json"
+ },
+ {
+  "code": "GLD1",
+  "prefix": "GLD1",
+  "game": "ygo",
+  "names": {
+   "en": "Gold Series",
+   "fr": "Collection Gold"
+  },
+  "releaseDate": "2008-04-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 45,
+  "path": "assets/sets/ygo/GLD1.json"
+ },
+ {
+  "code": "GLD2",
+  "prefix": "GLD2",
+  "game": "ygo",
+  "names": {
+   "en": "Gold Series 2009",
+   "fr": "Collection Gold 2009"
+  },
+  "releaseDate": "2009-06-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 50,
+  "path": "assets/sets/ygo/GLD2.json"
+ },
+ {
+  "code": "GLD3",
+  "prefix": "GLD3",
+  "game": "ygo",
+  "names": {
+   "en": "Gold Series 3",
+   "fr": "Collection Gold 3"
+  },
+  "releaseDate": "2010-06-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 50,
+  "path": "assets/sets/ygo/GLD3.json"
+ },
+ {
+  "code": "GLD4",
+  "prefix": "GLD4",
+  "game": "ygo",
+  "names": {
+   "en": "Gold Series 4: Pyramids Edition",
+   "fr": "Collection Gold 4: Édition Pyramides"
+  },
+  "releaseDate": "2011-06-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 50,
+  "path": "assets/sets/ygo/GLD4.json"
+ },
+ {
+  "code": "GLD5",
+  "prefix": "GLD5",
+  "game": "ygo",
+  "names": {
+   "en": "Gold Series: Haunted Mine",
+   "fr": "Collection Gold: La Mine Hantée"
+  },
+  "releaseDate": "2012-06-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 55,
+  "path": "assets/sets/ygo/GLD5.json"
+ },
+ {
+  "code": "GRCR",
+  "prefix": "GRCR",
+  "game": "ygo",
+  "names": {
+   "en": "The Grand Creators",
+   "fr": "Les Grands Créateurs"
+  },
+  "releaseDate": "2022-01-28",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/GRCR.json"
+ },
+ {
+  "code": "HA01",
+  "prefix": "HA01",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Arsenal",
+   "fr": "Arsenal Mystérieux"
+  },
+  "releaseDate": "2009-11-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/HA01.json"
+ },
+ {
+  "code": "HA02",
+  "prefix": "HA02",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Arsenal 2",
+   "fr": "Arsenal Mystérieux 2"
+  },
+  "releaseDate": "2010-07-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/HA02.json"
+ },
+ {
+  "code": "HA03",
+  "prefix": "HA03",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Arsenal 3",
+   "fr": "Arsenal Mystérieux 3"
+  },
+  "releaseDate": "2010-12-02",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/HA03.json"
+ },
+ {
+  "code": "HA04",
+  "prefix": "HA04",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Arsenal 4: Trishula's Triumph",
+   "fr": "Arsenal Mystérieux 4: Le Triomphe de Trishula"
+  },
+  "releaseDate": "2011-04-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/HA04.json"
+ },
+ {
+  "code": "HA05",
+  "prefix": "HA05",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Arsenal 5: Steelswarm Invasion",
+   "fr": "Arsenal Mystérieux 5: Invasion Colonie de Chrome"
+  },
+  "releaseDate": "2011-12-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/HA05.json"
+ },
+ {
+  "code": "HA06",
+  "prefix": "HA06",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Arsenal 6: Omega Xyz",
+   "fr": "Arsenal Mystérieux 6: Oméga Xyz"
+  },
+  "releaseDate": "2012-07-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/HA06.json"
+ },
+ {
+  "code": "HA07",
+  "prefix": "HA07",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Arsenal 7: Knight of Stars",
+   "fr": "Arsenal Mystérieux 7: Le Chevalier des Étoiles"
+  },
+  "releaseDate": "2013-04-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 70,
+  "path": "assets/sets/ygo/HA07.json"
+ },
+ {
+  "code": "HISU",
+  "prefix": "HISU",
+  "game": "ygo",
+  "names": {
+   "en": "Hidden Summoners",
+   "fr": "Les Invocateurs Cachés"
+  },
+  "releaseDate": "2018-11-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/HISU.json"
+ },
+ {
+  "code": "HSRD",
+  "prefix": "HSRD",
+  "game": "ygo",
+  "names": {
+   "en": "High-Speed Riders",
+   "fr": "Riders à Grande Vitesse"
+  },
+  "releaseDate": "2015-10-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/HSRD.json"
+ },
+ {
+  "code": "IGAS",
+  "prefix": "IGAS",
+  "game": "ygo",
+  "names": {
+   "en": "Ignition Assault",
+   "fr": "l'Assaut de l'Ignition"
+  },
+  "releaseDate": "2020-01-30",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/IGAS.json"
+ },
+ {
+  "code": "INCH",
+  "prefix": "INCH",
+  "game": "ygo",
+  "names": {
+   "en": "The Infinity Chasers",
+   "fr": "Les Chasseurs de l'Infini"
+  },
+  "releaseDate": "2019-03-21",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/INCH.json"
+ },
+ {
+  "code": "INFO",
+  "prefix": "INFO",
+  "game": "ygo",
+  "names": {
+   "en": "The Infinite Forbidden",
+   "fr": "L’Infini Interdit"
+  },
+  "releaseDate": "2024-07-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/INFO.json"
+ },
+ {
+  "code": "INOV",
+  "prefix": "INOV",
+  "game": "ygo",
+  "names": {
+   "en": "Invasion: Vengeance",
+   "fr": "Invasion : Vengeance"
+  },
+  "releaseDate": "2016-11-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/INOV.json"
+ },
+ {
+  "code": "IOC",
+  "prefix": "IOC",
+  "game": "ygo",
+  "names": {
+   "en": "Invasion of Chaos (25th Anniversary Edition)",
+   "fr": "L'Invasion des Tenebres (25e anniversaire)"
+  },
+  "releaseDate": "2023-04-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 112,
+  "path": "assets/sets/ygo/IOC.json"
+ },
+ {
+  "code": "IOC2",
+  "prefix": "IOC",
+  "game": "ygo",
+  "names": {
+   "en": "Invasion of Chaos",
+   "fr": "L'Invasion des Tenebres"
+  },
+  "releaseDate": "2007-06-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 112,
+  "path": "assets/sets/ygo/IOC2.json"
+ },
+ {
+  "code": "JOTL",
+  "prefix": "JOTL",
+  "game": "ygo",
+  "names": {
+   "en": "Judgment of the Light",
+   "fr": "Le Jugement de la Lumière"
+  },
+  "releaseDate": "2013-08-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/JOTL.json"
+ },
+ {
+  "code": "JUSH",
+  "prefix": "JUSH",
+  "game": "ygo",
+  "names": {
+   "en": "Justice Hunters",
+   "fr": "Les Chasseurs de Justice"
+  },
+  "releaseDate": "2025-07-31",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/JUSH.json"
+ },
+ {
+  "code": "KICO",
+  "prefix": "KICO",
+  "game": "ygo",
+  "names": {
+   "en": "King's Court",
+   "fr": "La Court du Roi"
+  },
+  "releaseDate": "2021-07-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 65,
+  "path": "assets/sets/ygo/KICO.json"
+ },
+ {
+  "code": "LC5D",
+  "prefix": "LC5D",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Collection 5D's Mega Pack",
+   "fr": "Collection Légendaire 5D's Méga Pack"
+  },
+  "releaseDate": "2014-10-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 151,
+  "path": "assets/sets/ygo/LC5D.json"
+ },
+ {
+  "code": "LCJW",
+  "prefix": "LCJW",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Collection 4: Joey's World Mega Pack",
+   "fr": "Collection Légendaire 4: Le Monde de Joey Méga Pack"
+  },
+  "releaseDate": "2013-10-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 298,
+  "path": "assets/sets/ygo/LCJW.json"
+ },
+ {
+  "code": "LCKC",
+  "prefix": "LCKC",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Collection Kaiba Mega Pack",
+   "fr": "Collection Légendaire Kaiba Méga-Pack"
+  },
+  "releaseDate": "2018-03-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 110,
+  "path": "assets/sets/ygo/LCKC.json"
+ },
+ {
+  "code": "LCYW",
+  "prefix": "LCYW",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Collection 3: Yugi's World Mega Pack",
+   "fr": "Collection Légendaire 3: Le Monde de Yugi Méga Pack"
+  },
+  "releaseDate": "2012-09-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 306,
+  "path": "assets/sets/ygo/LCYW.json"
+ },
+ {
+  "code": "LD10",
+  "prefix": "LD10",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Soulburning Volcano",
+   "fr": "Duellistes Légendaires : Volcan Brûleur d'Âmes"
+  },
+  "releaseDate": "2023-08-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 62,
+  "path": "assets/sets/ygo/LD10.json"
+ },
+ {
+  "code": "LDC",
+  "prefix": "LDC",
+  "game": "ygo",
+  "names": {
+   "en": "Labyrinth of Nightmare",
+   "fr": "Le Labyrinthe Des Cauchemars"
+  },
+  "releaseDate": "2003-03-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 105,
+  "path": "assets/sets/ygo/LDC.json"
+ },
+ {
+  "code": "LDD",
+  "prefix": "LDD",
+  "game": "ygo",
+  "names": {
+   "en": "Legend of Blue Eyes White Dragon",
+   "fr": "La Légende du Dragon Blanc aux Yeux Bleus"
+  },
+  "releaseDate": "2002-03-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 103,
+  "path": "assets/sets/ygo/LDD.json"
+ },
+ {
+  "code": "LED2",
+  "prefix": "LED2",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Ancient Millennium",
+   "fr": "Duellistes Légendaires : L'ancien Millenaire"
+  },
+  "releaseDate": "2018-02-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 53,
+  "path": "assets/sets/ygo/LED2.json"
+ },
+ {
+  "code": "LED3",
+  "prefix": "LED3",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: White Dragon Abyss",
+   "fr": "Duellistes Légendaires : Le Dragon Blanc des Abysses"
+  },
+  "releaseDate": "2018-09-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 56,
+  "path": "assets/sets/ygo/LED3.json"
+ },
+ {
+  "code": "LED4",
+  "prefix": "LED4",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Sisters of the Rose",
+   "fr": "Duellistes Légendaires: Les Sœurs de la Rose"
+  },
+  "releaseDate": "2019-01-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 56,
+  "path": "assets/sets/ygo/LED4.json"
+ },
+ {
+  "code": "LED5",
+  "prefix": "LED5",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Immortal Destiny",
+   "fr": "Duellistes Légendaires : Destinée Immortelle"
+  },
+  "releaseDate": "2019-09-26",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 58,
+  "path": "assets/sets/ygo/LED5.json"
+ },
+ {
+  "code": "LED6",
+  "prefix": "LED6",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Magical Hero",
+   "fr": "Duellistes Légendaires : Les Héros Magique"
+  },
+  "releaseDate": "2020-01-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 56,
+  "path": "assets/sets/ygo/LED6.json"
+ },
+ {
+  "code": "LED7",
+  "prefix": "LED7",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Rage of Ra",
+   "fr": "Duellistes Légendaires : La Rage de Râ"
+  },
+  "releaseDate": "2020-09-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 58,
+  "path": "assets/sets/ygo/LED7.json"
+ },
+ {
+  "code": "LED8",
+  "prefix": "LED8",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Synchro Storm",
+   "fr": "Duellistes Légendaires : Tempête Synchro"
+  },
+  "releaseDate": "2021-10-28",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 56,
+  "path": "assets/sets/ygo/LED8.json"
+ },
+ {
+  "code": "LED9",
+  "prefix": "LED9",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists: Duels from the Deep",
+   "fr": "Duellistes Légendaires : Duels des Profondeurs"
+  },
+  "releaseDate": "2022-06-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 57,
+  "path": "assets/sets/ygo/LED9.json"
+ },
+ {
+  "code": "LEDE",
+  "prefix": "LEDE",
+  "game": "ygo",
+  "names": {
+   "en": "Legacy of Destruction",
+   "fr": "Héritage de la Destruction"
+  },
+  "releaseDate": "2024-04-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/LEDE.json"
+ },
+ {
+  "code": "LEDU",
+  "prefix": "LEDU",
+  "game": "ygo",
+  "names": {
+   "en": "Legendary Duelists",
+   "fr": "Duellistes Legendaires"
+  },
+  "releaseDate": "2017-09-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 52,
+  "path": "assets/sets/ygo/LEDU.json"
+ },
+ {
+  "code": "LIOV",
+  "prefix": "LIOV",
+  "game": "ygo",
+  "names": {
+   "en": "Lightning Overdrive",
+   "fr": "Foudre Amplifiée"
+  },
+  "releaseDate": "2021-06-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/LIOV.json"
+ },
+ {
+  "code": "LOB",
+  "prefix": "LOB",
+  "game": "ygo",
+  "names": {
+   "en": "Legend of Blue Eyes White Dragon (25th Anniversary Edition)",
+   "fr": "La Légende du Dragon Blanc aux Yeux Bleus (25e anniversaire)"
+  },
+  "releaseDate": "2023-04-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 126,
+  "path": "assets/sets/ygo/LOB.json"
+ },
+ {
+  "code": "LODT",
+  "prefix": "LODT",
+  "game": "ygo",
+  "names": {
+   "en": "Light of Destruction",
+   "fr": "Lumière de la Destruction"
+  },
+  "releaseDate": "2008-05-13",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/LODT.json"
+ },
+ {
+  "code": "LTGY",
+  "prefix": "LTGY",
+  "game": "ygo",
+  "names": {
+   "en": "Lord of the Tachyon Galaxy",
+   "fr": "Le Seigneur de la Galaxie Tachyon"
+  },
+  "releaseDate": "2013-05-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/LTGY.json"
+ },
+ {
+  "code": "LVAL",
+  "prefix": "LVAL",
+  "game": "ygo",
+  "names": {
+   "en": "Legacy of the Valiant",
+   "fr": "L'Heritage des Braves"
+  },
+  "releaseDate": "2014-01-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/LVAL.json"
+ },
+ {
+  "code": "MACR",
+  "prefix": "MACR",
+  "game": "ygo",
+  "names": {
+   "en": "Maximum Crisis",
+   "fr": "La Crise Maximale"
+  },
+  "releaseDate": "2017-05-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/MACR.json"
+ },
+ {
+  "code": "MAGO",
+  "prefix": "MAGO",
+  "game": "ygo",
+  "names": {
+   "en": "Maximum Gold",
+   "fr": "Or Maximum"
+  },
+  "releaseDate": "2020-11-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 171,
+  "path": "assets/sets/ygo/MAGO.json"
+ },
+ {
+  "code": "MAZE",
+  "prefix": "MAZE",
+  "game": "ygo",
+  "names": {
+   "en": "Maze of Memories",
+   "fr": "Le Labyrinthe des Souvenirs"
+  },
+  "releaseDate": "2023-03-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 67,
+  "path": "assets/sets/ygo/MAZE.json"
+ },
+ {
+  "code": "MDM",
+  "prefix": "MDM",
+  "game": "ygo",
+  "names": {
+   "en": "Spell Ruler",
+   "fr": "Maître des Magies"
+  },
+  "releaseDate": "2002-09-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 131,
+  "path": "assets/sets/ygo/MDM.json"
+ },
+ {
+  "code": "MGED",
+  "prefix": "MGED",
+  "game": "ygo",
+  "names": {
+   "en": "Maximum Gold: El Dorado",
+   "fr": "Or Maximum: Eldorado"
+  },
+  "releaseDate": "2021-11-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 161,
+  "path": "assets/sets/ygo/MGED.json"
+ },
+ {
+  "code": "MIL1",
+  "prefix": "MIL1",
+  "game": "ygo",
+  "names": {
+   "en": "Millennium Pack",
+   "fr": "Pack du Millenium"
+  },
+  "releaseDate": "2016-04-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 48,
+  "path": "assets/sets/ygo/MIL1.json"
+ },
+ {
+  "code": "MP14",
+  "prefix": "MP14",
+  "game": "ygo",
+  "names": {
+   "en": "2014 Mega-Tin Mega Pack",
+   "fr": "2014 Méga-Boîte Méga-Pack"
+  },
+  "releaseDate": "2014-08-28",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 247,
+  "path": "assets/sets/ygo/MP14.json"
+ },
+ {
+  "code": "MP15",
+  "prefix": "MP15",
+  "game": "ygo",
+  "names": {
+   "en": "2015 Mega-Tin Mega Pack",
+   "fr": "2015 Méga-Boîte Méga-Pack"
+  },
+  "releaseDate": "2015-09-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 247,
+  "path": "assets/sets/ygo/MP15.json"
+ },
+ {
+  "code": "MP16",
+  "prefix": "MP16",
+  "game": "ygo",
+  "names": {
+   "en": "2016 Mega-Tin Mega Pack",
+   "fr": "2016 Méga-Boîte Méga-Pack"
+  },
+  "releaseDate": "2016-09-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 239,
+  "path": "assets/sets/ygo/MP16.json"
+ },
+ {
+  "code": "MP17",
+  "prefix": "MP17",
+  "game": "ygo",
+  "names": {
+   "en": "2017 Mega-Tin Mega Pack",
+   "fr": "2017 Méga-Boîte Méga-Pack"
+  },
+  "releaseDate": "2017-08-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 239,
+  "path": "assets/sets/ygo/MP17.json"
+ },
+ {
+  "code": "MP18",
+  "prefix": "MP18",
+  "game": "ygo",
+  "names": {
+   "en": "2018 Mega-Tin Mega Pack",
+   "fr": "2018 Méga-Boîtes Méga Pack"
+  },
+  "releaseDate": "2018-08-30",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 233,
+  "path": "assets/sets/ygo/MP18.json"
+ },
+ {
+  "code": "MP19",
+  "prefix": "MP19",
+  "game": "ygo",
+  "names": {
+   "en": "2019 Gold Sarcophagus Tin Mega Pack",
+   "fr": "Boîte Sarcophage Doré 2019 Méga Pack"
+  },
+  "releaseDate": "2019-08-29",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 96,
+  "path": "assets/sets/ygo/MP19.json"
+ },
+ {
+  "code": "MP23",
+  "prefix": "MP23",
+  "game": "ygo",
+  "names": {
+   "en": "25th Anniversary Tin: Dueling Heroes Mega Pack",
+   "fr": "Boîte du 25E Anniversaire : Les Héros du Duel Méga-Pack"
+  },
+  "releaseDate": "2023-09-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 283,
+  "path": "assets/sets/ygo/MP23.json"
+ },
+ {
+  "code": "MRD",
+  "prefix": "MRD",
+  "game": "ygo",
+  "names": {
+   "en": "Metal Raiders (25th Anniversary Edition)",
+   "fr": "Métal Raiders (25e anniversaire)"
+  },
+  "releaseDate": "2023-04-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 144,
+  "path": "assets/sets/ygo/MRD.json"
+ },
+ {
+  "code": "MRD2",
+  "prefix": "MRD",
+  "game": "ygo",
+  "names": {
+   "en": "Metal Raiders",
+   "fr": "Métal Raiders"
+  },
+  "releaseDate": "2002-06-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 144,
+  "path": "assets/sets/ygo/MRD2.json"
+ },
+ {
+  "code": "MZMI",
+  "prefix": "MZMI",
+  "game": "ygo",
+  "names": {
+   "en": "Maze of Millennia",
+   "fr": "Le Labyrinthe du Millénaire"
+  },
+  "releaseDate": "2024-01-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 85,
+  "path": "assets/sets/ygo/MZMI.json"
+ },
+ {
+  "code": "MZMU",
+  "prefix": "MZMU",
+  "game": "ygo",
+  "names": {
+   "en": "Maze of Muertos",
+   "fr": "Le Labyrinthe des Morts"
+  },
+  "releaseDate": "2026-02-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 127,
+  "path": "assets/sets/ygo/MZMU.json"
+ },
+ {
+  "code": "MZTM",
+  "prefix": "MZTM",
+  "game": "ygo",
+  "names": {
+   "en": "Maze of the Master",
+   "fr": "Le Labyrinthe du Maître"
+  },
+  "releaseDate": "2025-03-13",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 112,
+  "path": "assets/sets/ygo/MZTM.json"
+ },
+ {
+  "code": "NECH",
+  "prefix": "NECH",
+  "game": "ygo",
+  "names": {
+   "en": "The New Challengers",
+   "fr": "Les Nouveaux Challengers"
+  },
+  "releaseDate": "2014-11-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/NECH.json"
+ },
+ {
+  "code": "NUMH",
+  "prefix": "NUMH",
+  "game": "ygo",
+  "names": {
+   "en": "Number Hunters",
+   "fr": "Chasseurs de Numéros"
+  },
+  "releaseDate": "2013-07-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/NUMH.json"
+ },
+ {
+  "code": "OP01",
+  "prefix": "OP01",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 1",
+   "fr": "OTS Pack de Tournoi 1"
+  },
+  "releaseDate": "2016-03-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP01.json"
+ },
+ {
+  "code": "OP02",
+  "prefix": "OP02",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 2",
+   "fr": "OTS Pack de Tournoi 2"
+  },
+  "releaseDate": "2016-07-21",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP02.json"
+ },
+ {
+  "code": "OP03",
+  "prefix": "OP03",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 3",
+   "fr": "OTS Pack de Tournoi 3"
+  },
+  "releaseDate": "2016-11-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP03.json"
+ },
+ {
+  "code": "OP04",
+  "prefix": "OP04",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 4",
+   "fr": "OTS Pack de Tournoi 4"
+  },
+  "releaseDate": "2017-04-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP04.json"
+ },
+ {
+  "code": "OP05",
+  "prefix": "OP05",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 5",
+   "fr": "OTS Pack de Tournoi 5"
+  },
+  "releaseDate": "2017-08-03",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP05.json"
+ },
+ {
+  "code": "OP06",
+  "prefix": "OP06",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 6",
+   "fr": "OTS Pack de Tournoi 6"
+  },
+  "releaseDate": "2017-12-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP06.json"
+ },
+ {
+  "code": "OP07",
+  "prefix": "OP07",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 7",
+   "fr": "OTS Pack de Tournoi 7"
+  },
+  "releaseDate": "2018-04-13",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP07.json"
+ },
+ {
+  "code": "OP08",
+  "prefix": "OP08",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 8",
+   "fr": "OTS Pack de Tournoi 8"
+  },
+  "releaseDate": "2018-08-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP08.json"
+ },
+ {
+  "code": "OP09",
+  "prefix": "OP09",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 9",
+   "fr": "OTS Pack de Tournoi 9"
+  },
+  "releaseDate": "2018-12-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP09.json"
+ },
+ {
+  "code": "OP10",
+  "prefix": "OP10",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 10",
+   "fr": "OTS Pack de Tournoi 10"
+  },
+  "releaseDate": "2019-04-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP10.json"
+ },
+ {
+  "code": "OP11",
+  "prefix": "OP11",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 11",
+   "fr": "OTS Pack de Tournoi 11"
+  },
+  "releaseDate": "2019-08-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP11.json"
+ },
+ {
+  "code": "OP12",
+  "prefix": "OP12",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 12",
+   "fr": "OTS Pack de Tournoi 12"
+  },
+  "releaseDate": "2019-12-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP12.json"
+ },
+ {
+  "code": "OP13",
+  "prefix": "OP13",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 13",
+   "fr": "OTS Pack de Tournoi 13"
+  },
+  "releaseDate": "2020-06-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP13.json"
+ },
+ {
+  "code": "OP14",
+  "prefix": "OP14",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 14",
+   "fr": "OTS Pack de Tournoi 14"
+  },
+  "releaseDate": "2020-10-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP14.json"
+ },
+ {
+  "code": "OP15",
+  "prefix": "OP15",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 15",
+   "fr": "OTS Pack de Tournoi 15"
+  },
+  "releaseDate": "2021-02-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP15.json"
+ },
+ {
+  "code": "OP16",
+  "prefix": "OP16",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 16",
+   "fr": "OTS Pack de Tournoi 16"
+  },
+  "releaseDate": "2021-06-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP16.json"
+ },
+ {
+  "code": "OP17",
+  "prefix": "OP17",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 17",
+   "fr": "OTS Pack de Tournoi 17"
+  },
+  "releaseDate": "2021-10-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP17.json"
+ },
+ {
+  "code": "OP18",
+  "prefix": "OP18",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 18",
+   "fr": "OTS Pack de Tournoi 18"
+  },
+  "releaseDate": "2022-02-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 26,
+  "path": "assets/sets/ygo/OP18.json"
+ },
+ {
+  "code": "OP19",
+  "prefix": "OP19",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 19",
+   "fr": "OTS Pack de Tournoi 19"
+  },
+  "releaseDate": "2022-06-14",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 29,
+  "path": "assets/sets/ygo/OP19.json"
+ },
+ {
+  "code": "OP20",
+  "prefix": "OP20",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 20",
+   "fr": "OTS Pack de Tournoi 20"
+  },
+  "releaseDate": "2022-10-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP20.json"
+ },
+ {
+  "code": "OP21",
+  "prefix": "OP21",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 21",
+   "fr": "OTS Pack de Tournoi 21"
+  },
+  "releaseDate": "2023-02-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP21.json"
+ },
+ {
+  "code": "OP22",
+  "prefix": "OP22",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 22",
+   "fr": "OTS Pack de Tournoi 22"
+  },
+  "releaseDate": "2023-07-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP22.json"
+ },
+ {
+  "code": "OP23",
+  "prefix": "OP23",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 23",
+   "fr": "OTS Pack de Tournoi 23"
+  },
+  "releaseDate": "2023-10-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP23.json"
+ },
+ {
+  "code": "OP24",
+  "prefix": "OP24",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 24",
+   "fr": "OTS Pack de Tournoi 24"
+  },
+  "releaseDate": "2024-02-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP24.json"
+ },
+ {
+  "code": "OP242",
+  "prefix": "OP24",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 25",
+   "fr": "OTS Pack de Tournoi 25"
+  },
+  "releaseDate": "2024-06-13",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP242.json"
+ },
+ {
+  "code": "OP26",
+  "prefix": "OP26",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 26",
+   "fr": "OTS Pack de Tournoi 26"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/OP26.json"
+ },
+ {
+  "code": "OP27",
+  "prefix": "OP27",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 27",
+   "fr": "OTS Pack de Tournoi 27"
+  },
+  "releaseDate": "2025-02-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP27.json"
+ },
+ {
+  "code": "OP28",
+  "prefix": "OP28",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 28",
+   "fr": "OTS Pack de Tournoi 28"
+  },
+  "releaseDate": "2025-06-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP28.json"
+ },
+ {
+  "code": "OP30",
+  "prefix": "OP30",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Tournament Pack 30",
+   "fr": "OTS Pack de Tournoi 30"
+  },
+  "releaseDate": "2026-02-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 27,
+  "path": "assets/sets/ygo/OP30.json"
+ },
+ {
+  "code": "ORCS",
+  "prefix": "ORCS",
+  "game": "ygo",
+  "names": {
+   "en": "Order of Chaos",
+   "fr": "L'Ordre du Chaos"
+  },
+  "releaseDate": "2012-01-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/ORCS.json"
+ },
+ {
+  "code": "PEVO",
+  "prefix": "PEVO",
+  "game": "ygo",
+  "names": {
+   "en": "Pendulum Evolution",
+   "fr": "Évolution des Pendules"
+  },
+  "releaseDate": "2017-06-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/PEVO.json"
+ },
+ {
+  "code": "PGL2",
+  "prefix": "PGL2",
+  "game": "ygo",
+  "names": {
+   "en": "Premium Gold: Return of the Bling",
+   "fr": "Gold Premium 2"
+  },
+  "releaseDate": "2015-03-19",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 91,
+  "path": "assets/sets/ygo/PGL2.json"
+ },
+ {
+  "code": "PGL3",
+  "prefix": "PGL3",
+  "game": "ygo",
+  "names": {
+   "en": "Premium Gold: Infinite Gold",
+   "fr": "Gold Premium: Or Infini"
+  },
+  "releaseDate": "2016-03-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/PGL3.json"
+ },
+ {
+  "code": "PGLD",
+  "prefix": "PGLD",
+  "game": "ygo",
+  "names": {
+   "en": "Premium Gold",
+   "fr": "Gold Premium"
+  },
+  "releaseDate": "2014-03-27",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 90,
+  "path": "assets/sets/ygo/PGLD.json"
+ },
+ {
+  "code": "PHHY",
+  "prefix": "PHHY",
+  "game": "ygo",
+  "names": {
+   "en": "Photon Hypernova",
+   "fr": "Hypernova Photon"
+  },
+  "releaseDate": "2023-02-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/PHHY.json"
+ },
+ {
+  "code": "PHNI",
+  "prefix": "PHNI",
+  "game": "ygo",
+  "names": {
+   "en": "Phantom Nightmare",
+   "fr": "Cauchemar Fantôme"
+  },
+  "releaseDate": "2024-02-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/PHNI.json"
+ },
+ {
+  "code": "PHRA",
+  "prefix": "PHRA",
+  "game": "ygo",
+  "names": {
+   "en": "Phantom Rage",
+   "fr": "La Raje Fantôme"
+  },
+  "releaseDate": "2020-11-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/PHRA.json"
+ },
+ {
+  "code": "PHRE",
+  "prefix": "PHRE",
+  "game": "ygo",
+  "names": {
+   "en": "Phantom Revenge",
+   "fr": "La Vengeance Fantôme"
+  },
+  "releaseDate": "2025-12-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/PHRE.json"
+ },
+ {
+  "code": "PHSW",
+  "prefix": "PHSW",
+  "game": "ygo",
+  "names": {
+   "en": "Photon Shockwave",
+   "fr": "Onde de Choc du Photon"
+  },
+  "releaseDate": "2011-11-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/PHSW.json"
+ },
+ {
+  "code": "POTD",
+  "prefix": "POTD",
+  "game": "ygo",
+  "names": {
+   "en": "Power of the Duelist",
+   "fr": "Puissance du Duelliste"
+  },
+  "releaseDate": "2006-08-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/POTD.json"
+ },
+ {
+  "code": "POTE",
+  "prefix": "POTE",
+  "game": "ygo",
+  "names": {
+   "en": "Power of the Elements",
+   "fr": "Le Pouvoir des Éléments"
+  },
+  "releaseDate": "2022-08-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/POTE.json"
+ },
+ {
+  "code": "PRIO",
+  "prefix": "PRIO",
+  "game": "ygo",
+  "names": {
+   "en": "Primal Origin",
+   "fr": "Origine Primitive"
+  },
+  "releaseDate": "2014-05-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/PRIO.json"
+ },
+ {
+  "code": "PSV",
+  "prefix": "PSV",
+  "game": "ygo",
+  "names": {
+   "en": "Pharaoh's Servant (25th Anniversary Edition)",
+   "fr": "Serviteur du Pharaon (25e anniversaire)"
+  },
+  "releaseDate": "2023-04-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 105,
+  "path": "assets/sets/ygo/PSV.json"
+ },
+ {
+  "code": "PTDN",
+  "prefix": "PTDN",
+  "game": "ygo",
+  "names": {
+   "en": "Phantom Darkness",
+   "fr": "Ténèbres Fantômes"
+  },
+  "releaseDate": "2008-01-26",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/PTDN.json"
+ },
+ {
+  "code": "RA04",
+  "prefix": "RA04",
+  "game": "ygo",
+  "names": {
+   "en": "Quarter Century Stampede",
+   "fr": "La Stampede du Quart de Siècle"
+  },
+  "releaseDate": "2025-04-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 22,
+  "path": "assets/sets/ygo/RA04.json"
+ },
+ {
+  "code": "RA05",
+  "prefix": "RA05",
+  "game": "ygo",
+  "names": {
+   "en": "Rarity Collection 5",
+   "fr": "Collection Rareté 5"
+  },
+  "releaseDate": "2026-04-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 150,
+  "path": "assets/sets/ygo/RA05.json"
+ },
+ {
+  "code": "RATE",
+  "prefix": "RATE",
+  "game": "ygo",
+  "names": {
+   "en": "Raging Tempest",
+   "fr": "Tempête de Rage"
+  },
+  "releaseDate": "2017-02-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/RATE.json"
+ },
+ {
+  "code": "RDS",
+  "prefix": "RDS",
+  "game": "ygo",
+  "names": {
+   "en": "Rise of Destiny",
+   "fr": "Avènement du Destin"
+  },
+  "releaseDate": "2004-11-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/RDS.json"
+ },
+ {
+  "code": "REDU",
+  "prefix": "REDU",
+  "game": "ygo",
+  "names": {
+   "en": "Return of the Duelist",
+   "fr": "Le Retour du Duelliste"
+  },
+  "releaseDate": "2012-08-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/REDU.json"
+ },
+ {
+  "code": "RGBT",
+  "prefix": "RGBT",
+  "game": "ygo",
+  "names": {
+   "en": "Raging Battle",
+   "fr": "Rage des Guerriers"
+  },
+  "releaseDate": "2009-06-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/RGBT.json"
+ },
+ {
+  "code": "RIRA",
+  "prefix": "RIRA",
+  "game": "ygo",
+  "names": {
+   "en": "Rising Rampage",
+   "fr": "Le Soulèvement de la Fureur"
+  },
+  "releaseDate": "2019-07-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/RIRA.json"
+ },
+ {
+  "code": "ROTA",
+  "prefix": "ROTA",
+  "game": "ygo",
+  "names": {
+   "en": "Rage of the Abyss",
+   "fr": "La Rage des Abysses"
+  },
+  "releaseDate": "2024-10-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/ROTA.json"
+ },
+ {
+  "code": "ROTD",
+  "prefix": "ROTD",
+  "game": "ygo",
+  "names": {
+   "en": "Rise of the Duelist",
+   "fr": "l'Ascension du Duelliste"
+  },
+  "releaseDate": "2020-08-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/ROTD.json"
+ },
+ {
+  "code": "RP01",
+  "prefix": "RP01",
+  "game": "ygo",
+  "names": {
+   "en": "Retro Pack",
+   "fr": "Retro Pack"
+  },
+  "releaseDate": "2008-07-08",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 51,
+  "path": "assets/sets/ygo/RP01.json"
+ },
+ {
+  "code": "RP02",
+  "prefix": "RP02",
+  "game": "ygo",
+  "names": {
+   "en": "Retro Pack 2",
+   "fr": "Retro Pack 2"
+  },
+  "releaseDate": "2009-07-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/RP02.json"
+ },
+ {
+  "code": "RYMP",
+  "prefix": "RYMP",
+  "game": "ygo",
+  "names": {
+   "en": "Ra Yellow Mega Pack",
+   "fr": "Mega-Pack Jaune Ra"
+  },
+  "releaseDate": "2012-02-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 113,
+  "path": "assets/sets/ygo/RYMP.json"
+ },
+ {
+  "code": "SAST",
+  "prefix": "SAST",
+  "game": "ygo",
+  "names": {
+   "en": "Savage Strike",
+   "fr": "L'Attaque Sauvage"
+  },
+  "releaseDate": "2019-01-31",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/SAST.json"
+ },
+ {
+  "code": "SBAD",
+  "prefix": "SBAD",
+  "game": "ygo",
+  "names": {
+   "en": "Speed Duel: Attack from the Deep",
+   "fr": "Speed Duel : L'Assaut des Profondeurs"
+  },
+  "releaseDate": "2019-05-30",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 50,
+  "path": "assets/sets/ygo/SBAD.json"
+ },
+ {
+  "code": "SBTK",
+  "prefix": "SBTK",
+  "game": "ygo",
+  "names": {
+   "en": "Speed Duel: Trials of the Kingdom",
+   "fr": "Speed Duel : Les Épreuves du Royaume"
+  },
+  "releaseDate": "2019-12-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 51,
+  "path": "assets/sets/ygo/SBTK.json"
+ },
+ {
+  "code": "SDP",
+  "prefix": "SDP",
+  "game": "ygo",
+  "names": {
+   "en": "Pharaoh's Servant",
+   "fr": "Serviteur du Pharaon"
+  },
+  "releaseDate": "2002-10-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 105,
+  "path": "assets/sets/ygo/SDP.json"
+ },
+ {
+  "code": "SECE",
+  "prefix": "SECE",
+  "game": "ygo",
+  "names": {
+   "en": "Secrets of Eternity",
+   "fr": "Les Secrets de L'Eternite"
+  },
+  "releaseDate": "2015-01-15",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/SECE.json"
+ },
+ {
+  "code": "SESL",
+  "prefix": "SESL",
+  "game": "ygo",
+  "names": {
+   "en": "Secret Slayers",
+   "fr": "Les Pourfendeurs Secrets"
+  },
+  "releaseDate": "2020-04-02",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/SESL.json"
+ },
+ {
+  "code": "SHSP",
+  "prefix": "SHSP",
+  "game": "ygo",
+  "names": {
+   "en": "Shadow Specters",
+   "fr": "Spectres de l'Ombre"
+  },
+  "releaseDate": "2013-11-07",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/SHSP.json"
+ },
+ {
+  "code": "SHVA",
+  "prefix": "SHVA",
+  "game": "ygo",
+  "names": {
+   "en": "Shadows in Valhalla",
+   "fr": "Les Ombres au Walhalla"
+  },
+  "releaseDate": "2018-08-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/SHVA.json"
+ },
+ {
+  "code": "SHVI",
+  "prefix": "SHVI",
+  "game": "ygo",
+  "names": {
+   "en": "Shining Victories",
+   "fr": "Les Victoires Scintillantes"
+  },
+  "releaseDate": "2016-05-05",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/SHVI.json"
+ },
+ {
+  "code": "SOD",
+  "prefix": "SOD",
+  "game": "ygo",
+  "names": {
+   "en": "Soul of the Duelist",
+   "fr": "L'Ame du Duelliste"
+  },
+  "releaseDate": "2004-10-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/SOD.json"
+ },
+ {
+  "code": "SOFU",
+  "prefix": "SOFU",
+  "game": "ygo",
+  "names": {
+   "en": "Soul Fusion",
+   "fr": "La Fusion de L'ame"
+  },
+  "releaseDate": "2018-10-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/SOFU.json"
+ },
+ {
+  "code": "SOI",
+  "prefix": "SOI",
+  "game": "ygo",
+  "names": {
+   "en": "Shadow of Infinity",
+   "fr": "L'Ombre de l'Infini"
+  },
+  "releaseDate": "2006-02-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/SOI.json"
+ },
+ {
+  "code": "SOVR",
+  "prefix": "SOVR",
+  "game": "ygo",
+  "names": {
+   "en": "Stardust Overdrive",
+   "fr": "Pouvoir de la Poussière d'Etoile"
+  },
+  "releaseDate": "2009-11-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/SOVR.json"
+ },
+ {
+  "code": "SP13",
+  "prefix": "SP13",
+  "game": "ygo",
+  "names": {
+   "en": "Star Pack 2013",
+   "fr": "Pack Étoile 2013"
+  },
+  "releaseDate": "2013-02-28",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 50,
+  "path": "assets/sets/ygo/SP13.json"
+ },
+ {
+  "code": "SP15",
+  "prefix": "SP15",
+  "game": "ygo",
+  "names": {
+   "en": "Star Pack ARC-V",
+   "fr": "Pack Étoile ARC-V"
+  },
+  "releaseDate": "2015-06-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 50,
+  "path": "assets/sets/ygo/SP15.json"
+ },
+ {
+  "code": "SP18",
+  "prefix": "SP18",
+  "game": "ygo",
+  "names": {
+   "en": "Star Pack VRAINS",
+   "fr": "Pack Étoile VRAINS"
+  },
+  "releaseDate": "2018-03-29",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 50,
+  "path": "assets/sets/ygo/SP18.json"
+ },
+ {
+  "code": "SPWA",
+  "prefix": "SPWA",
+  "game": "ygo",
+  "names": {
+   "en": "Spirit Warriors",
+   "fr": "l'Esprit des Guerriers"
+  },
+  "releaseDate": "2017-11-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/SPWA.json"
+ },
+ {
+  "code": "SRL",
+  "prefix": "SRL",
+  "game": "ygo",
+  "names": {
+   "en": "Spell Ruler (25th Anniversary Edition)",
+   "fr": "Maître des Magies (25e anniversaire)"
+  },
+  "releaseDate": "2023-04-20",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 104,
+  "path": "assets/sets/ygo/SRL.json"
+ },
+ {
+  "code": "STBL",
+  "prefix": "STBL",
+  "game": "ygo",
+  "names": {
+   "en": "Starstrike Blast",
+   "fr": "Explosion des Etoiles"
+  },
+  "releaseDate": "2010-11-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/STBL.json"
+ },
+ {
+  "code": "STON",
+  "prefix": "STON",
+  "game": "ygo",
+  "names": {
+   "en": "Strike of Neos",
+   "fr": "L'Attaque de Néos"
+  },
+  "releaseDate": "2007-02-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 69,
+  "path": "assets/sets/ygo/STON.json"
+ },
+ {
+  "code": "STOR",
+  "prefix": "STOR",
+  "game": "ygo",
+  "names": {
+   "en": "Storm of Ragnarok",
+   "fr": "La Tempête de Ragnarök"
+  },
+  "releaseDate": "2011-02-10",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/STOR.json"
+ },
+ {
+  "code": "STP3",
+  "prefix": "STP3",
+  "game": "ygo",
+  "names": {
+   "en": "Speed Duel Tournament Pack 3",
+   "fr": "Pack de Tournoi Speed Duel 3"
+  },
+  "releaseDate": "2022-03-24",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 35,
+  "path": "assets/sets/ygo/STP3.json"
+ },
+ {
+  "code": "SUDA",
+  "prefix": "SUDA",
+  "game": "ygo",
+  "names": {
+   "en": "Supreme Darkness",
+   "fr": "Les Ténèbres Suprêmes"
+  },
+  "releaseDate": "2025-01-23",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 101,
+  "path": "assets/sets/ygo/SUDA.json"
+ },
+ {
+  "code": "TAEV",
+  "prefix": "TAEV",
+  "game": "ygo",
+  "names": {
+   "en": "Tactical Evolution",
+   "fr": "Évolution Tactique"
+  },
+  "releaseDate": "2007-08-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 90,
+  "path": "assets/sets/ygo/TAEV.json"
+ },
+ {
+  "code": "TAMA",
+  "prefix": "TAMA",
+  "game": "ygo",
+  "names": {
+   "en": "Tactical Masters",
+   "fr": "Les Maîtres Tactiques"
+  },
+  "releaseDate": "2022-08-25",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/TAMA.json"
+ },
+ {
+  "code": "TDGS",
+  "prefix": "TDGS",
+  "game": "ygo",
+  "names": {
+   "en": "The Duelist Genesis",
+   "fr": "La Genèse du Duelliste"
+  },
+  "releaseDate": "2008-09-02",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/TDGS.json"
+ },
+ {
+  "code": "TDIL",
+  "prefix": "TDIL",
+  "game": "ygo",
+  "names": {
+   "en": "The Dark Illusion",
+   "fr": "L'Illusion des Ténèbres"
+  },
+  "releaseDate": "2016-08-04",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/TDIL.json"
+ },
+ {
+  "code": "THSF",
+  "prefix": "THSF",
+  "game": "ygo",
+  "names": {
+   "en": "The Secret Forces",
+   "fr": "Les Forces Secrètes"
+  },
+  "releaseDate": "2015-02-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/THSF.json"
+ },
+ {
+  "code": "TLM",
+  "prefix": "TLM",
+  "game": "ygo",
+  "names": {
+   "en": "The Lost Millennium",
+   "fr": "Le Millenaire Perdu"
+  },
+  "releaseDate": "2005-06-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/TLM.json"
+ },
+ {
+  "code": "TOCH",
+  "prefix": "TOCH",
+  "game": "ygo",
+  "names": {
+   "en": "Toon Chaos",
+   "fr": "Le Chaos Toon"
+  },
+  "releaseDate": "2020-06-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/TOCH.json"
+ },
+ {
+  "code": "TP1",
+  "prefix": "TP1",
+  "game": "ygo",
+  "names": {
+   "en": "Tournament Pack: 1st Season",
+   "fr": "Pack de Tournoi: 1ère Saison"
+  },
+  "releaseDate": "2002-09-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/TP1.json"
+ },
+ {
+  "code": "TP2",
+  "prefix": "TP2",
+  "game": "ygo",
+  "names": {
+   "en": "Tournament Pack: 2nd Season",
+   "fr": "Pack De Tournoi 2"
+  },
+  "releaseDate": "2002-10-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 30,
+  "path": "assets/sets/ygo/TP2.json"
+ },
+ {
+  "code": "TP5",
+  "prefix": "TP5",
+  "game": "ygo",
+  "names": {
+   "en": "Tournament Pack 5",
+   "fr": "Pack de Tournoi 5"
+  },
+  "releaseDate": "2004-11-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/TP5.json"
+ },
+ {
+  "code": "TP6",
+  "prefix": "TP6",
+  "game": "ygo",
+  "names": {
+   "en": "Tournament Pack 6",
+   "fr": "Pack de Tournoi 6"
+  },
+  "releaseDate": "2005-06-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/TP6.json"
+ },
+ {
+  "code": "TP7",
+  "prefix": "TP7",
+  "game": "ygo",
+  "names": {
+   "en": "Tournament Pack 7",
+   "fr": "Pack de Tournoi 7"
+  },
+  "releaseDate": "2005-11-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/TP7.json"
+ },
+ {
+  "code": "TP8",
+  "prefix": "TP8",
+  "game": "ygo",
+  "names": {
+   "en": "Tournament Pack 8",
+   "fr": "Pack de Tournoi 8"
+  },
+  "releaseDate": "2006-04-28",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/TP8.json"
+ },
+ {
+  "code": "TSHD",
+  "prefix": "TSHD",
+  "game": "ygo",
+  "names": {
+   "en": "The Shining Darkness",
+   "fr": "Les Ténèbres Scintillantes"
+  },
+  "releaseDate": "2010-05-06",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 100,
+  "path": "assets/sets/ygo/TSHD.json"
+ },
+ {
+  "code": "TU01",
+  "prefix": "TU01",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster One",
+   "fr": "Paquet Turbo: Numéro Un"
+  },
+  "releaseDate": "2009-09-12",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU01.json"
+ },
+ {
+  "code": "TU02",
+  "prefix": "TU02",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster Two",
+   "fr": "Paquet Turbo: Numéro Deux"
+  },
+  "releaseDate": "2010-01-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU02.json"
+ },
+ {
+  "code": "TU03",
+  "prefix": "TU03",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster Three",
+   "fr": "Paquet Turbo: Numéro Trois"
+  },
+  "releaseDate": "2010-07-22",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU03.json"
+ },
+ {
+  "code": "TU04",
+  "prefix": "TU04",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster Four",
+   "fr": "Paquet Turbo: Numéro Quatre"
+  },
+  "releaseDate": "2010-11-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU04.json"
+ },
+ {
+  "code": "TU05",
+  "prefix": "TU05",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster Five",
+   "fr": "Paquet Turbo: Numéro Cinq"
+  },
+  "releaseDate": "2011-04-09",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU05.json"
+ },
+ {
+  "code": "TU06",
+  "prefix": "TU06",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster Six",
+   "fr": "Paquet Turbo: Numéro Six"
+  },
+  "releaseDate": "2011-08-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU06.json"
+ },
+ {
+  "code": "TU07",
+  "prefix": "TU07",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster Seven",
+   "fr": "Paquet Turbo: Numéro Sept"
+  },
+  "releaseDate": "2012-01-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU07.json"
+ },
+ {
+  "code": "TU08",
+  "prefix": "TU08",
+  "game": "ygo",
+  "names": {
+   "en": "Turbo Pack: Booster Eight",
+   "fr": "Paquet Turbo: Numéro Huit"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 21,
+  "path": "assets/sets/ygo/TU08.json"
+ },
+ {
+  "code": "UP01",
+  "prefix": "UP01",
+  "game": "ygo",
+  "names": {
+   "en": "OTS Ultimate Tournament Pack 1",
+   "fr": "Pack de Tournoi Ultime OTS 1"
+  },
+  "releaseDate": "2026-06-18",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 20,
+  "path": "assets/sets/ygo/UP01.json"
+ },
+ {
+  "code": "VASM",
+  "prefix": "VASM",
+  "game": "ygo",
+  "names": {
+   "en": "Valiant Smashers",
+   "fr": "Les Vaillants Fracasseurs"
+  },
+  "releaseDate": "2023-11-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/VASM.json"
+ },
+ {
+  "code": "WGRT",
+  "prefix": "WGRT",
+  "game": "ygo",
+  "names": {
+   "en": "War of the Giants Reinforcements",
+   "fr": "La Guerre des Géants Recommence"
+  },
+  "releaseDate": "2014-01-17",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 104,
+  "path": "assets/sets/ygo/WGRT.json"
+ },
+ {
+  "code": "WIRA",
+  "prefix": "WIRA",
+  "game": "ygo",
+  "names": {
+   "en": "Wing Raiders",
+   "fr": "Les Aventuriers Ailés"
+  },
+  "releaseDate": "2016-02-11",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/WIRA.json"
+ },
+ {
+  "code": "WISU",
+  "prefix": "WISU",
+  "game": "ygo",
+  "names": {
+   "en": "Wild Survivors",
+   "fr": "Les Survivants Sauvages"
+  },
+  "releaseDate": "2023-06-01",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 60,
+  "path": "assets/sets/ygo/WISU.json"
+ },
+ {
+  "code": "WSUP",
+  "prefix": "WSUP",
+  "game": "ygo",
+  "names": {
+   "en": "World Superstars",
+   "fr": "Les Superstars Mondiales"
+  },
+  "releaseDate": "2015-04-16",
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 52,
+  "path": "assets/sets/ygo/WSUP.json"
+ }
+]

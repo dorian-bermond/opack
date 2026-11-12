@@ -1,0 +1,471 @@
+{
+  "@@locale": "en",
+  "appTitle": "Opack",
+  "chooseGame": "Choose a game",
+  "chooseSet": "Choose a set",
+  "gameMtg": "Magic: The Gathering",
+  "gameYgo": "Yu-Gi-Oh!",
+  "language": "Language",
+  "languageSystem": "System",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "pictureLanguage": "Card pictures language",
+  "dataLanguage": "Card names and texts language",
+  "modeOpen": "Open a pack",
+  "modeSealed": "Sealed",
+  "modeDraft": "Draft",
+  "tapToOpen": "Tap the pack to open it",
+  "revealAll": "Reveal all",
+  "openAnother": "Open another",
+  "openingModeSetting": "Pack opening",
+  "openingGrid": "Grid: tap each card",
+  "openingSwipe": "Stack: swipe card by card",
+  "swipeToReveal": "Swipe the card away to see the next one",
+  "cardsLeft": "{count, plural, =1{1 card left} other{{count} cards left}}",
+  "@cardsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dealAgain": "Deal again",
+  "newPool": "New pool",
+  "sealedPool": "Sealed pool",
+  "cardsCount": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@cardsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "packsCount": "{count, plural, =1{1 pack} other{{count} packs}}",
+  "@packsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "draftHeader": "Round {round}/{rounds} · Pick {pick}",
+  "@draftHeader": {
+    "placeholders": {
+      "round": { "type": "int" },
+      "rounds": { "type": "int" },
+      "pick": { "type": "int" }
+    }
+  },
+  "draftDone": "Draft complete",
+  "yourPool": "Your pool",
+  "restart": "Restart",
+  "rarityCommon": "Common",
+  "rarityUncommon": "Uncommon",
+  "rarityRare": "Rare",
+  "rarityMythic": "Mythic rare",
+  "raritySuperRare": "Super rare",
+  "rarityUltraRare": "Ultra rare",
+  "raritySecretRare": "Secret rare",
+  "raritySpecial": "Special",
+  "foil": "Foil",
+  "searchSets": "Search a set",
+  "boosterPlay": "Play Booster",
+  "boosterDraft": "Draft Booster",
+  "boosterStandard": "Booster",
+  "boosterSet": "Set Booster",
+  "boosterCollector": "Collector Booster",
+  "tabSets": "Sets",
+  "tabCubes": "Cubes",
+  "importCubeCobra": "Import from CubeCobra",
+  "importCubeFile": "Import a list",
+  "cubeCobraIdLabel": "CubeCobra cube ID or link",
+  "noCubesMtg": "No cube yet. Import one from CubeCobra with its ID (e.g. \"vintage\"); it is then stored on this device and playable offline.",
+  "noCubesYgo": "No cube yet. Import a .ydk file or a text file with one card name per line (French or English).",
+  "cubeImported": "Cube \"{name}\" imported: {count} cards",
+  "@cubeImported": {
+    "placeholders": { "name": { "type": "String" }, "count": { "type": "int" } }
+  },
+  "unresolvedCards": "{count} lines not recognized: {examples}",
+  "@unresolvedCards": {
+    "placeholders": { "count": { "type": "int" }, "examples": { "type": "String" } }
+  },
+  "importFailed": "Import failed: {error}",
+  "@importFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "poolTooSmall": "This pool can deal {packs} packs of {packSize} cards; this mode needs {needed}. Give the limited cards more copies, or make some unlimited.",
+  "@poolTooSmall": {
+    "placeholders": {
+      "packs": { "type": "int" },
+      "packSize": { "type": "int" },
+      "needed": { "type": "int" }
+    }
+  },
+  "poolOpen": "Open",
+  "poolClosed": "Closed",
+  "poolCustom": "Custom",
+  "poolOpenDescription": "Preset: every card unlimited, as in sealed boosters",
+  "poolClosedDescription": "Preset: every card a set number of times, as in a cube. Each slot draws from the copies left, so the scarcest slot limits the packs",
+  "copiesPerCard": "{count} × each card",
+  "@copiesPerCard": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "editPool": "Edit",
+  "tabPools": "Pools",
+  "createPool": "Create a pool",
+  "noPools": "No pool yet. A pool is the card list you open packs, play sealed and draft from: start one empty, from a set or from a cube, then shape it in its editor.",
+  "poolEmpty": "Empty pool",
+  "poolFromSet": "From a set",
+  "poolFromCube": "From a cube",
+  "poolNoSources": "No cards yet",
+  "poolEmptyHint": "This pool has no cards yet. Edit it to add a set or a cube.",
+  "packsLeft": "{count, plural, =1{1 pack left} other{{count} packs left}}",
+  "@packsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "duplicatePool": "Duplicate",
+  "deletePool": "Delete pool",
+  "copyOf": "{name} (copy)",
+  "@copyOf": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "renamePool": "Rename",
+  "apply": "Apply",
+  "addSource": "Add a set or cube",
+  "poolSources": "Cards from",
+  "packLayout": "Pack layout",
+  "poolCopies": "Copies",
+  "randomPacks": "Random packs",
+  "cardsPerPack": "{count} cards per pack",
+  "@cardsPerPack": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "cardsUnplaced": "{count, plural, =1{1 card fits no slot} other{{count} cards fit no slot}}",
+  "@cardsUnplaced": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "presetDropsChanges": "{count, plural, =1{This preset resets the card you changed.} other{This preset resets the {count} cards you changed.}}",
+  "@presetDropsChanges": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "resetCards": "Reset every card to the preset",
+  "packsUnlimited": "Unlimited packs",
+  "packsAvailable": "{count, plural, =1{1 pack} other{{count} packs}} of {packSize} cards available",
+  "@packsAvailable": {
+    "placeholders": { "count": { "type": "int" }, "packSize": { "type": "int" } }
+  },
+  "cardsChanged": "{count, plural, =1{1 card changed} other{{count} cards changed}}",
+  "@cardsChanged": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "searchCards": "Search cards",
+  "listedTimes": "listed {count} ×",
+  "@listedTimes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "unlimitedCopies": "Unlimited copies",
+  "copiesCount": "{count, plural, =0{Left out} =1{1 copy} other{{count} copies}}",
+  "@copiesCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "deleteCube": "Delete cube",
+  "cancel": "Cancel",
+  "import": "Import",
+  "settings": "Settings",
+  "cardImagesSetting": "Card pictures",
+  "cardImagesOnline": "Download when online",
+  "sortBy": "Sort by",
+  "sortName": "Name",
+  "sortRarity": "Rarity",
+  "sortManaValue": "Mana value",
+  "sortColor": "Color",
+  "sortType": "Type",
+  "sortPower": "Power",
+  "sortToughness": "Toughness",
+  "sortCollector": "Collector number",
+  "sortLevel": "Level / Rank",
+  "sortAtk": "ATK",
+  "sortDef": "DEF",
+  "sortAttribute": "Attribute",
+  "sortRace": "Monster type",
+  "sortArchetype": "Archetype",
+  "filters": "Filters",
+  "clearFilters": "Clear filters",
+  "poolStats": "Statistics",
+  "cardsShown": "{shown} of {total} cards",
+  "@cardsShown": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "cardDataMissing": "{count, plural, =1{1 card without details} other{{count} cards without details}}",
+  "@cardDataMissing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fetchCardData": "Download card details",
+  "fetchingCardData": "Downloading card details…",
+  "fetchCardDataFailed": "Download failed. Check the connection and try again.",
+  "averageValue": "Average {value}",
+  "@averageValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "highestValue": "Highest {value}",
+  "@highestValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "knownOf": "{count, plural, =1{1 card with a value} other{{count} cards with a value}}",
+  "@knownOf": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "facetRarity": "Rarity",
+  "facetColor": "Color",
+  "facetColorIdentity": "Color identity",
+  "facetType": "Type",
+  "facetSubtype": "Subtype",
+  "facetKeyword": "Keyword",
+  "facetManaValue": "Mana value",
+  "facetSet": "Set",
+  "facetKind": "Card kind",
+  "facetCategory": "Monster category",
+  "facetAttribute": "Attribute",
+  "facetRace": "Monster type",
+  "facetProperty": "Spell / Trap property",
+  "facetArchetype": "Archetype",
+  "facetLevel": "Level / Rank",
+  "facetLinkRating": "Link rating",
+  "facetAtk": "ATK",
+  "facetDef": "DEF",
+  "metricManaCurve": "Mana curve",
+  "metricColors": "Colors",
+  "metricColorIdentity": "Color identity",
+  "metricColorCount": "Mono, multi, colorless",
+  "metricDevotion": "Devotion (colored mana symbols)",
+  "metricTypes": "Card types",
+  "metricSubtypes": "Top subtypes",
+  "metricKeywords": "Top keywords",
+  "metricCreatureSize": "Creature sizes (power/toughness)",
+  "metricRarity": "Rarity",
+  "metricFoil": "Foil",
+  "metricSets": "Sets",
+  "metricKind": "Monsters, Spells, Traps",
+  "metricCategories": "Monster categories",
+  "metricLevels": "Levels",
+  "metricRanks": "Ranks",
+  "metricLinkRatings": "Link ratings",
+  "metricAttributes": "Attributes",
+  "metricRaces": "Monster types",
+  "metricAtk": "ATK",
+  "metricDef": "DEF",
+  "metricArchetypes": "Top archetypes",
+  "metricProperties": "Spell and Trap properties",
+  "colorWhite": "White",
+  "colorBlue": "Blue",
+  "colorBlack": "Black",
+  "colorRed": "Red",
+  "colorGreen": "Green",
+  "colorless": "Colorless",
+  "monoColored": "Monocolored",
+  "multiColored": "Multicolored",
+  "kindMonster": "Monster",
+  "kindSpell": "Spell",
+  "kindTrap": "Trap",
+  "noArchetype": "No archetype",
+  "nonFoil": "Non-foil",
+  "addCards": "Add cards",
+  "pickedCards": "{count, plural, =1{1 picked card} other{{count} picked cards}}",
+  "@pickedCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchOnline": "Search cards online",
+  "searchHint": "Name or text",
+  "searchButton": "Search",
+  "noResults": "No card found.",
+  "moreResults": "More results exist: refine the search.",
+  "selectedCount": "{count, plural, =0{Nothing selected} =1{1 selected} other{{count} selected}}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addSelected": "Add to the pool",
+  "searchFailed": "Search failed: {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "viewList": "List",
+  "viewGallery": "Gallery",
+  "viewStacks": "Stacks",
+  "viewSpoiler": "Spoiler",
+  "facetTag": "Tag",
+  "metricTags": "Tags",
+  "allCards": "All cards",
+  "boosterComposition": "Booster composition",
+  "slotRow": "{count} × {tag}",
+  "@slotRow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "slotCards": "{count, plural, =0{no card} =1{1 card} other{{count} cards}}",
+  "@slotCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "slotLocked": "Set slot",
+  "addSlot": "Add a slot",
+  "slotPullsFrom": "Pull from",
+  "slotCount": "Cards per pack",
+  "poolTags": "Tags",
+  "newTag": "New tag",
+  "tagName": "Tag name",
+  "deleteTag": "Delete tag",
+  "tagCardsAction": "Tag cards",
+  "taggingTitle": "Tagging: {tag}",
+  "@taggingTitle": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "taggingHint": "Tap cards to toggle the tag. Green: added, red: removed, blue: kept, grey: not tagged.",
+  "cardTags": "Tags of this card",
+  "noTags": "No tag yet. Tags group cards for your own booster slots.",
+  "userSlots": "Your slots",
+  "noUserSlots": "No slot of yours yet. A slot pulls cards from one or more tags, each with its chance.",
+  "editSlot": "Edit slot",
+  "deleteSlot": "Delete slot",
+  "slotOptions": "Pull from (by chance)",
+  "addOption": "Add an option",
+  "editComposition": "Edit composition",
+  "groupBy": "Group by",
+  "groupNone": "No grouping",
+  "thenBy": "Then by",
+  "setTags": "Layout tags",
+  "resetTag": "Reset to the layout",
+  "noTagGroup": "Without tag",
+  "deleteTagTitle": "Delete the tag {tag}?",
+  "@deleteTagTitle": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteTagAffects": "These booster slots pull from it and will change:",
+  "prefillFrom": "Prefill again",
+  "prefillHint": "Replaces every tag and slot with a set's booster or random packs. Your own tags and slots are lost.",
+  "prefillTitle": "Replace tags and slots?",
+  "prefillWarning": "The pool gets {slots} slots and {tags} tags from this prefill; the current ones are discarded.",
+  "@prefillWarning": {
+    "placeholders": {
+      "slots": {
+        "type": "int"
+      },
+      "tags": {
+        "type": "int"
+      }
+    }
+  },
+  "formats": "Formats",
+  "editFormats": "Formats",
+  "newFormat": "New format",
+  "formatName": "Format name",
+  "formatKind": "Played as",
+  "deleteFormat": "Delete format",
+  "chooseFormat": "Choose a format",
+  "rounds": "Packs, in order",
+  "addRound": "Add a pack",
+  "roundNumber": "Pack {number}",
+  "@roundNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "picksPerPass": "Picks per pass",
+  "burnPerPass": "Burn per pass",
+  "seats": "Players",
+  "boosterKind": "Booster",
+  "boosterKinds": "Boosters",
+  "newBooster": "New booster",
+  "boosterName": "Booster name",
+  "deleteBooster": "Delete booster",
+  "pickPhase": "{count, plural, =1{Pick 1 card} other{Pick {count} cards}}",
+  "@pickPhase": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "burnPhase": "{count, plural, =1{Burn 1 card} other{Burn {count} cards}}",
+  "@burnPhase": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "formatSummary": "{kind} · {packs, plural, =1{1 pack} other{{packs} packs}}",
+  "@formatSummary": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "packs": {
+        "type": "int"
+      }
+    }
+  },
+  "cardTextSetting": "Card text",
+  "textModePrinted": "As printed in the set",
+  "textModeLatest": "Latest version (errata)",
+  "noCardText": "No card text available.",
+  "textVersionsCount": "{count} versions — tap one to use it for this card",
+  "@textVersionsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "textVersionNumber": "Version {number}",
+  "@textVersionNumber": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "textVersionLatest": "Latest",
+  "useDefaultVersion": "Use default"
+}
