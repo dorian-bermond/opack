@@ -20,7 +20,7 @@
   "openingModeSetting": "Pack opening",
   "openingGrid": "Grid: tap each card",
   "openingSwipe": "Stack: swipe card by card",
-  "swipeToReveal": "Swipe the card away to see the next one",
+  "swipeToReveal": "Tap or swipe the card away to see the next one",
   "cardsLeft": "{count, plural, =1{1 card left} other{{count} cards left}}",
   "@cardsLeft": {
     "placeholders": {

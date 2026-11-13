@@ -94,7 +94,11 @@ class _PackStackState extends State<PackStack> with SingleTickerProviderStateMix
                                 key: ValueKey('stackTop$_top'),
                                 onPanUpdate: (d) => setState(() => _drag += d.delta),
                                 onPanEnd: (d) => _release(d, constraints.maxWidth),
-                                child: CardTile(card: cards[_top]),
+                                child: CardTile(
+                                  card: cards[_top],
+                                  // A tap flies the card off like a swipe to the right.
+                                  onTap: _flyOut.isAnimating ? null : _flyOut.forward,
+                                ),
                               ),
                             ),
                           ),

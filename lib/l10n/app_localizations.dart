@@ -221,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @swipeToReveal.
   ///
   /// In en, this message translates to:
-  /// **'Swipe the card away to see the next one'**
+  /// **'Tap or swipe the card away to see the next one'**
   String get swipeToReveal;
 
   /// No description provided for @cardsLeft.

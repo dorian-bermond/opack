@@ -70,7 +70,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openingSwipe => 'Stack: swipe card by card';
 
   @override
-  String get swipeToReveal => 'Swipe the card away to see the next one';
+  String get swipeToReveal => 'Tap or swipe the card away to see the next one';
 
   @override
   String cardsLeft(int count) {

@@ -20,7 +20,7 @@
   "openingModeSetting": "Ouverture des boosters",
   "openingGrid": "Grille : touchez chaque carte",
   "openingSwipe": "Pile : glissez carte par carte",
-  "swipeToReveal": "Glissez la carte pour voir la suivante",
+  "swipeToReveal": "Touchez ou glissez la carte pour voir la suivante",
   "cardsLeft": "{count, plural, =1{1 carte restante} other{{count} cartes restantes}}",
   "@cardsLeft": {
     "placeholders": {

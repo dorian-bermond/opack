@@ -70,7 +70,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openingSwipe => 'Pile : glissez carte par carte';
 
   @override
-  String get swipeToReveal => 'Glissez la carte pour voir la suivante';
+  String get swipeToReveal =>
+      'Touchez ou glissez la carte pour voir la suivante';
 
   @override
   String cardsLeft(int count) {

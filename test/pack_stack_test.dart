@@ -34,7 +34,7 @@ Future<Widget> _app(Widget child) async {
 }
 
 void main() {
-  testWidgets('swiping the top card away uncovers the next, then the grid', (tester) async {
+  testWidgets('swiping or tapping the top card away uncovers the next, then the grid', (tester) async {
     await tester.pumpWidget(await _app(const PackStack(cards: _cards)));
     expect(find.text('3 cards left'), findsOneWidget);
 
@@ -48,9 +48,11 @@ void main() {
     expect(find.text('2 cards left'), findsOneWidget);
     expect(find.byKey(const ValueKey('stackTop1')), findsOneWidget);
 
-    await tester.fling(find.byKey(const ValueKey('stackTop1')), const Offset(-120, 0), 1500);
+    // A plain tap counts as a swipe.
+    await tester.tap(find.byKey(const ValueKey('stackTop1')));
     await tester.pumpAndSettle();
     expect(find.text('1 card left'), findsOneWidget);
+    expect(find.byKey(const ValueKey('stackTop2')), findsOneWidget);
 
     await tester.drag(find.byKey(const ValueKey('stackTop2')), const Offset(0, 400));
     await tester.pumpAndSettle();
