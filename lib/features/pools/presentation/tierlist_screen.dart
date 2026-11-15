@@ -97,11 +97,9 @@ class _TierlistState extends ConsumerState<_Tierlist> {
 
   void _save(Pool pool) => savePool(ref, pool);
 
-  /// The tiers of the chosen quality: its tags, in the pool's order.
-  List<String> get _tiers => [
-        for (final tag in _pool.tags.keys)
-          if (Pool.qualityOf(tag) == _quality) tag,
-      ];
+  /// The tiers of the chosen quality, in its preferred order (best first
+  /// when descending).
+  List<String> get _tiers => _quality == null ? const [] : _pool.orderedValuesOf(_quality!);
 
   /// Puts [card] in [tier] right before [before], or last; its other
   /// value of the quality goes.
@@ -113,15 +111,25 @@ class _TierlistState extends ConsumerState<_Tierlist> {
     _save(_pool.withCardInTag(tier, card.id, before: before));
   }
 
-  /// Moves [tier] one rank up ([by] -1) or down (+1) among its quality's
-  /// values.
+  /// Moves [tier] one row up ([by] -1) or down (+1) as shown.
   void _moveTier(String tier, int by) {
-    final tiers = _tiers;
-    final i = tiers.indexOf(tier);
+    final quality = _quality;
+    if (quality == null) return;
+    final shown = [..._tiers];
+    final i = shown.indexOf(tier);
     final j = i + by;
-    if (i < 0 || j < 0 || j >= tiers.length) return;
+    if (i < 0 || j < 0 || j >= shown.length) return;
+    shown.removeAt(i);
+    shown.insert(j, tier);
     setState(() => _undo.add(_pool));
-    _save(_pool.withTagBefore(tier, by < 0 ? tiers[j] : (j + 1 < tiers.length ? tiers[j + 1] : null)));
+    _save(_pool.withValuesOrder(quality, _pool.isDescending(quality) ? shown.reversed.toList() : shown));
+  }
+
+  void _toggleOrder() {
+    final quality = _quality;
+    if (quality == null) return;
+    setState(() => _undo.add(_pool));
+    _save(_pool.withQualityDescending(quality, !_pool.isDescending(quality)));
   }
 
   /// Takes [card] out of its tier, back to the feed.
@@ -274,6 +282,17 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                           '${l10n.tierlistQuality}: ${quality == null ? l10n.noQualityYet : qualityLabel(l10n, quality)}'),
                       onPressed: _pickQuality,
                     ),
+                    if (quality != null)
+                      ActionChip(
+                        key: const Key('tierlistOrder'),
+                        avatar: Icon(
+                          _pool.isDescending(quality) ? Icons.arrow_downward : Icons.arrow_upward,
+                          size: 18,
+                        ),
+                        label: Text(_pool.isDescending(quality) ? l10n.orderDescending : l10n.orderAscending),
+                        tooltip: l10n.qualityOrder,
+                        onPressed: _toggleOrder,
+                      ),
                     ActionChip(
                       key: const Key('tierlistGroup'),
                       avatar: const Icon(Icons.label_outline, size: 18),

@@ -470,6 +470,7 @@ class Pool {
     this.boosters = const [],
     this.formats = const [],
     this.artworks = const {},
+    this.descending = const {},
   });
 
   factory Pool.fromJson(Map<String, dynamic> json) => Pool(
@@ -505,6 +506,7 @@ class Pool {
             PlayFormat.fromJson(format as Map<String, dynamic>),
         ],
         artworks: (json['artworks'] as Map<String, dynamic>? ?? const {}).cast<String, String>(),
+        descending: (json['descending'] as Map<String, dynamic>? ?? const {}).cast<String, bool>(),
       );
 
   /// A set's booster print run: every card unlimited, tags and slots
@@ -565,6 +567,7 @@ class Pool {
         if (boosters.isNotEmpty) 'boosters': [for (final booster in boosters) booster.toJson()],
         if (formats.isNotEmpty) 'formats': [for (final format in formats) format.toJson()],
         if (artworks.isNotEmpty) 'artworks': artworks,
+        if (descending.isNotEmpty) 'descending': descending,
       };
 
   final String id;
@@ -587,6 +590,9 @@ class Pool {
   /// Another print's picture chosen for a card, by card id (see
   /// [CardData.artwork]); applied when the pool is resolved.
   final Map<String, String> artworks;
+
+  /// Per quality, whether its values read best first; see [isDescending].
+  final Map<String, bool> descending;
 
   /// Shows [cardId] with [artwork]'s picture, or its own again with `null`.
   Pool withArtwork(String cardId, String? artwork) => copyWith(artworks: {
@@ -669,8 +675,41 @@ class Pool {
   /// Every quality of the pool, in the order its tags list them.
   List<String> get qualities => {for (final tag in tags.keys) ?qualityOf(tag)}.toList();
 
-  /// The values of [quality], ranked: its tags in the pool's order.
+  /// The values of [quality] as stored: its tags in the pool's order,
+  /// lowest first (common before rare).
   List<String> valuesOf(String quality) => [for (final tag in tags.keys) if (qualityOf(tag) == quality) tag];
+
+  /// Whether [quality] reads best first, i.e. its stored order reversed:
+  /// as chosen, else yes for the rarity, no otherwise.
+  bool isDescending(String quality) => descending[quality] ?? (quality == 'rarity');
+
+  /// The values of [quality] in their preferred order: see [isDescending].
+  List<String> orderedValuesOf(String quality) =>
+      isDescending(quality) ? valuesOf(quality).reversed.toList() : valuesOf(quality);
+
+  Pool withQualityDescending(String quality, bool value) =>
+      copyWith(descending: {...descending, quality: value});
+
+  /// Reorders the values of [quality] as [stored] lists them (stored
+  /// order, lowest first); they keep the place of the first one among the
+  /// other tags.
+  Pool withValuesOrder(String quality, List<String> stored) {
+    final values = valuesOf(quality);
+    if (values.isEmpty || stored.toSet().length != values.length || !values.toSet().containsAll(stored)) return this;
+    final ordered = <String, TagDef>{};
+    for (final MapEntry(:key, :value) in tags.entries) {
+      if (qualityOf(key) == quality) {
+        if (key == values.first) {
+          for (final tag in stored) {
+            ordered[tag] = tags[tag]!;
+          }
+        }
+        continue;
+      }
+      ordered[key] = value;
+    }
+    return copyWith(tags: ordered);
+  }
 
   /// The plain tags: yes/no traits, outside any quality.
   List<String> get plainTags => [for (final tag in tags.keys) if (qualityOf(tag) == null) tag];
@@ -771,6 +810,7 @@ class Pool {
     List<PlayFormat>? formats,
     List<PackSlot>? slots,
     Map<String, String>? artworks,
+    Map<String, bool>? descending,
   }) {
     var kinds = boosters ?? this.boosters;
     if (slots != null) {
@@ -791,6 +831,7 @@ class Pool {
       boosters: kinds,
       formats: formats ?? this.formats,
       artworks: artworks ?? this.artworks,
+      descending: descending ?? this.descending,
     );
   }
 

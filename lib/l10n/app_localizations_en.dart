@@ -719,6 +719,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get qualityOrder => 'Value order';
+
+  @override
+  String get orderDescending => 'Best first';
+
+  @override
+  String get orderAscending => 'Lowest first';
+
+  @override
   String get rarityMarkerSetting => 'Rarity marker';
 
   @override

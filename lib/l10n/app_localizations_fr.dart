@@ -721,6 +721,15 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get qualityOrder => 'Ordre des valeurs';
+
+  @override
+  String get orderDescending => 'Meilleure en premier';
+
+  @override
+  String get orderAscending => 'Plus basse en premier';
+
+  @override
   String get rarityMarkerSetting => 'Marque de rareté';
 
   @override

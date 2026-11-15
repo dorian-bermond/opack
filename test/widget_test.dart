@@ -449,14 +449,26 @@ void main() {
 
     // Tiers rank by their arrows; the first cannot go up.
     double top(Finder tier) => tester.getTopLeft(tier).dy;
-    expect(tester.widget<IconButton>(find.byKey(const ValueKey('tierUp-Common'))).onPressed, isNull);
-    expect(top(find.byKey(const ValueKey('tier-rarity:common'))), lessThan(top(rare)));
-    await tester.tap(find.byKey(const ValueKey('tierDown-Common')));
+    // Rarities read best first: secret rare on top, common at the bottom.
+    final common = find.byKey(const ValueKey('tier-rarity:common'));
+    expect(find.text('Best first'), findsOneWidget);
+    expect(top(secret), lessThan(top(rare)));
+    expect(top(rare), lessThan(top(common)));
+    expect(tester.widget<IconButton>(find.byKey(const ValueKey('tierDown-Common'))).onPressed, isNull);
+    await tester.tap(find.byKey(const ValueKey('tierUp-Common')));
     await settleLoading(tester);
-    expect(top(find.byKey(const ValueKey('tier-rarity:common'))), greaterThan(top(rare)));
+    expect(top(common), lessThan(top(rare)), reason: 'moved up one row as shown');
     await tester.tap(find.byKey(const Key('tierlistUndo')));
     await settleLoading(tester);
-    expect(top(find.byKey(const ValueKey('tier-rarity:common'))), lessThan(top(rare)));
+    expect(top(rare), lessThan(top(common)));
+    // The order flips for the whole quality, and flips back by undo.
+    await tester.tap(find.byKey(const Key('tierlistOrder')));
+    await settleLoading(tester);
+    expect(find.text('Lowest first'), findsOneWidget);
+    expect(top(common), lessThan(top(secret)));
+    await tester.tap(find.byKey(const Key('tierlistUndo')));
+    await settleLoading(tester);
+    expect(top(secret), lessThan(top(common)));
 
     // A new quality comes with its ranked values and becomes the current one.
     await tester.tap(find.byKey(const Key('tierlistQuality')));

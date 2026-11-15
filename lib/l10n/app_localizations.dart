@@ -1238,6 +1238,24 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @qualityOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Value order'**
+  String get qualityOrder;
+
+  /// No description provided for @orderDescending.
+  ///
+  /// In en, this message translates to:
+  /// **'Best first'**
+  String get orderDescending;
+
+  /// No description provided for @orderAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest first'**
+  String get orderAscending;
+
   /// No description provided for @rarityMarkerSetting.
   ///
   /// In en, this message translates to:

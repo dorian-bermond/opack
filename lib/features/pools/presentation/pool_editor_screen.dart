@@ -252,7 +252,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        for (final tag in pool.valuesOf(quality))
+                        for (final tag in pool.orderedValuesOf(quality))
                           RadioListTile<String>(
                             dense: true,
                             value: tag,
@@ -629,7 +629,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text('${qualityLabel(l10n, quality)}:', style: theme.textTheme.labelMedium),
-                            for (final tag in play.pool.valuesOf(quality))
+                            for (final tag in play.pool.orderedValuesOf(quality))
                               _Basket(
                                 key: ValueKey('basket-$tag'),
                                 label: '${tagLabel(l10n, tag.substring(quality.length + 1))}'

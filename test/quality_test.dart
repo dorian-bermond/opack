@@ -70,6 +70,31 @@ void main() {
     expect(pool.qualities, ['tier']);
   });
 
+  test('a quality reads lowest or best first, rarity best first by default', () {
+    var pool = Pool.empty(Game.mtg, name: 'p')
+        .withTag('rarity:common', ['a'])
+        .withTag('rarity:rare', ['b'])
+        .withTag('tier:S', ['c'])
+        .withTag('tier:A', ['d']);
+    expect(pool.isDescending('rarity'), isTrue);
+    expect(pool.isDescending('tier'), isFalse);
+    expect(pool.orderedValuesOf('rarity'), ['rarity:rare', 'rarity:common']);
+    expect(pool.orderedValuesOf('tier'), ['tier:S', 'tier:A']);
+
+    pool = pool.withQualityDescending('rarity', false).withQualityDescending('tier', true);
+    expect(pool.orderedValuesOf('rarity'), ['rarity:common', 'rarity:rare']);
+    expect(pool.orderedValuesOf('tier'), ['tier:A', 'tier:S']);
+    final reloaded = Pool.fromJson(pool.toJson());
+    expect(reloaded.descending, {'rarity': false, 'tier': true});
+
+    // Reordering values keeps them in place among the other tags.
+    pool = pool.withValuesOrder('tier', ['tier:A', 'tier:S']);
+    expect(pool.tags.keys.toList(), ['rarity:common', 'rarity:rare', 'tier:A', 'tier:S']);
+    expect(pool.withValuesOrder('tier', ['tier:S']).tags.keys.toList(), pool.tags.keys.toList(),
+        reason: 'an incomplete order is ignored');
+    expect(pool.withValuesOrder('nope', []).tags.keys.toList(), pool.tags.keys.toList());
+  });
+
   test('a value keeps its color through edits and saving', () {
     var pool = Pool.empty(Game.mtg, name: 'p').withTag('tier:S', ['a']).withTagColor('tier:S', 0xFFE53935);
     expect(pool.tags['tier:S']!.color, 0xFFE53935);

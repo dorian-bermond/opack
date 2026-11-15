@@ -157,7 +157,15 @@ class _PoolDetails extends ConsumerWidget {
                       const Icon(Icons.category_outlined, size: 18),
                       const SizedBox(width: 6),
                       Text(qualityLabel(l10n, quality), style: theme.textTheme.titleSmall),
-                      const SizedBox(width: 8),
+                      IconButton(
+                        key: ValueKey('qualityOrder-$quality'),
+                        tooltip: '${l10n.qualityOrder}: '
+                            '${saved.isDescending(quality) ? l10n.orderDescending : l10n.orderAscending}',
+                        icon: Icon(saved.isDescending(quality) ? Icons.arrow_downward : Icons.arrow_upward, size: 18),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () =>
+                            savePool(ref, saved.withQualityDescending(quality, !saved.isDescending(quality))),
+                      ),
                       TextButton.icon(
                         icon: const Icon(Icons.leaderboard_outlined, size: 18),
                         label: Text(l10n.tierlist),
@@ -171,7 +179,7 @@ class _PoolDetails extends ConsumerWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      for (final name in saved.valuesOf(quality))
+                      for (final name in saved.orderedValuesOf(quality))
                         InputChip(
                           avatar: ColorDot(tagColor(saved, name) ?? theme.colorScheme.outline, size: 14),
                           label: Text('${tagLabel(l10n, name.substring(quality.length + 1))}'
