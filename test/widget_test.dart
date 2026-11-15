@@ -114,7 +114,7 @@ void main() {
     await startApp(tester, locale: const Locale('en'));
     expect(find.text('Opack'), findsOneWidget);
     await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
-    expect(find.text('Booster composition'), findsOneWidget);
+    expect(find.text('Gallery'), findsOneWidget);
     expect(find.text('Cards from'), findsNothing, reason: 'sources live on the details page');
 
     // The details page holds the sources, tags and copies.
@@ -145,7 +145,6 @@ void main() {
     await tester.pumpAndSettle();
 
     // Tag a card in bulk, pull one such card per pack, then drop the slot.
-    expect(find.textContaining('7 × Common'), findsOneWidget);
     await tester.tap(find.byTooltip('Pool details'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('New tag'));
@@ -188,7 +187,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Rarity').last);
     await tester.pumpAndSettle();
-    expect(find.textContaining('Common · '), findsWidgets, reason: 'rarity sections inside tag groups');
+    expect(find.text('Secret rare · 1'), findsOneWidget, reason: 'the rarity section inside the mine group');
     await tester.tap(find.byTooltip('Group by'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('No grouping'));
@@ -216,13 +215,12 @@ void main() {
     await tester.tap(find.descendant(of: commonChipWidget, matching: find.byTooltip('Delete')));
     await tester.pumpAndSettle();
     expect(find.text('Delete the tag Common?'), findsOneWidget);
-    expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the warning');
+    expect(find.textContaining('7 × Common'), findsNWidgets(2), reason: 'the composition and the warning');
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(commonChip, findsOneWidget);
-    await tester.pageBack();
-    await tester.pumpAndSettle();
 
+    // The composition is edited from the details page too.
     await tester.tap(find.text('Edit composition'));
     await settleLoading(tester);
     expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the prefilled common slot');
@@ -242,6 +240,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Booster composition'), findsOneWidget);
 
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Gallery'), findsOneWidget, reason: 'back in the editor');
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text('Circuit Break'), findsOneWidget);
@@ -291,7 +292,7 @@ void main() {
     await tester.tap(find.byKey(const Key('searchPanelToggle')));
     await tester.pumpAndSettle();
     expect(find.text('Search cards to add'), findsOneWidget);
-    expect(find.text('Booster composition'), findsOneWidget, reason: 'the pool is still shown');
+    expect(find.text('Gallery'), findsOneWidget, reason: 'the pool is still shown');
     expect(find.text('Add cards'), findsNothing, reason: 'the chip moved into the panel');
 
     await tester.enterText(find.byKey(const Key('panelSearch')), 'mock');
@@ -358,7 +359,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Empty pool'));
     await settleLoading(tester);
-    expect(find.text('Booster composition'), findsOneWidget);
+    expect(find.text('Gallery'), findsOneWidget);
     expect(find.text('Add a set or cube'), findsNothing, reason: 'sources are added from the details page');
 
     await tester.pageBack();

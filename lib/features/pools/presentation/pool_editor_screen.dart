@@ -20,7 +20,6 @@ import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
 import 'pool_actions.dart';
-import 'pool_composition_screen.dart';
 import 'pool_loader.dart';
 import 'pool_view.dart';
 
@@ -275,33 +274,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     );
 
     final header = <Widget>[
-      _Section(
-        title: l10n.boosterComposition,
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                pool.slots.isEmpty
-                    ? l10n.noUserSlots
-                    : [
-                        for (final slot in pool.slots) l10n.slotRow(slot.count, slotOptionsLabel(l10n, slot)),
-                      ].join(' · '),
-                style: theme.textTheme.bodyMedium,
-              ),
-            ),
-            TextButton.icon(
-              icon: const Icon(Icons.tune),
-              label: Text(l10n.editComposition),
-              onPressed: () => context.push(poolModePath(pool.game, pool.id, 'composition')),
-            ),
-            TextButton.icon(
-              icon: const Icon(Icons.sports_esports),
-              label: Text(l10n.formats),
-              onPressed: () => context.push(poolModePath(pool.game, pool.id, 'formats')),
-            ),
-          ],
-        ),
-      ),
       if (_taggingTag case final tag?)
         _Section(
           title: l10n.poolTags,

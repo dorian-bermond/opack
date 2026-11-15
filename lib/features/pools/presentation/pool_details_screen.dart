@@ -8,6 +8,7 @@ import '../../card_info/presentation/labels.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
 import 'pool_actions.dart';
+import 'pool_composition_screen.dart';
 import 'pool_loader.dart';
 import 'pool_widgets.dart';
 import 'source_picker.dart';
@@ -75,6 +76,33 @@ class _PoolDetails extends ConsumerWidget {
                   avatar: const Icon(Icons.add, size: 18),
                   label: Text(l10n.addSource),
                   onPressed: () => addPoolSource(context, ref, play),
+                ),
+              ],
+            ),
+          ),
+              PoolSection(
+            title: l10n.boosterComposition,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    saved.slots.isEmpty
+                        ? l10n.noUserSlots
+                        : [
+                            for (final slot in saved.slots) l10n.slotRow(slot.count, slotOptionsLabel(l10n, slot)),
+                          ].join(' · '),
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.tune),
+                  label: Text(l10n.editComposition),
+                  onPressed: () => context.push(poolModePath(saved.game, saved.id, 'composition')),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.sports_esports),
+                  label: Text(l10n.formats),
+                  onPressed: () => context.push(poolModePath(saved.game, saved.id, 'formats')),
                 ),
               ],
             ),
