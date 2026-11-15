@@ -539,10 +539,18 @@ void main() {
     expect(top(find.byKey(const ValueKey('tier-power:S'))), lessThan(top(find.byKey(const ValueKey('tier-power:B')))));
     expect(container.read(poolsProvider).value!.single.tags['power:S']!.color, 0xFFE53935, reason: 'the first palette color');
     expect(find.textContaining('Ctrl+Z undoes. · 0'), findsNothing, reason: 'nothing valued yet: all in the feed');
+    // The last quality used is remembered on the pool for the next time.
+    expect(container.read(poolsProvider).value!.single.tierlistQuality, 'power');
+    await tester.pageBack();
+    await settleLoading(tester);
+    await tester.tap(find.byKey(const Key('tierlistButton')));
+    await settleLoading(tester);
+    expect(find.text('Quality: Power'), findsOneWidget, reason: 'reopened on Power');
     await tester.tap(find.byKey(const Key('tierlistQuality')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Rarity'));
     await tester.pumpAndSettle();
+    expect(container.read(poolsProvider).value!.single.tierlistQuality, 'rarity');
 
     // The size slider scales every card of the tiers and the feed.
     double cardWidth() => tester.getSize(find.descendant(of: rare, matching: find.byType(DraggableCard)).first).width;

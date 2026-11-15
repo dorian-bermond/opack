@@ -60,6 +60,14 @@ class PoolsController extends AsyncNotifier<List<Pool>> {
     await ref.read(poolStoreProvider).save(pool);
   }
 
+  /// Changes the pool [id] through [change] on its latest saved state,
+  /// after any save already under way, so nothing of it is lost.
+  Future<void> change(String id, Pool Function(Pool pool) change) async {
+    await future;
+    final current = state.value?.where((p) => p.id == id).firstOrNull;
+    if (current != null) await save(change(current));
+  }
+
   Future<void> remove(String id) async {
     state = AsyncData([...await future]..removeWhere((p) => p.id == id));
     await ref.read(poolStoreProvider).delete(id);

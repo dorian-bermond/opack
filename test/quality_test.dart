@@ -142,6 +142,16 @@ void main() {
     expect(pool.withTagRenamed('rarity:common', 'rarity:c').tags['rarity:c']!.copies, 4);
   });
 
+  test('the tierlist opens on the last quality used, while it exists', () {
+    var pool = Pool.empty(Game.mtg, name: 'p').withTag('rarity:rare', ['a']).withTag('tier:S', ['b']);
+    expect(pool.defaultTierlistQuality, 'rarity', reason: 'the first one');
+    pool = pool.copyWith(tierlistQuality: 'tier');
+    expect(pool.defaultTierlistQuality, 'tier');
+    expect(Pool.fromJson(pool.toJson()).tierlistQuality, 'tier');
+    expect(pool.withoutTag('tier:S').defaultTierlistQuality, 'rarity', reason: 'gone: back to the first');
+    expect(Pool.empty(Game.mtg, name: 'q').defaultTierlistQuality, isNull);
+  });
+
   test('a value keeps its color through edits and saving', () {
     var pool = Pool.empty(Game.mtg, name: 'p').withTag('tier:S', ['a']).withTagColor('tier:S', 0xFFE53935);
     expect(pool.tags['tier:S']!.color, 0xFFE53935);

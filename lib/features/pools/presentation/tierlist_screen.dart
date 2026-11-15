@@ -11,6 +11,7 @@ import '../../card_info/presentation/filter_sheet.dart';
 import '../../card_info/presentation/labels.dart';
 import '../../card_text/data/card_text_repository.dart';
 import '../../catalog/domain/models.dart';
+import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
 import 'pool_actions.dart';
@@ -110,11 +111,21 @@ class _TierlistState extends ConsumerState<_Tierlist> {
   @override
   void initState() {
     super.initState();
-    _quality = widget.quality ?? _pool.qualities.firstOrNull;
+    _quality = widget.quality ?? _pool.defaultTierlistQuality;
     _tag = widget.tag;
   }
 
   void _save(Pool pool) => savePool(ref, pool);
+
+  /// Switches to [quality] and remembers it as the pool's tierlist quality.
+  void _useQuality(String? quality) {
+    setState(() => _quality = quality);
+    // On the latest saved pool, after the save of a quality just created.
+    if (quality != null) {
+      ref.read(poolsProvider.notifier).change(
+          _pool.id, (p) => p.tierlistQuality == quality ? p : p.copyWith(tierlistQuality: quality));
+    }
+  }
 
   /// The tiers of the chosen quality, in its preferred order (best first
   /// when descending).
@@ -201,9 +212,9 @@ class _TierlistState extends ConsumerState<_Tierlist> {
       ),
     );
     if (chosen == null || !mounted) return;
-    if (chosen.isNotEmpty) return setState(() => _quality = chosen);
+    if (chosen.isNotEmpty) return _useQuality(chosen);
     final quality = await newPoolQuality(context, ref, _pool);
-    if (quality != null) setState(() => _quality = quality);
+    if (quality != null && mounted) _useQuality(quality);
   }
 
   Future<void> _pickTag() async {
@@ -309,7 +320,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                         label: Text(l10n.editQualityTitle),
                         onPressed: () async {
                           final name = await editPoolQuality(context, ref, _pool, quality);
-                          if (mounted) setState(() => _quality = name ?? _pool.qualities.firstOrNull);
+                          if (mounted) _useQuality(name ?? _pool.qualities.firstOrNull);
                         },
                       ),
                     if (quality != null)

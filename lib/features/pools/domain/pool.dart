@@ -500,6 +500,7 @@ class Pool {
     this.formats = const [],
     this.artworks = const {},
     this.descending = const {},
+    this.tierlistQuality,
   });
 
   factory Pool.fromJson(Map<String, dynamic> json) => Pool(
@@ -536,6 +537,7 @@ class Pool {
         ],
         artworks: (json['artworks'] as Map<String, dynamic>? ?? const {}).cast<String, String>(),
         descending: (json['descending'] as Map<String, dynamic>? ?? const {}).cast<String, bool>(),
+        tierlistQuality: json['tierlistQuality'] as String?,
       );
 
   /// A set's booster print run: every card unlimited, tags and slots
@@ -597,6 +599,7 @@ class Pool {
         if (formats.isNotEmpty) 'formats': [for (final format in formats) format.toJson()],
         if (artworks.isNotEmpty) 'artworks': artworks,
         if (descending.isNotEmpty) 'descending': descending,
+        'tierlistQuality': ?tierlistQuality,
       };
 
   final String id;
@@ -622,6 +625,14 @@ class Pool {
 
   /// Per quality, whether its values read best first; see [isDescending].
   final Map<String, bool> descending;
+
+  /// The quality the tierlist was last on, to open on it again.
+  final String? tierlistQuality;
+
+  /// The quality the tierlist opens on: the last one used, while it
+  /// exists, else the first.
+  String? get defaultTierlistQuality =>
+      tierlistQuality != null && qualities.contains(tierlistQuality) ? tierlistQuality : qualities.firstOrNull;
 
   /// Shows [cardId] with [artwork]'s picture, or its own again with `null`.
   Pool withArtwork(String cardId, String? artwork) => copyWith(artworks: {
@@ -885,6 +896,7 @@ class Pool {
     List<PackSlot>? slots,
     Map<String, String>? artworks,
     Map<String, bool>? descending,
+    String? tierlistQuality,
   }) {
     var kinds = boosters ?? this.boosters;
     if (slots != null) {
@@ -906,6 +918,7 @@ class Pool {
       formats: formats ?? this.formats,
       artworks: artworks ?? this.artworks,
       descending: descending ?? this.descending,
+      tierlistQuality: tierlistQuality ?? this.tierlistQuality,
     );
   }
 
