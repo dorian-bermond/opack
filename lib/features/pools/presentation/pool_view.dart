@@ -32,6 +32,63 @@ class PoolViewSetting extends Notifier<PoolView> {
   }
 }
 
+/// Cards per row of a gallery, saved across launches; one setting per
+/// [key] (the pool, the search results). `0` means as many as fit.
+final galleryColumnsProvider =
+    NotifierProvider.family<GalleryColumnsSetting, int, String>(GalleryColumnsSetting.new);
+
+class GalleryColumnsSetting extends Notifier<int> {
+  GalleryColumnsSetting(this.key);
+
+  final String key;
+  static const max = 12;
+
+  @override
+  int build() => ref.read(sharedPreferencesProvider).getInt('galleryColumns:$key') ?? 0;
+
+  void set(int columns) {
+    final clamped = columns.clamp(0, max);
+    ref.read(sharedPreferencesProvider).setInt('galleryColumns:$key', clamped);
+    state = clamped;
+  }
+}
+
+/// A stepper for the cards per row of the gallery under [settingKey]:
+/// "auto", then 1 to 12.
+class GalleryColumnsControl extends ConsumerWidget {
+  const GalleryColumnsControl({super.key, required this.settingKey});
+
+  final String settingKey;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final columns = ref.watch(galleryColumnsProvider(settingKey));
+    final setting = ref.read(galleryColumnsProvider(settingKey).notifier);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(l10n.cardsPerRow, style: Theme.of(context).textTheme.labelMedium),
+        IconButton(
+          key: ValueKey('fewerColumns-$settingKey'),
+          tooltip: l10n.fewerPerRow,
+          icon: const Icon(Icons.remove, size: 18),
+          visualDensity: VisualDensity.compact,
+          onPressed: columns > 0 ? () => setting.set(columns - 1) : null,
+        ),
+        Text(columns == 0 ? l10n.columnsAuto : '$columns'),
+        IconButton(
+          key: ValueKey('moreColumns-$settingKey'),
+          tooltip: l10n.morePerRow,
+          icon: const Icon(Icons.add, size: 18),
+          visualDensity: VisualDensity.compact,
+          onPressed: columns < GalleryColumnsSetting.max ? () => setting.set(columns + 1) : null,
+        ),
+      ],
+    );
+  }
+}
+
 /// The column a card falls in when stacked by [sort]: its mana value, color,
 /// level, first letter… `?` when the card has no such value.
 String stackLabel(CardSort sort, CardWithInfo item, String language) {
@@ -271,23 +328,32 @@ class _PictureCard extends StatelessWidget {
   }
 }
 
-/// Pictures in a grid.
+/// Pictures in a grid, [columns] per row (as many 160 px ones as fit
+/// when 0).
 class PoolGallerySliver extends StatelessWidget {
-  const PoolGallerySliver({super.key, required this.items, required this.actions});
+  const PoolGallerySliver({super.key, required this.items, required this.actions, this.columns = 0});
 
   final List<CardWithInfo> items;
   final PoolCardActions actions;
+  final int columns;
 
   @override
   Widget build(BuildContext context) => SliverPadding(
         padding: const EdgeInsets.all(12),
         sliver: SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 160,
-            childAspectRatio: 63 / 88,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-          ),
+          gridDelegate: columns > 0
+              ? SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  childAspectRatio: 63 / 88,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                )
+              : const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 160,
+                  childAspectRatio: 63 / 88,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
           itemCount: items.length,
           itemBuilder: (context, i) => _PictureCard(card: items[i].card, actions: actions),
         ),

@@ -721,6 +721,18 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get cardsPerRow => 'Par ligne';
+
+  @override
+  String get columnsAuto => 'auto';
+
+  @override
+  String get fewerPerRow => 'Moins de cartes par ligne';
+
+  @override
+  String get morePerRow => 'Plus de cartes par ligne';
+
+  @override
   String get poolDetails => 'Détails du pool';
 
   @override

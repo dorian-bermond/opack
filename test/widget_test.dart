@@ -13,6 +13,7 @@ import 'package:opack/core/settings/locale_controller.dart';
 import 'package:opack/features/card_text/data/card_text_repository.dart';
 import 'package:opack/features/card_info/data/card_info_repository.dart';
 import 'package:opack/features/card_info/data/card_search.dart';
+import 'package:opack/features/card_info/presentation/search_panel.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_info/presentation/card_search_sheet.dart';
 import 'package:opack/features/catalog/data/catalog_repository.dart';
@@ -308,6 +309,33 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('result-MOCK-EN001')));
     await settleLoading(tester);
     expect(find.text('Mock Dragon'), findsOneWidget);
+
+    // In gallery mode each side has its own cards-per-row setting.
+    await tester.tap(find.text('Gallery'));
+    await tester.pumpAndSettle();
+    expect(find.text('auto'), findsNWidgets(2));
+    await tester.tap(find.byKey(const ValueKey('moreColumns-pool')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('moreColumns-search')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('moreColumns-search')));
+    await tester.pumpAndSettle();
+    expect(find.text('auto'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('fewerColumns-pool')));
+    await tester.pumpAndSettle();
+    expect(find.text('auto'), findsOneWidget);
+    await tester.tap(find.text('List'));
+    await tester.pumpAndSettle();
+
+    // The splitter widens the panel when dragged left.
+    double panelWidth() => tester.getSize(find.byType(SearchPanel)).width;
+    final before = panelWidth();
+    await tester.drag(find.byKey(const Key('panelSplitter')), const Offset(-120, 0));
+    await tester.pumpAndSettle();
+    // Touch slop eats the first few pixels of the drag.
+    expect(panelWidth(), inInclusiveRange(before + 90, before + 120));
 
     // The former Add cards page is the panel's advanced search.
     await tester.tap(find.byKey(const Key('advancedSearch')));

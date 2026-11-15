@@ -202,14 +202,20 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              key: const Key('advancedSearch'),
-              icon: const Icon(Icons.manage_search),
-              label: Text(l10n.advancedSearch),
-              onPressed: _advanced,
-            ),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              TextButton.icon(
+                key: const Key('advancedSearch'),
+                icon: const Icon(Icons.manage_search),
+                label: Text(l10n.advancedSearch),
+                onPressed: _advanced,
+              ),
+              if (view == PoolView.gallery) const GalleryColumnsControl(settingKey: 'search'),
+            ],
           ),
         ),
         Expanded(
@@ -244,7 +250,8 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
               if (items.isNotEmpty)
                 switch (view) {
                   PoolView.list => PoolListSliver(items: items, actions: actions, language: language),
-                  PoolView.gallery => PoolGallerySliver(items: items, actions: actions),
+                  PoolView.gallery => PoolGallerySliver(
+                      items: items, actions: actions, columns: ref.watch(galleryColumnsProvider('search'))),
                   PoolView.stacks => PoolStacksSliver(
                       items: items,
                       actions: actions,

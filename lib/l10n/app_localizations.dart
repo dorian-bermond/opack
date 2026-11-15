@@ -1238,6 +1238,30 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @cardsPerRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Per row'**
+  String get cardsPerRow;
+
+  /// No description provided for @columnsAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'auto'**
+  String get columnsAuto;
+
+  /// No description provided for @fewerPerRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Fewer cards per row'**
+  String get fewerPerRow;
+
+  /// No description provided for @morePerRow.
+  ///
+  /// In en, this message translates to:
+  /// **'More cards per row'**
+  String get morePerRow;
+
   /// No description provided for @poolDetails.
   ///
   /// In en, this message translates to:

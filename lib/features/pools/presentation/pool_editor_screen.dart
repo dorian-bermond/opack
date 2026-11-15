@@ -69,6 +69,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// Whether the search panel is open beside (or over) the pool.
   bool _searchOpen = false;
 
+  /// The panel's share of the window, dragged by the user.
+  double _panelShare = 0.4;
+
   Pool get _pool => widget.pool.pool;
 
   @override
@@ -352,7 +355,12 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       ),
       Padding(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-        child: SegmentedButton<PoolView>(
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            SegmentedButton<PoolView>(
           showSelectedIcon: false,
           segments: [
             for (final (view, icon, label) in [
@@ -365,6 +373,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           ],
           selected: {view},
           onSelectionChanged: (selection) => ref.read(poolViewProvider.notifier).select(selection.single),
+        ),
+            if (view == PoolView.gallery) const GalleryColumnsControl(settingKey: 'pool'),
+          ],
         ),
       ),
       Padding(
@@ -520,11 +531,36 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     );
     return LayoutBuilder(builder: (context, constraints) {
       if (constraints.maxWidth < 900) return panel;
+      final width = constraints.maxWidth;
+      final panelWidth = (width * _panelShare).clamp(300.0, width - 300.0);
       return Row(
         children: [
           Expanded(child: poolBody),
-          const VerticalDivider(width: 1),
-          SizedBox(width: (constraints.maxWidth * 0.4).clamp(360.0, 520.0), child: panel),
+          // The splitter: drag it to resize the panel.
+          MouseRegion(
+            cursor: SystemMouseCursors.resizeLeftRight,
+            child: GestureDetector(
+              key: const Key('panelSplitter'),
+              behavior: HitTestBehavior.opaque,
+              onHorizontalDragUpdate: (d) => setState(() {
+                _panelShare = ((panelWidth - d.delta.dx) / width).clamp(0.2, 0.8);
+              }),
+              child: SizedBox(
+                width: 10,
+                child: Center(
+                  child: Container(
+                    width: 4,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: panelWidth, child: panel),
         ],
       );
     });
@@ -574,7 +610,8 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   ) =>
       switch (view) {
             PoolView.list => PoolListSliver(items: items, actions: actions, language: language),
-            PoolView.gallery => PoolGallerySliver(items: items, actions: actions),
+            PoolView.gallery => PoolGallerySliver(
+                items: items, actions: actions, columns: ref.watch(galleryColumnsProvider('pool'))),
             // Stacks are laid out as a whole, see build.
             PoolView.stacks => const SliverToBoxAdapter(child: SizedBox.shrink()),
             PoolView.spoiler => PoolSpoilerSliver(items: items, actions: actions, language: language),
