@@ -9,6 +9,7 @@ import '../features/pools/presentation/pool_details_screen.dart';
 import '../features/pools/presentation/pool_editor_screen.dart';
 import '../features/pools/presentation/pool_formats_screen.dart';
 import '../features/pools/presentation/pools_screen.dart';
+import '../features/pools/presentation/tierlist_screen.dart';
 import '../features/sealed/presentation/sealed_screen.dart';
 
 /// `/`: every pool of every game, the app's main screen.
@@ -62,6 +63,14 @@ final router = GoRouter(
               path: 'pool/:pool/edit',
               builder: (context, state) =>
                   PoolEditorScreen(poolId: _pool(state), taggingTag: state.uri.queryParameters['tag']),
+            ),
+            GoRoute(
+              path: 'pool/:pool/tierlist',
+              builder: (context, state) => TierlistScreen(
+                poolId: _pool(state),
+                quality: state.uri.queryParameters['quality'],
+                tag: state.uri.queryParameters['tag'],
+              ),
             ),
             GoRoute(
               path: 'pool/:pool/details',

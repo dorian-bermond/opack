@@ -51,6 +51,11 @@ class _PoolDetails extends ConsumerWidget {
             onPressed: () => renamePool(context, ref, saved),
           ),
           IconButton(
+            tooltip: l10n.tierlist,
+            icon: const Icon(Icons.leaderboard_outlined),
+            onPressed: () => context.push(poolModePath(saved.game, saved.id, 'tierlist')),
+          ),
+          IconButton(
             tooltip: l10n.editPool,
             icon: const Icon(Icons.edit_note),
             onPressed: () => context.push(poolModePath(saved.game, saved.id, 'edit')),

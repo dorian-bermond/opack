@@ -719,6 +719,35 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tierlist => 'Tierlist';
+
+  @override
+  String get tierlistQuality => 'Quality';
+
+  @override
+  String get tierlistGroup => 'Cards';
+
+  @override
+  String get allCards => 'All cards';
+
+  @override
+  String get newQuality => 'New quality…';
+
+  @override
+  String get noQualityYet => 'none';
+
+  @override
+  String get tierlistNoQuality =>
+      'Pick a quality to sort the cards by, or create one: each of its values becomes a tier.';
+
+  @override
+  String get addTier => 'Add a tier';
+
+  @override
+  String get tierlistFeedHint =>
+      'Drag a card to a tier to give it that value; drop it here to take the value away. Ctrl+Z undoes.';
+
+  @override
   String get tagQuality => 'Quality (optional)';
 
   @override
@@ -790,9 +819,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metricTags => 'Tags';
-
-  @override
-  String get allCards => 'All cards';
 
   @override
   String get boosterComposition => 'Booster composition';

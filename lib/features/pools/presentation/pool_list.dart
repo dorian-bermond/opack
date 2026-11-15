@@ -158,7 +158,12 @@ class _PoolTile extends ConsumerWidget {
     final pools = ref.read(poolsProvider.notifier);
 
     return Card(
-      child: Padding(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        // The whole card opens the editor; the buttons keep their own action.
+        key: ValueKey('poolTile-${pool.id}'),
+        onTap: () => context.go(poolModePath(pool.game, pool.id, 'edit')),
+        child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,6 +252,7 @@ class _PoolTile extends ConsumerWidget {
               ],
             ),
           ],
+        ),
         ),
       ),
     );

@@ -721,6 +721,35 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get tierlist => 'Tierlist';
+
+  @override
+  String get tierlistQuality => 'Qualité';
+
+  @override
+  String get tierlistGroup => 'Cartes';
+
+  @override
+  String get allCards => 'Toutes les cartes';
+
+  @override
+  String get newQuality => 'Nouvelle qualité…';
+
+  @override
+  String get noQualityYet => 'aucune';
+
+  @override
+  String get tierlistNoQuality =>
+      'Choisissez la qualité selon laquelle trier les cartes, ou créez-en une : chacune de ses valeurs devient un tier.';
+
+  @override
+  String get addTier => 'Ajouter un tier';
+
+  @override
+  String get tierlistFeedHint =>
+      'Glissez une carte vers un tier pour lui donner cette valeur ; déposez-la ici pour la lui retirer. Ctrl+Z annule.';
+
+  @override
   String get tagQuality => 'Qualité (facultatif)';
 
   @override
@@ -793,9 +822,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get metricTags => 'Étiquettes';
-
-  @override
-  String get allCards => 'Toutes les cartes';
 
   @override
   String get boosterComposition => 'Composition du booster';

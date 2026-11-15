@@ -1238,6 +1238,60 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @tierlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Tierlist'**
+  String get tierlist;
+
+  /// No description provided for @tierlistQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality'**
+  String get tierlistQuality;
+
+  /// No description provided for @tierlistGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get tierlistGroup;
+
+  /// No description provided for @allCards.
+  ///
+  /// In en, this message translates to:
+  /// **'All cards'**
+  String get allCards;
+
+  /// No description provided for @newQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'New quality…'**
+  String get newQuality;
+
+  /// No description provided for @noQualityYet.
+  ///
+  /// In en, this message translates to:
+  /// **'none'**
+  String get noQualityYet;
+
+  /// No description provided for @tierlistNoQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a quality to sort the cards by, or create one: each of its values becomes a tier.'**
+  String get tierlistNoQuality;
+
+  /// No description provided for @addTier.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a tier'**
+  String get addTier;
+
+  /// No description provided for @tierlistFeedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag a card to a tier to give it that value; drop it here to take the value away. Ctrl+Z undoes.'**
+  String get tierlistFeedHint;
+
   /// No description provided for @tagQuality.
   ///
   /// In en, this message translates to:
@@ -1375,12 +1429,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get metricTags;
-
-  /// No description provided for @allCards.
-  ///
-  /// In en, this message translates to:
-  /// **'All cards'**
-  String get allCards;
 
   /// No description provided for @boosterComposition.
   ///

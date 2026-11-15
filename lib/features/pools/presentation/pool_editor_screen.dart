@@ -400,6 +400,12 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         title: InkWell(onTap: _rename, child: Text(pool.name)),
         actions: [
           IconButton(
+            key: const Key('tierlistButton'),
+            tooltip: l10n.tierlist,
+            icon: const Icon(Icons.leaderboard_outlined),
+            onPressed: () => context.push(poolModePath(pool.game, pool.id, 'tierlist')),
+          ),
+          IconButton(
             key: const Key('basketsToggle'),
             tooltip: l10n.tagBaskets,
             isSelected: _baskets,

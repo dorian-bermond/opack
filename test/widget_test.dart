@@ -385,6 +385,61 @@ void main() {
     expect(find.byKey(const ValueKey('basket-rarity:rare')), findsNothing);
   });
 
+  testWidgets('tierlist: drag cards between tiers and the feed, undo with Ctrl+Z', (tester) async {
+    await startApp(tester, locale: const Locale('en'));
+    await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
+    await tester.tap(find.byKey(const Key('tierlistButton')));
+    await settleLoading(tester);
+
+    // The set's rarities are the first quality: one tier each, no card unvalued.
+    expect(find.text('Quality: Rarity'), findsOneWidget);
+    expect(find.text('Cards: All cards'), findsOneWidget);
+    final rare = find.byKey(const ValueKey('tier-rarity:rare'));
+    final secret = find.byKey(const ValueKey('tier-rarity:secretRare'));
+    expect(rare, findsOneWidget);
+    expect(find.descendant(of: rare, matching: find.text('20')), findsOneWidget);
+    expect(find.descendant(of: secret, matching: find.text('8')), findsOneWidget);
+    expect(find.textContaining('take the value away. Ctrl+Z undoes. · 0'), findsOneWidget);
+    expect(tester.widget<IconButton>(find.byKey(const Key('tierlistUndo'))).onPressed, isNull);
+
+    // A secret rare card dragged to the Rare tier changes value.
+    final card = find.descendant(of: secret, matching: find.byKey(const ValueKey('drag-CIBR-FR042')));
+    expect(card, findsOneWidget);
+    await tester.timedDrag(card, tester.getCenter(rare) - tester.getCenter(card), const Duration(milliseconds: 400));
+    await settleLoading(tester);
+    expect(find.descendant(of: rare, matching: find.text('21')), findsOneWidget);
+    expect(find.descendant(of: secret, matching: find.text('7')), findsOneWidget);
+
+    // Dropped on the feed, it loses its value.
+    final moved = find.descendant(of: rare, matching: find.byKey(const ValueKey('drag-CIBR-FR042')));
+    final feed = find.byKey(const Key('tierlistFeed'));
+    await tester.timedDrag(moved, tester.getCenter(feed) - tester.getCenter(moved), const Duration(milliseconds: 400));
+    await settleLoading(tester);
+    expect(find.descendant(of: rare, matching: find.text('20')), findsOneWidget);
+    expect(find.textContaining('take the value away. Ctrl+Z undoes. · 1'), findsOneWidget);
+    expect(find.descendant(of: feed, matching: find.byKey(const ValueKey('drag-CIBR-FR042'))), findsOneWidget);
+
+    // Ctrl+Z twice walks both drops back.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await settleLoading(tester);
+    expect(find.descendant(of: rare, matching: find.text('21')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('tierlistUndo')));
+    await settleLoading(tester);
+    expect(find.descendant(of: secret, matching: find.text('8')), findsOneWidget);
+    expect(tester.widget<IconButton>(find.byKey(const Key('tierlistUndo'))).onPressed, isNull);
+
+    // A new tier is a new value of the quality.
+    await tester.tap(find.byKey(const Key('addTier')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(find.byKey(const Key('tagQualityField'))).controller!.text, 'rarity');
+    await tester.enterText(find.byKey(const Key('tagNameField')), 'bonus');
+    await tester.tap(find.text('Apply'));
+    await settleLoading(tester);
+    expect(find.byKey(const ValueKey('tier-rarity:bonus')), findsOneWidget);
+  });
+
   testWidgets('an empty pool cannot be played until it has a source', (tester) async {
     await startApp(tester, locale: const Locale('en'));
 
