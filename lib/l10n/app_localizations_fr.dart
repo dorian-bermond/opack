@@ -721,6 +721,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get cardHoverPreview => 'Grand aperçu au survol d\'une carte';
+
+  @override
   String get collapse => 'Replier';
 
   @override

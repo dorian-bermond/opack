@@ -719,6 +719,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get cardHoverPreview => 'Large preview when hovering a card';
+
+  @override
   String get collapse => 'Collapse';
 
   @override

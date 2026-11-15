@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,9 +72,14 @@ class CardTile extends ConsumerWidget {
     final source = cardImageSource(card, language: pictureLanguage(ref, context));
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
 
+    final preview = revealed && image != null && ref.watch(cardHoverPreviewProvider);
+
     return AspectRatio(
       aspectRatio: 63 / 88,
-      child: _RarityGlow(
+      child: _HoverPreview(
+        enabled: preview,
+        image: image,
+        child: _RarityGlow(
         enabled: !revealed,
         color: card.rarity.color,
         child: Card(
@@ -150,8 +159,107 @@ class CardTile extends ConsumerWidget {
         ),
       ),
     ),
+      ),
     );
   }
+}
+
+/// Shows [image] large, next to the pointer, once it has hovered [child]
+/// for a moment, until it leaves; nothing on touch screens, where there is
+/// no hover.
+class _HoverPreview extends StatefulWidget {
+  const _HoverPreview({required this.enabled, required this.image, required this.child});
+
+  final bool enabled;
+  final File? image;
+  final Widget child;
+
+  /// How long the pointer rests on the card before the preview shows.
+  static const delay = Duration(milliseconds: 450);
+
+  /// The preview's width; the card's text reads at this size.
+  static const width = 360.0;
+
+  @override
+  State<_HoverPreview> createState() => _HoverPreviewState();
+}
+
+class _HoverPreviewState extends State<_HoverPreview> {
+  Timer? _timer;
+  OverlayEntry? _entry;
+  Offset _pointer = Offset.zero;
+
+  @override
+  void didUpdateWidget(_HoverPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!widget.enabled || widget.image != oldWidget.image) _hide();
+  }
+
+  @override
+  void dispose() {
+    _hide();
+    super.dispose();
+  }
+
+  void _enter(PointerEnterEvent event) {
+    if (!widget.enabled) return;
+    _pointer = event.position;
+    _timer?.cancel();
+    _timer = Timer(_HoverPreview.delay, _show);
+  }
+
+  void _move(PointerHoverEvent event) {
+    _pointer = event.position;
+    _entry?.markNeedsBuild();
+  }
+
+  void _hide() {
+    _timer?.cancel();
+    _timer = null;
+    _entry?.remove();
+    _entry = null;
+  }
+
+  void _show() {
+    final image = widget.image;
+    if (!mounted || image == null || _entry != null) return;
+    final overlay = Overlay.of(context);
+    _entry = OverlayEntry(builder: (context) {
+      final size = MediaQuery.sizeOf(context);
+      const width = _HoverPreview.width;
+      const height = width * 88 / 63;
+      // Beside the pointer, flipped to the left or clamped when short on room.
+      var left = _pointer.dx + 24;
+      if (left + width > size.width) left = _pointer.dx - 24 - width;
+      final top = (_pointer.dy - height / 2).clamp(8.0, (size.height - height - 8).clamp(8.0, double.infinity));
+      return Positioned(
+        left: left.clamp(8.0, (size.width - width - 8).clamp(8.0, double.infinity)),
+        top: top,
+        child: IgnorePointer(
+          child: Material(
+            key: const Key('cardPreview'),
+            elevation: 12,
+            borderRadius: BorderRadius.circular(width / 22),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              width: width,
+              height: height,
+              child: Image.file(image, fit: BoxFit.contain),
+            ),
+          ),
+        ),
+      );
+    });
+    overlay.insert(_entry!);
+  }
+
+  @override
+  Widget build(BuildContext context) => MouseRegion(
+        onEnter: _enter,
+        onHover: _move,
+        onExit: (_) => _hide(),
+        child: widget.child,
+      );
 }
 
 /// A rarity-colored glow around a face-down card while the pointer hovers

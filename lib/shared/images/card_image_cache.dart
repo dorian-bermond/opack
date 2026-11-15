@@ -459,6 +459,22 @@ class CardImagesSetting extends Notifier<bool> {
   }
 }
 
+/// Whether hovering a card for a moment shows its picture large enough to
+/// read; saved across launches, on by default.
+final cardHoverPreviewProvider = NotifierProvider<CardHoverPreviewSetting, bool>(CardHoverPreviewSetting.new);
+
+class CardHoverPreviewSetting extends Notifier<bool> {
+  static const _key = 'cardHoverPreview';
+
+  @override
+  bool build() => ref.read(sharedPreferencesProvider).getBool(_key) ?? true;
+
+  void set(bool enabled) {
+    ref.read(sharedPreferencesProvider).setBool(_key, enabled);
+    state = enabled;
+  }
+}
+
 /// The picture at a [cardImageSource], or `null` when disabled or unreachable.
 final cardImageProvider = FutureProvider.family<File?, ImageSource>((ref, source) async {
   final cache = ref.watch(cardImageCacheProvider);

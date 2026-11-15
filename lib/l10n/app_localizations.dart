@@ -1238,6 +1238,12 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @cardHoverPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Large preview when hovering a card'**
+  String get cardHoverPreview;
+
   /// No description provided for @collapse.
   ///
   /// In en, this message translates to:

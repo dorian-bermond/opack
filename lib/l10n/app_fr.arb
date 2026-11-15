@@ -256,6 +256,7 @@
   },
   "addSelected": "Ajouter au pool",
   "searchFailed": "Recherche impossible : {error}",
+  "cardHoverPreview": "Grand aperçu au survol d'une carte",
   "collapse": "Replier",
   "expand": "Déplier",
   "cardSize": "Taille des cartes",

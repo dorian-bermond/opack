@@ -20,6 +20,7 @@ class SettingsMenu extends ConsumerWidget {
     final language = ref.watch(localeProvider)?.languageCode ?? '';
     final mode = ref.watch(textPreferencesProvider).mode;
     final images = ref.watch(cardImagesEnabledProvider);
+    final hoverPreview = ref.watch(cardHoverPreviewProvider);
     final opening = ref.watch(openingModeProvider);
     final cardLanguages = ref.watch(cardLanguagesProvider);
     final languagesSetting = ref.read(cardLanguagesProvider.notifier);
@@ -65,6 +66,8 @@ class SettingsMenu extends ConsumerWidget {
         PopupMenuItem(enabled: false, child: Text(l10n.cardImagesSetting)),
         option(l10n.cardImagesOnline, images,
             () => ref.read(cardImagesEnabledProvider.notifier).set(!images)),
+        option(l10n.cardHoverPreview, hoverPreview,
+            () => ref.read(cardHoverPreviewProvider.notifier).set(!hoverPreview)),
       ],
     );
   }

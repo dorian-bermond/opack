@@ -312,6 +312,7 @@
   },
   "addSelected": "Add to the pool",
   "searchFailed": "Search failed: {error}",
+  "cardHoverPreview": "Large preview when hovering a card",
   "collapse": "Collapse",
   "expand": "Expand",
   "cardSize": "Card size",
