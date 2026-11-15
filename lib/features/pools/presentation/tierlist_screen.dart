@@ -42,6 +42,25 @@ class TierlistCardWidth extends Notifier<double> {
   }
 }
 
+/// The gap between two cards of a tier, saved across launches; negative
+/// gaps overlap the cards, each above its right neighbour.
+final tierlistSpacingProvider = NotifierProvider<TierlistSpacing, double>(TierlistSpacing.new);
+
+class TierlistSpacing extends Notifier<double> {
+  static const _key = 'tierlistSpacing';
+  static const min = -80.0;
+  static const max = 24.0;
+
+  @override
+  double build() => ref.read(sharedPreferencesProvider).getDouble(_key) ?? 8;
+
+  void set(double spacing) {
+    final clamped = spacing.clamp(min, max);
+    ref.read(sharedPreferencesProvider).setDouble(_key, clamped);
+    state = clamped;
+  }
+}
+
 class TierlistScreen extends StatelessWidget {
   const TierlistScreen({super.key, required this.poolId, this.quality, this.tag});
 
@@ -224,6 +243,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
     final quality = _quality;
     final infos = ref.watch(poolCardInfoProvider(_pool.id)).value?.infos ?? const <String, CardInfo>{};
     final cardWidth = ref.watch(tierlistCardWidthProvider);
+    final spacing = ref.watch(tierlistSpacingProvider);
 
     final allItems = [
       for (final e in play.entries) (card: e.card, info: infos[e.card.id], tags: play.tagsOfCard(e.card.id)),
@@ -344,6 +364,25 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                         ],
                       ),
                     ),
+                    SizedBox(
+                      width: 200,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.layers, size: 18),
+                          Expanded(
+                            child: Slider(
+                              key: const Key('tierlistSpacing'),
+                              min: TierlistSpacing.min,
+                              max: TierlistSpacing.max,
+                              value: spacing,
+                              label: l10n.cardSpacing,
+                              onChanged: ref.read(tierlistSpacingProvider.notifier).set,
+                            ),
+                          ),
+                          const Icon(Icons.space_bar, size: 18),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -366,6 +405,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                               onColor: (c) => setTagColor(ref, _pool, tier, c),
                               cards: valued[tier]!,
                               cardWidth: cardWidth,
+                              spacing: spacing,
                               onDrop: (card, {before}) => _dropOnTier(tier, card, before: before),
                               onMoveUp: i == 0 ? null : () => _moveTier(tier, -1),
                               onMoveDown: i == tiers.length - 1 ? null : () => _moveTier(tier, 1),
@@ -418,6 +458,7 @@ class _Tier extends StatelessWidget {
     this.onColor,
     required this.cards,
     required this.cardWidth,
+    required this.spacing,
     required this.onDrop,
     this.onMoveUp,
     this.onMoveDown,
@@ -430,6 +471,9 @@ class _Tier extends StatelessWidget {
   final ValueChanged<Color?>? onColor;
   final List<CardData> cards;
   final double cardWidth;
+
+  /// The gap between cards; negative to overlap them.
+  final double spacing;
   final void Function(CardData card, {String? before}) onDrop;
   final VoidCallback? onMoveUp;
   final VoidCallback? onMoveDown;
@@ -440,9 +484,11 @@ class _Tier extends StatelessWidget {
     return DragTarget<CardData>(
       onWillAcceptWithDetails: (d) => cards.lastOrNull?.id != d.data.id,
       onAcceptWithDetails: (d) => onDrop(d.data),
-      builder: (context, candidates, _) {
+      builder: (context, candidates, _) => LayoutBuilder(builder: (context, constraints) {
         final hovered = candidates.isNotEmpty;
         final tint = color ?? theme.colorScheme.primary;
+        // The label band, the border and the padding around the cards.
+        final flowWidth = (constraints.maxWidth - 96 - 2 * 2 - 2 * 8).clamp(cardWidth, double.infinity);
         return AnimatedContainer(
           key: ValueKey('tierRow-$label'),
           duration: const Duration(milliseconds: 120),
@@ -508,12 +554,15 @@ class _Tier extends StatelessWidget {
                   constraints: BoxConstraints(minHeight: cardWidth * 88 / 63 + 16),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                    child: _CardFlow(
+                      width: flowWidth,
+                      cardWidth: cardWidth,
+                      cardHeight: cardWidth * 88 / 63,
+                      spacing: spacing,
                       children: [
                         for (final card in cards)
                           _RankedCard(
+                            key: ValueKey('ranked-${card.id}'),
                             card: card,
                             width: cardWidth,
                             color: color,
@@ -528,7 +577,7 @@ class _Tier extends StatelessWidget {
           ),
           ),
         );
-      },
+      }),
     );
   }
 }
@@ -589,11 +638,63 @@ class OutlinedText extends StatelessWidget {
       );
 }
 
+/// Cards laid out in rows, [spacing] apart; a negative spacing overlaps
+/// them so each card sits above its right neighbour and every row covers
+/// the one above it, keeping every card's top-left corner clear.
+class _CardFlow extends StatelessWidget {
+  const _CardFlow({
+    required this.width,
+    required this.cardWidth,
+    required this.cardHeight,
+    required this.spacing,
+    required this.children,
+  });
+
+  /// The width to flow in (measured by the tier, as an intrinsic-height
+  /// row cannot hold a layout builder).
+  final double width;
+  final double cardWidth;
+  final double cardHeight;
+  final double spacing;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+        final stepX = cardWidth + spacing;
+        final stepY = cardHeight + spacing;
+        final columns = (((width - cardWidth) / stepX).floor() + 1).clamp(1, 1 << 16);
+        final rows = children.isEmpty ? 0 : (children.length / columns).ceil();
+        final height = rows == 0 ? 0.0 : cardHeight + (rows - 1) * stepY;
+        return SizedBox(
+          width: width,
+          height: height,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Painted in this order: within a row from right to left, so
+              // the left card is on top; rows top to bottom, so the lower
+              // row is on top.
+              for (var row = 0; row < rows; row++)
+                for (var column = columns - 1; column >= 0; column--)
+                  if (row * columns + column < children.length)
+                    Positioned(
+                      left: column * stepX,
+                      top: row * stepY,
+                      width: cardWidth,
+                      height: cardHeight,
+                      child: children[row * columns + column],
+                    ),
+            ],
+          ),
+        );
+  }
+}
+
 /// A card of a tier, sitting on its value's [color] with no rarity
 /// marker: dragged to rank it elsewhere, and a drop target that ranks the
 /// dropped card right before it.
 class _RankedCard extends StatelessWidget {
-  const _RankedCard({required this.card, required this.width, required this.color, required this.onDropBefore});
+  const _RankedCard({super.key, required this.card, required this.width, required this.color, required this.onDropBefore});
 
   final CardData card;
   final double width;

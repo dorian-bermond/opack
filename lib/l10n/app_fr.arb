@@ -256,6 +256,7 @@
   },
   "addSelected": "Ajouter au pool",
   "searchFailed": "Recherche impossible : {error}",
+  "cardSpacing": "Espacement des cartes",
   "editQualityTitle": "Modifier la qualité",
   "deleteQuality": "Supprimer la qualité",
   "deleteQualityTitle": "Supprimer la qualité {quality} ?",

@@ -721,6 +721,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get cardSpacing => 'Espacement des cartes';
+
+  @override
   String get editQualityTitle => 'Modifier la qualité';
 
   @override

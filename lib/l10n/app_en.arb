@@ -312,6 +312,7 @@
   },
   "addSelected": "Add to the pool",
   "searchFailed": "Search failed: {error}",
+  "cardSpacing": "Card spacing",
   "editQualityTitle": "Edit the quality",
   "deleteQuality": "Delete the quality",
   "deleteQualityTitle": "Delete the quality {quality}?",

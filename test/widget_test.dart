@@ -434,17 +434,25 @@ void main() {
     expect(tester.widget<IconButton>(find.byKey(const Key('tierlistUndo'))).onPressed, isNull);
 
     // Dropping a card on another ranks it right before that one.
-    final first = find.descendant(of: rare, matching: find.byType(DraggableCard)).first;
-    final firstId = tester.widget<DraggableCard>(first).card.id;
-    final third = find.descendant(of: rare, matching: find.byType(DraggableCard)).at(2);
-    final thirdId = tester.widget<DraggableCard>(third).card.id;
+    // Cards of a tier by rank: left to right, top to bottom on screen (the
+    // tree paints them in another order so the left card is on top).
+    List<(String, Rect)> rankedCards() {
+      final cards = find.descendant(of: rare, matching: find.byType(DraggableCard));
+      final list = [
+        for (var i = 0; i < cards.evaluate().length; i++)
+          (tester.widget<DraggableCard>(cards.at(i)).card.id, tester.getRect(cards.at(i))),
+      ];
+      list.sort((a, b) => a.$2.top != b.$2.top ? a.$2.top.compareTo(b.$2.top) : a.$2.left.compareTo(b.$2.left));
+      return list;
+    }
+
+    final firstId = rankedCards()[0].$1;
+    final thirdId = rankedCards()[2].$1;
+    final first = find.byKey(ValueKey('ranked-$firstId'));
+    final third = find.byKey(ValueKey('ranked-$thirdId'));
     await tester.timedDrag(third, tester.getCenter(first) - tester.getCenter(third), const Duration(milliseconds: 400));
     await settleLoading(tester);
-    final ranked = [
-      for (final w in tester.widgetList<DraggableCard>(find.descendant(of: rare, matching: find.byType(DraggableCard))))
-        w.card.id,
-    ];
-    expect(ranked.take(2), [thirdId, firstId]);
+    expect(rankedCards().take(2).map((c) => c.$1), [thirdId, firstId]);
     await tester.tap(find.byKey(const Key('tierlistUndo')));
     await settleLoading(tester);
 
@@ -507,6 +515,20 @@ void main() {
     await tester.pumpAndSettle();
     expect(cardWidth(), 120);
     expect(tester.widget<Slider>(find.byKey(const Key('tierlistCardSize'))).value, 120);
+
+    // Spacing: 8 px apart by default; negative, the cards overlap with the
+    // left one on top and the lower row on top.
+    Rect rankedRect(int i) => rankedCards()[i].$2;
+    expect(rankedRect(1).left - rankedRect(0).right, 8);
+    container.read(tierlistSpacingProvider.notifier).set(-40);
+    await tester.pumpAndSettle();
+    expect(rankedRect(1).left, rankedRect(0).left + 120 - 40);
+    expect(rankedRect(0).top, rankedRect(1).top);
+    final columns = ((tester.getSize(rare).width - 96 - 16 - 120) / 80).floor() + 1;
+    expect(rankedRect(columns).top, closeTo(rankedRect(0).top + 120 * 88 / 63 - 40, 0.5), reason: 'rows overlap too');
+    expect(rankedRect(columns).left, rankedRect(0).left);
+    container.read(tierlistSpacingProvider.notifier).set(8);
+    await tester.pumpAndSettle();
 
     // Editing the quality as a whole: rename, recolor, reorder, delete values.
     await tester.tap(find.byKey(const Key('tierlistEditQuality')));

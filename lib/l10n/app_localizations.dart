@@ -1238,6 +1238,12 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @cardSpacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Card spacing'**
+  String get cardSpacing;
+
   /// No description provided for @editQualityTitle.
   ///
   /// In en, this message translates to:
