@@ -9,6 +9,7 @@ import '../../card_info/domain/card_filter.dart';
 import '../../card_info/domain/card_info.dart';
 import '../../card_info/presentation/filter_sheet.dart';
 import '../../card_info/presentation/labels.dart';
+import '../../card_text/data/card_text_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
@@ -22,6 +23,24 @@ import 'pool_view.dart';
 /// one tier per value, the others in a feed at the bottom. Cards drag from
 /// the feed to a tier, from tier to tier, or back to the feed to lose
 /// their value; Ctrl+Z undoes the last drop.
+/// The width of a card in the tierlist, saved across launches.
+final tierlistCardWidthProvider = NotifierProvider<TierlistCardWidth, double>(TierlistCardWidth.new);
+
+class TierlistCardWidth extends Notifier<double> {
+  static const _key = 'tierlistCardWidth';
+  static const min = 56.0;
+  static const max = 220.0;
+
+  @override
+  double build() => ref.read(sharedPreferencesProvider).getDouble(_key) ?? 96;
+
+  void set(double width) {
+    final clamped = width.clamp(min, max);
+    ref.read(sharedPreferencesProvider).setDouble(_key, clamped);
+    state = clamped;
+  }
+}
+
 class TierlistScreen extends StatelessWidget {
   const TierlistScreen({super.key, required this.poolId, this.quality, this.tag});
 
@@ -60,6 +79,11 @@ class _TierlistState extends ConsumerState<_Tierlist> {
 
   /// The pools before each drop, newest last.
   final List<Pool> _undo = [];
+
+  /// The feed's height once the user resized it, and whether it is folded
+  /// to its header.
+  double? _feedHeight;
+  bool _feedCollapsed = false;
 
   Pool get _pool => widget.pool.pool;
 
@@ -190,6 +214,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
     final play = widget.pool;
     final quality = _quality;
     final infos = ref.watch(poolCardInfoProvider(_pool.id)).value?.infos ?? const <String, CardInfo>{};
+    final cardWidth = ref.watch(tierlistCardWidthProvider);
 
     final allItems = [
       for (final e in play.entries) (card: e.card, info: infos[e.card.id], tags: play.tagsOfCard(e.card.id)),
@@ -270,6 +295,25 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                       ),
                     ),
                     Text(l10n.cardsCount(group.length), style: theme.textTheme.labelMedium),
+                    SizedBox(
+                      width: 200,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.photo_size_select_small, size: 18),
+                          Expanded(
+                            child: Slider(
+                              key: const Key('tierlistCardSize'),
+                              min: TierlistCardWidth.min,
+                              max: TierlistCardWidth.max,
+                              value: cardWidth,
+                              label: l10n.cardSize,
+                              onChanged: ref.read(tierlistCardWidthProvider.notifier).set,
+                            ),
+                          ),
+                          const Icon(Icons.photo_size_select_large, size: 18),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -289,6 +333,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                               key: ValueKey('tier-$tier'),
                               label: tagLabel(l10n, tier.substring(quality.length + 1)),
                               cards: valued[tier]!,
+                              cardWidth: cardWidth,
                               onDrop: (card, {before}) => _dropOnTier(tier, card, before: before),
                               onMoveUp: i == 0 ? null : () => _moveTier(tier, -1),
                               onMoveDown: i == tiers.length - 1 ? null : () => _moveTier(tier, 1),
@@ -309,7 +354,18 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                       ),
               ),
               if (quality != null)
-                _Feed(cards: feed, hint: l10n.tierlistFeedHint, onDrop: _dropOnFeed),
+                _Feed(
+                  cards: feed,
+                  hint: l10n.tierlistFeedHint,
+                  height: _feedHeight ?? cardWidth * 88 / 63 + 16,
+                  collapsed: _feedCollapsed,
+                  onToggle: () => setState(() => _feedCollapsed = !_feedCollapsed),
+                  onResize: (delta) => setState(() {
+                    _feedCollapsed = false;
+                    _feedHeight = ((_feedHeight ?? cardWidth * 88 / 63 + 16) - delta).clamp(80.0, 600.0);
+                  }),
+                  onDrop: _dropOnFeed,
+                ),
             ],
           ),
         ),
@@ -318,15 +374,16 @@ class _TierlistState extends ConsumerState<_Tierlist> {
   }
 }
 
-/// One tier: its label and rank arrows, then its cards in a row that
-/// scrolls sideways, ranked left to right. A drop target for cards of the
-/// feed or of other tiers; dropping on a card ranks before it, on the
-/// row's free space last.
+/// One tier: its label and rank arrows, then its cards as a gallery
+/// wrapping over as many lines as needed, ranked left to right, top to
+/// bottom. A drop target for cards of the feed or of other tiers;
+/// dropping on a card ranks before it, on free space last.
 class _Tier extends StatelessWidget {
   const _Tier({
     super.key,
     required this.label,
     required this.cards,
+    required this.cardWidth,
     required this.onDrop,
     this.onMoveUp,
     this.onMoveDown,
@@ -334,6 +391,7 @@ class _Tier extends StatelessWidget {
 
   final String label;
   final List<CardData> cards;
+  final double cardWidth;
   final void Function(CardData card, {String? before}) onDrop;
   final VoidCallback? onMoveUp;
   final VoidCallback? onMoveDown;
@@ -391,16 +449,21 @@ class _Tier extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: SizedBox(
-                  height: 150,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: cardWidth * 88 / 63 + 16),
+                  child: Padding(
                     padding: const EdgeInsets.all(8),
-                    itemCount: cards.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, i) => _RankedCard(
-                      card: cards[i],
-                      onDropBefore: (card) => onDrop(card, before: cards[i].id),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final card in cards)
+                          _RankedCard(
+                            card: card,
+                            width: cardWidth,
+                            onDropBefore: (dropped) => onDrop(dropped, before: card.id),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -416,9 +479,10 @@ class _Tier extends StatelessWidget {
 /// A card of a tier: dragged to rank it elsewhere, and a drop target that
 /// ranks the dropped card right before it.
 class _RankedCard extends StatelessWidget {
-  const _RankedCard({required this.card, required this.onDropBefore});
+  const _RankedCard({required this.card, required this.width, required this.onDropBefore});
 
   final CardData card;
+  final double width;
   final void Function(CardData card) onDropBefore;
 
   @override
@@ -428,7 +492,7 @@ class _RankedCard extends StatelessWidget {
       onWillAcceptWithDetails: (d) => d.data.id != card.id,
       onAcceptWithDetails: (d) => onDropBefore(d.data),
       builder: (context, candidates, _) => Container(
-        width: 96,
+        width: width,
         decoration: candidates.isEmpty
             ? null
             : BoxDecoration(border: Border(left: BorderSide(color: theme.colorScheme.primary, width: 3))),
@@ -438,18 +502,35 @@ class _RankedCard extends StatelessWidget {
   }
 }
 
-/// The cards of the group without a value yet, scrolled sideways; a
-/// drop target that takes a card's value away.
+/// The cards of the group without a value yet, scrolled sideways, as tall
+/// as the zone the user resized by its top edge, or folded to its header;
+/// a drop target that takes a card's value away.
 class _Feed extends StatelessWidget {
-  const _Feed({required this.cards, required this.hint, required this.onDrop});
+  const _Feed({
+    required this.cards,
+    required this.hint,
+    required this.height,
+    required this.collapsed,
+    required this.onToggle,
+    required this.onResize,
+    required this.onDrop,
+  });
 
   final List<CardData> cards;
   final String hint;
+  final double height;
+  final bool collapsed;
+  final VoidCallback onToggle;
+
+  /// Called with the vertical drag of the top edge (negative: taller).
+  final ValueChanged<double> onResize;
   final void Function(CardData card) onDrop;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final cardWidth = (height - 16) * 63 / 88;
     return DragTarget<CardData>(
       onWillAcceptWithDetails: (d) => !cards.any((c) => c.id == d.data.id),
       onAcceptWithDetails: (d) => onDrop(d.data),
@@ -464,19 +545,55 @@ class _Feed extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                  child: Text('$hint · ${cards.length}', style: theme.textTheme.labelMedium),
+                // The resizer: drag the top edge to change the zone's height.
+                MouseRegion(
+                  cursor: SystemMouseCursors.resizeUpDown,
+                  child: GestureDetector(
+                    key: const Key('feedResizer'),
+                    behavior: HitTestBehavior.opaque,
+                    onVerticalDragUpdate: (d) => onResize(d.delta.dy),
+                    child: SizedBox(
+                      height: 12,
+                      child: Center(
+                        child: Container(
+                          width: 48,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.outlineVariant,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12),
+                        child: Text('$hint · ${cards.length}', style: theme.textTheme.labelMedium),
+                      ),
+                    ),
+                    IconButton(
+                      key: const Key('feedToggle'),
+                      tooltip: collapsed ? l10n.expand : l10n.collapse,
+                      icon: Icon(collapsed ? Icons.expand_less : Icons.expand_more),
+                      visualDensity: VisualDensity.compact,
+                      onPressed: onToggle,
+                    ),
+                  ],
+                ),
+                if (!collapsed)
                 SizedBox(
-                  height: 166,
+                  height: height,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.all(8),
                     itemCount: cards.length,
                     separatorBuilder: (_, _) => const SizedBox(width: 8),
                     itemBuilder: (context, i) => SizedBox(
-                      width: 108,
+                      width: cardWidth,
                       child: DraggableCard(card: cards[i], enabled: true, child: CardTile(card: cards[i])),
                     ),
                   ),

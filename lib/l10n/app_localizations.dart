@@ -1238,6 +1238,24 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @collapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get collapse;
+
+  /// No description provided for @expand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get expand;
+
+  /// No description provided for @cardSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Card size'**
+  String get cardSize;
+
   /// No description provided for @newQualityTitle.
   ///
   /// In en, this message translates to:

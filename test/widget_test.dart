@@ -22,6 +22,7 @@ import 'package:opack/features/cube/domain/cube.dart';
 import 'package:opack/features/pools/data/pool_repository.dart';
 import 'package:opack/features/pools/domain/pool.dart';
 import 'package:opack/features/pools/presentation/pool_view.dart';
+import 'package:opack/features/pools/presentation/tierlist_screen.dart';
 import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 import 'package:opack/shared/widgets/card_tile.dart';
@@ -387,7 +388,7 @@ void main() {
   });
 
   testWidgets('tierlist: drag cards between tiers and the feed, undo with Ctrl+Z', (tester) async {
-    await startApp(tester, locale: const Locale('en'));
+    final container = await startApp(tester, locale: const Locale('en'));
     await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
     await tester.tap(find.byKey(const Key('tierlistButton')));
     await settleLoading(tester);
@@ -474,6 +475,28 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Rarity'));
     await tester.pumpAndSettle();
+
+    // The size slider scales every card of the tiers and the feed.
+    double cardWidth() => tester.getSize(find.descendant(of: rare, matching: find.byType(DraggableCard)).first).width;
+    expect(cardWidth(), 96);
+    expect(tester.widget<Slider>(find.byKey(const Key('tierlistCardSize'))).value, 96);
+    container.read(tierlistCardWidthProvider.notifier).set(120);
+    await tester.pumpAndSettle();
+    expect(cardWidth(), 120);
+    expect(tester.widget<Slider>(find.byKey(const Key('tierlistCardSize'))).value, 120);
+
+    // The feed folds to its header and resizes by its top edge.
+    final feedZone = find.byKey(const Key('tierlistFeed'));
+    final feedBefore = tester.getSize(feedZone).height;
+    await tester.tap(find.byKey(const Key('feedToggle')));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(feedZone).height, lessThan(feedBefore - 80));
+    await tester.tap(find.byKey(const Key('feedToggle')));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(feedZone).height, feedBefore);
+    await tester.drag(find.byKey(const Key('feedResizer')), const Offset(0, -100));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(feedZone).height, greaterThan(feedBefore + 60));
 
     // A new tier is a new value of the quality.
     await tester.tap(find.byKey(const Key('addTier')));

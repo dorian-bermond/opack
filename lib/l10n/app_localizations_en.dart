@@ -719,6 +719,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get collapse => 'Collapse';
+
+  @override
+  String get expand => 'Expand';
+
+  @override
+  String get cardSize => 'Card size';
+
+  @override
   String get newQualityTitle => 'Add a quality';
 
   @override
