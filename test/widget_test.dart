@@ -508,6 +508,29 @@ void main() {
     expect(cardWidth(), 120);
     expect(tester.widget<Slider>(find.byKey(const Key('tierlistCardSize'))).value, 120);
 
+    // Editing the quality as a whole: rename, recolor, reorder, delete values.
+    await tester.tap(find.byKey(const Key('tierlistEditQuality')));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(AlertDialog, 'Edit the quality'), findsOneWidget);
+    expect(tester.widget<TextField>(find.byKey(const ValueKey('qualityValue-0'))).controller!.text, 'secretRare',
+        reason: 'values listed best first');
+    await tester.enterText(find.byKey(const ValueKey('qualityValue-0')), 'secret');
+    await tester.tap(find.byKey(const ValueKey('qualityValueDelete-1')), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('qualityValueDown-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
+    await settleLoading(tester);
+    final tags = container.read(poolsProvider).value!.single;
+    expect(tags.tags.containsKey('rarity:ultraRare'), isFalse, reason: 'deleted');
+    expect(tags.tags.containsKey('rarity:secretRare'), isFalse, reason: 'renamed');
+    expect(tags.tags['rarity:secret']!.cards.length, 8, reason: 'kept its cards');
+    expect(tags.orderedValuesOf('rarity').take(2), ['rarity:superRare', 'rarity:secret'], reason: 'moved down one');
+    expect(find.byKey(const ValueKey('tier-rarity:secret')), findsOneWidget);
+    expect(find.byKey(const ValueKey('tier-rarity:ultraRare')), findsNothing);
+    await tester.tap(find.byKey(const Key('tierlistUndo')), warnIfMissed: false);
+    await settleLoading(tester);
+
     // The feed folds to its header and resizes by its top edge.
     final feedZone = find.byKey(const Key('tierlistFeed'));
     final feedBefore = tester.getSize(feedZone).height;

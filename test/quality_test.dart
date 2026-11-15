@@ -95,6 +95,25 @@ void main() {
     expect(pool.withValuesOrder('nope', []).tags.keys.toList(), pool.tags.keys.toList());
   });
 
+  test('renaming a tag keeps its place, cards, color and booster slots', () {
+    var pool = Pool.empty(Game.mtg, name: 'p')
+        .withTag('tier:S', ['a'])
+        .withTagColor('tier:S', 1)
+        .withTag('tier:A', ['b'])
+        .withTag('mine', ['a'])
+        .copyWith(slots: [PackSlot(1, const [SlotOption('tier:S', 2), SlotOption('mine')])]);
+    pool = pool.withTagRenamed('tier:S', 'tier:SS');
+    expect(pool.tags.keys.toList(), ['tier:SS', 'tier:A', 'mine']);
+    expect(pool.tags['tier:SS']!.cards, ['a']);
+    expect(pool.tags['tier:SS']!.color, 1);
+    expect(pool.slots.single.options.map((o) => '${o.tag}:${o.weight}'), ['tier:SS:2', 'mine:1']);
+    expect(pool.withTagRenamed('tier:A', 'mine').tags.keys.toList(), pool.tags.keys.toList(), reason: 'taken');
+    expect(pool.withTagRenamed('nope', 'x').tags.keys.toList(), pool.tags.keys.toList());
+    // Renaming into another quality carries the order preference along.
+    pool = pool.withQualityDescending('tier', true).withTagRenamed('tier:SS', 'grade:SS');
+    expect(pool.isDescending('grade'), isTrue);
+  });
+
   test('a value keeps its color through edits and saving', () {
     var pool = Pool.empty(Game.mtg, name: 'p').withTag('tier:S', ['a']).withTagColor('tier:S', 0xFFE53935);
     expect(pool.tags['tier:S']!.color, 0xFFE53935);

@@ -85,24 +85,264 @@ Future<String?> newQualityValue(BuildContext context, WidgetRef ref, Pool pool, 
 void setTagColor(WidgetRef ref, Pool pool, String tag, Color? color) =>
     savePool(ref, pool.withTagColor(tag, color?.toARGB32()));
 
+/// One value as the quality dialog edits it: the tag it came from (`null`
+/// when new), its name and color.
+typedef QualityValueEdit = ({String? tag, String value, Color? color});
+
+/// What the quality dialog answers: the quality's name and its values in
+/// their preferred order; or a request to delete the whole quality.
+typedef QualityEdit = ({String quality, List<QualityValueEdit> values, bool delete});
+
 /// Creates a quality (a discrete trait: one value among several) with its
 /// first values and their colors, ranked as listed; answers its name,
 /// `null` when dismissed, blank or already there.
 Future<String?> newPoolQuality(BuildContext context, WidgetRef ref, Pool pool) async {
-  final result = await showDialog<(String, List<(String, Color?)>)>(
+  final edit = await showDialog<QualityEdit>(
     context: context,
-    builder: (context) => const _NewQualityDialog(),
+    builder: (context) => const QualityDialog(),
   );
-  if (result == null) return null;
-  final (quality, values) = result;
-  if (pool.qualities.contains(quality)) return null;
+  if (edit == null || edit.delete) return null;
+  if (pool.qualities.contains(edit.quality)) return null;
   var updated = pool;
-  for (final (value, color) in values) {
-    final name = Pool.qualityTag(quality, value);
+  for (final (:tag, :value, :color) in edit.values) {
+    assert(tag == null);
+    final name = Pool.qualityTag(edit.quality, value);
     updated = updated.withTag(name, const []).withTagColor(name, color?.toARGB32());
   }
   savePool(ref, updated);
-  return quality;
+  return edit.quality;
+}
+
+/// Edits [quality] as a whole: its name, and its values' names, colors,
+/// order, with values added or deleted; or deletes it. Answers the
+/// quality's (new) name, `null` when dismissed or deleted.
+Future<String?> editPoolQuality(BuildContext context, WidgetRef ref, Pool pool, String quality) async {
+  final l10n = AppLocalizations.of(context);
+  final edit = await showDialog<QualityEdit>(
+    context: context,
+    builder: (context) => QualityDialog(
+      quality: quality,
+      values: [
+        for (final tag in pool.orderedValuesOf(quality))
+          (tag: tag, value: tag.substring(quality.length + 1), color: valueColor(pool, tag)),
+      ],
+      descending: pool.isDescending(quality),
+    ),
+  );
+  if (edit == null || !context.mounted) return null;
+  if (edit.delete) {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.deleteQualityTitle(qualityLabel(l10n, quality))),
+        content: Text(l10n.deleteQualityAffects),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(l10n.deleteQuality)),
+        ],
+      ),
+    );
+    if (confirmed != true) return null;
+    var updated = pool;
+    for (final tag in pool.valuesOf(quality)) {
+      updated = updated.withoutTag(tag);
+    }
+    savePool(ref, updated);
+    return null;
+  }
+  savePool(ref, applyQualityEdit(pool, quality, edit));
+  return edit.quality;
+}
+
+/// [pool] with [edit] applied to [quality]: values gone are deleted,
+/// kept ones renamed and recolored, new ones created, all ranked as
+/// listed; then the quality itself renamed when its name changed.
+Pool applyQualityEdit(Pool pool, String quality, QualityEdit edit) {
+  var updated = pool;
+  final kept = {for (final v in edit.values) if (v.tag != null) v.tag!};
+  for (final tag in pool.valuesOf(quality)) {
+    if (!kept.contains(tag)) updated = updated.withoutTag(tag);
+  }
+  // Two passes: temporary names first, so swapping two values' names works.
+  final finalNames = <String, String>{};
+  for (final (i, (:tag, :value, :color)) in edit.values.indexed) {
+    final name = Pool.qualityTag(quality, value);
+    if (tag == null) {
+      updated = updated.withTag(name, const []).withTagColor(name, color?.toARGB32());
+      finalNames[name] = name;
+    } else {
+      final temporary = Pool.qualityTag(quality, '\u0000$i');
+      updated = updated.withTagRenamed(tag, temporary).withTagColor(temporary, color?.toARGB32());
+      finalNames[temporary] = name;
+    }
+  }
+  for (final MapEntry(key: from, value: to) in finalNames.entries) {
+    updated = updated.withTagRenamed(from, to);
+  }
+  final shown = [for (final v in edit.values) Pool.qualityTag(quality, v.value)];
+  updated = updated.withValuesOrder(quality, updated.isDescending(quality) ? shown.reversed.toList() : shown);
+  if (edit.quality != quality) {
+    for (final tag in updated.valuesOf(quality)) {
+      updated = updated.withTagRenamed(tag, Pool.qualityTag(edit.quality, tag.substring(quality.length + 1)));
+    }
+  }
+  return updated;
+}
+
+/// Asks a quality name and its values, best first, each with a color;
+/// edits an existing one when [quality] is given, deletes it by a button.
+class QualityDialog extends StatefulWidget {
+  const QualityDialog({super.key, this.quality, this.values = const [], this.descending = false});
+
+  final String? quality;
+  final List<QualityValueEdit> values;
+  final bool descending;
+
+  @override
+  State<QualityDialog> createState() => _QualityDialogState();
+}
+
+class _QualityDialogState extends State<QualityDialog> {
+  late final _name = TextEditingController(text: widget.quality ?? '');
+  final _rows = <({String? tag, TextEditingController name, Color? color})>[];
+
+  @override
+  void initState() {
+    super.initState();
+    for (final (:tag, :value, :color) in widget.values) {
+      _rows.add((tag: tag, name: TextEditingController(text: value), color: color));
+    }
+    if (_rows.isEmpty) {
+      for (var i = 0; i < 3; i++) {
+        _addRow();
+      }
+    }
+  }
+
+  void _addRow() => _rows.add((tag: null, name: TextEditingController(), color: defaultValueColor(_rows.length)));
+
+  @override
+  void dispose() {
+    _name.dispose();
+    for (final row in _rows) {
+      row.name.dispose();
+    }
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _name.text.trim().replaceAll(':', '').toLowerCase();
+    final seen = <String>{};
+    final values = <QualityValueEdit>[
+      for (final row in _rows)
+        if (row.name.text.trim().replaceAll(':', '') case final value when value.isNotEmpty && seen.add(value))
+          (tag: row.tag, value: value, color: row.color),
+    ];
+    if (name.isEmpty || values.isEmpty) return;
+    Navigator.pop(context, (quality: name, values: values, delete: false));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final editing = widget.quality != null;
+    return AlertDialog(
+      title: Text(editing ? l10n.editQualityTitle : l10n.newQualityTitle),
+      content: SizedBox(
+        width: 440,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.newQualityHint, style: theme.textTheme.bodySmall),
+              const SizedBox(height: 12),
+              TextField(
+                key: const Key('qualityNameField'),
+                controller: _name,
+                autofocus: !editing,
+                decoration: InputDecoration(labelText: l10n.qualityName, hintText: 'power'),
+              ),
+              const SizedBox(height: 12),
+              Text(l10n.qualityValues, style: theme.textTheme.labelLarge),
+              Text(widget.descending ? l10n.qualityValuesHint : l10n.qualityValuesHintAscending,
+                  style: theme.textTheme.bodySmall),
+              for (final (i, row) in _rows.indexed)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('${i + 1}.', style: theme.textTheme.labelLarge),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          key: ValueKey('qualityValue-$i'),
+                          controller: row.name,
+                          decoration: InputDecoration(isDense: true, hintText: ['S', 'A', 'B', 'C'].elementAtOrNull(i)),
+                        ),
+                      ),
+                      PopupMenuButton<Color>(
+                        key: ValueKey('qualityValueColor-$i'),
+                        tooltip: l10n.valueColor,
+                        icon: ColorDot(row.color, size: 24),
+                        onSelected: (c) => setState(() => _rows[i] = (tag: row.tag, name: row.name, color: c)),
+                        itemBuilder: (context) => [
+                          for (final c in qualityPalette)
+                            PopupMenuItem(value: c, child: ColorDot(c, size: 20)),
+                        ],
+                      ),
+                      IconButton(
+                        key: ValueKey('qualityValueUp-$i'),
+                        icon: const Icon(Icons.arrow_upward, size: 18),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: i == 0 ? null : () => setState(() => _rows.insert(i - 1, _rows.removeAt(i))),
+                      ),
+                      IconButton(
+                        key: ValueKey('qualityValueDown-$i'),
+                        icon: const Icon(Icons.arrow_downward, size: 18),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: i == _rows.length - 1
+                            ? null
+                            : () => setState(() => _rows.insert(i + 1, _rows.removeAt(i))),
+                      ),
+                      IconButton(
+                        key: ValueKey('qualityValueDelete-$i'),
+                        tooltip: l10n.deleteValue,
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => setState(() => _rows.removeAt(i).name.dispose()),
+                      ),
+                    ],
+                  ),
+                ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  key: const Key('addQualityValueRow'),
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.addValue),
+                  onPressed: () => setState(_addRow),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        if (editing)
+          TextButton.icon(
+            key: const Key('deleteQuality'),
+            icon: const Icon(Icons.delete_outline),
+            label: Text(l10n.deleteQuality),
+            onPressed: () => Navigator.pop(context, (quality: widget.quality!, values: <QualityValueEdit>[], delete: true)),
+          ),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+        FilledButton(onPressed: _submit, child: Text(l10n.apply)),
+      ],
+    );
+  }
 }
 
 /// Asks a value's name and color.
@@ -153,126 +393,6 @@ class _ValueDialogState extends State<_ValueDialog> {
           const SizedBox(height: 6),
           ColorPicker(value: _color, onChanged: (c) => setState(() => _color = c)),
         ],
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-        FilledButton(onPressed: _submit, child: Text(l10n.apply)),
-      ],
-    );
-  }
-}
-
-/// Asks a quality name and its values, best first, each with a color.
-class _NewQualityDialog extends StatefulWidget {
-  const _NewQualityDialog();
-
-  @override
-  State<_NewQualityDialog> createState() => _NewQualityDialogState();
-}
-
-class _NewQualityDialogState extends State<_NewQualityDialog> {
-  late final _name = TextEditingController();
-  final _values = <(TextEditingController, Color?)>[];
-
-  @override
-  void initState() {
-    super.initState();
-    for (var i = 0; i < 3; i++) {
-      _addRow();
-    }
-  }
-
-  void _addRow() => _values.add((TextEditingController(), defaultValueColor(_values.length)));
-
-  @override
-  void dispose() {
-    _name.dispose();
-    for (final (controller, _) in _values) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  void _submit() {
-    final name = _name.text.trim().replaceAll(':', '').toLowerCase();
-    final seen = <String>{};
-    final values = [
-      for (final (controller, color) in _values)
-        if (controller.text.trim().replaceAll(':', '') case final value when value.isNotEmpty && seen.add(value))
-          (value, color),
-    ];
-    if (name.isEmpty || values.isEmpty) return;
-    Navigator.pop(context, (name, values));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return AlertDialog(
-      title: Text(l10n.newQualityTitle),
-      content: SizedBox(
-        width: 420,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.newQualityHint, style: theme.textTheme.bodySmall),
-              const SizedBox(height: 12),
-              TextField(
-                key: const Key('qualityNameField'),
-                controller: _name,
-                autofocus: true,
-                decoration: InputDecoration(labelText: l10n.qualityName, hintText: 'power'),
-              ),
-              const SizedBox(height: 12),
-              Text(l10n.qualityValues, style: theme.textTheme.labelLarge),
-              Text(l10n.qualityValuesHint, style: theme.textTheme.bodySmall),
-              for (final (i, (controller, color)) in _values.indexed)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 14),
-                        child: Text('${i + 1}.', style: theme.textTheme.labelLarge),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          key: ValueKey('qualityValue-$i'),
-                          controller: controller,
-                          decoration: InputDecoration(isDense: true, hintText: ['S', 'A', 'B', 'C'].elementAtOrNull(i)),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      PopupMenuButton<Color>(
-                        key: ValueKey('qualityValueColor-$i'),
-                        tooltip: l10n.valueColor,
-                        icon: ColorDot(color, size: 24),
-                        onSelected: (c) => setState(() => _values[i] = (controller, c)),
-                        itemBuilder: (context) => [
-                          for (final c in qualityPalette)
-                            PopupMenuItem(value: c, child: ColorDot(c, size: 20)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  key: const Key('addQualityValueRow'),
-                  icon: const Icon(Icons.add),
-                  label: Text(l10n.addValue),
-                  onPressed: () => setState(_addRow),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),

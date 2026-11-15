@@ -1238,6 +1238,42 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @editQualityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the quality'**
+  String get editQualityTitle;
+
+  /// No description provided for @deleteQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the quality'**
+  String get deleteQuality;
+
+  /// No description provided for @deleteQualityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the quality {quality}?'**
+  String deleteQualityTitle(String quality);
+
+  /// No description provided for @deleteQualityAffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Every value goes, and the cards lose them. Booster slots pulling from a value lose that option.'**
+  String get deleteQualityAffects;
+
+  /// No description provided for @deleteValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the value'**
+  String get deleteValue;
+
+  /// No description provided for @qualityValuesHintAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest first, the order they will show in.'**
+  String get qualityValuesHintAscending;
+
   /// No description provided for @qualityOrder.
   ///
   /// In en, this message translates to:

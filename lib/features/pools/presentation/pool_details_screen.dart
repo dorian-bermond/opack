@@ -158,6 +158,13 @@ class _PoolDetails extends ConsumerWidget {
                       const SizedBox(width: 6),
                       Text(qualityLabel(l10n, quality), style: theme.textTheme.titleSmall),
                       IconButton(
+                        key: ValueKey('editQuality-$quality'),
+                        tooltip: l10n.editQualityTitle,
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => editPoolQuality(context, ref, saved, quality),
+                      ),
+                      IconButton(
                         key: ValueKey('qualityOrder-$quality'),
                         tooltip: '${l10n.qualityOrder}: '
                             '${saved.isDescending(quality) ? l10n.orderDescending : l10n.orderAscending}',

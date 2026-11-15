@@ -721,6 +721,28 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get editQualityTitle => 'Modifier la qualité';
+
+  @override
+  String get deleteQuality => 'Supprimer la qualité';
+
+  @override
+  String deleteQualityTitle(String quality) {
+    return 'Supprimer la qualité $quality ?';
+  }
+
+  @override
+  String get deleteQualityAffects =>
+      'Toutes ses valeurs disparaissent, et les cartes les perdent. Les emplacements de booster qui en tiraient perdent cette option.';
+
+  @override
+  String get deleteValue => 'Supprimer la valeur';
+
+  @override
+  String get qualityValuesHintAscending =>
+      'La plus basse en premier, dans l\'ordre où elles s\'afficheront.';
+
+  @override
   String get qualityOrder => 'Ordre des valeurs';
 
   @override

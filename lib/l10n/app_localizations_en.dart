@@ -719,6 +719,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get editQualityTitle => 'Edit the quality';
+
+  @override
+  String get deleteQuality => 'Delete the quality';
+
+  @override
+  String deleteQualityTitle(String quality) {
+    return 'Delete the quality $quality?';
+  }
+
+  @override
+  String get deleteQualityAffects =>
+      'Every value goes, and the cards lose them. Booster slots pulling from a value lose that option.';
+
+  @override
+  String get deleteValue => 'Delete the value';
+
+  @override
+  String get qualityValuesHintAscending =>
+      'Lowest first, the order they will show in.';
+
+  @override
   String get qualityOrder => 'Value order';
 
   @override

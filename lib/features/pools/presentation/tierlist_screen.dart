@@ -284,6 +284,16 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                     ),
                     if (quality != null)
                       ActionChip(
+                        key: const Key('tierlistEditQuality'),
+                        avatar: const Icon(Icons.edit_outlined, size: 18),
+                        label: Text(l10n.editQualityTitle),
+                        onPressed: () async {
+                          final name = await editPoolQuality(context, ref, _pool, quality);
+                          if (mounted) setState(() => _quality = name ?? _pool.qualities.firstOrNull);
+                        },
+                      ),
+                    if (quality != null)
+                      ActionChip(
                         key: const Key('tierlistOrder'),
                         avatar: Icon(
                           _pool.isDescending(quality) ? Icons.arrow_downward : Icons.arrow_upward,
@@ -447,8 +457,9 @@ class _Tier extends StatelessWidget {
               width: hovered ? 3 : 2,
             ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: IntrinsicHeight(
+            child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
                 width: 96,
@@ -459,26 +470,30 @@ class _Tier extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
                         key: ValueKey('tierColor-$label'),
                         onTap: onColor == null ? null : () => _pickColor(context),
-                        child: Text(label, style: theme.textTheme.titleSmall, textAlign: TextAlign.center),
+                        child: OutlinedText(label, style: theme.textTheme.titleSmall, textAlign: TextAlign.center),
                       ),
-                      Text('${cards.length}', style: theme.textTheme.labelMedium),
+                      OutlinedText('${cards.length}', style: theme.textTheme.labelMedium),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
                             key: ValueKey('tierUp-$label'),
-                            icon: const Icon(Icons.arrow_upward, size: 16),
+                            icon: const Icon(Icons.arrow_upward, size: 16, shadows: _iconShadows),
+                            color: Colors.white,
+                            disabledColor: Colors.white38,
                             visualDensity: VisualDensity.compact,
                             onPressed: onMoveUp,
                           ),
                           IconButton(
                             key: ValueKey('tierDown-$label'),
-                            icon: const Icon(Icons.arrow_downward, size: 16),
+                            icon: const Icon(Icons.arrow_downward, size: 16, shadows: _iconShadows),
+                            color: Colors.white,
+                            disabledColor: Colors.white38,
                             visualDensity: VisualDensity.compact,
                             onPressed: onMoveDown,
                           ),
@@ -511,6 +526,7 @@ class _Tier extends StatelessWidget {
               ),
             ],
           ),
+          ),
         );
       },
     );
@@ -540,6 +556,37 @@ extension on _Tier {
     );
     if (chosen != null) onColor?.call(chosen);
   }
+}
+
+/// Shadows that outline a white icon on any color.
+const _iconShadows = [Shadow(color: Colors.black, blurRadius: 3), Shadow(color: Colors.black, blurRadius: 1)];
+
+/// White text with a black outline, readable on any color (tier headers).
+class OutlinedText extends StatelessWidget {
+  const OutlinedText(this.text, {super.key, this.style, this.textAlign});
+
+  final String text;
+  final TextStyle? style;
+  final TextAlign? textAlign;
+
+  /// A black shadow in every direction: an outline, from a single text.
+  static const outline = [
+    Shadow(color: Colors.black, offset: Offset(-1.2, -1.2), blurRadius: 0.6),
+    Shadow(color: Colors.black, offset: Offset(0, -1.2), blurRadius: 0.6),
+    Shadow(color: Colors.black, offset: Offset(1.2, -1.2), blurRadius: 0.6),
+    Shadow(color: Colors.black, offset: Offset(-1.2, 0), blurRadius: 0.6),
+    Shadow(color: Colors.black, offset: Offset(1.2, 0), blurRadius: 0.6),
+    Shadow(color: Colors.black, offset: Offset(-1.2, 1.2), blurRadius: 0.6),
+    Shadow(color: Colors.black, offset: Offset(0, 1.2), blurRadius: 0.6),
+    Shadow(color: Colors.black, offset: Offset(1.2, 1.2), blurRadius: 0.6),
+  ];
+
+  @override
+  Widget build(BuildContext context) => Text(
+        text,
+        textAlign: textAlign,
+        style: (style ?? const TextStyle()).copyWith(color: Colors.white, shadows: outline),
+      );
 }
 
 /// A card of a tier, sitting on its value's [color] with no rarity

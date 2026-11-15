@@ -777,6 +777,28 @@ class Pool {
         ],
       );
 
+  /// Renames [tag] to [name] in place, cards, weights, color and the
+  /// slots pulling from it included; nothing when [name] is taken.
+  Pool withTagRenamed(String tag, String name) {
+    if (tag == name || !tags.containsKey(tag) || tags.containsKey(name)) return this;
+    return copyWith(
+      tags: {for (final MapEntry(:key, :value) in tags.entries) (key == tag ? name : key): value},
+      boosters: [
+        for (final booster in boosters)
+          booster.copyWith(slots: [
+            for (final slot in booster.slots)
+              PackSlot(slot.count, [
+                for (final o in slot.options) o.tag == tag ? SlotOption(name, o.weight) : o,
+              ]),
+          ]),
+      ],
+      descending: {
+        for (final MapEntry(:key, :value) in descending.entries)
+          (key == qualityOf(tag) && qualityOf(name) != null ? qualityOf(name)! : key): value,
+      },
+    );
+  }
+
   /// Replaces the tags and the default booster's slots with [prefill],
   /// remembering [layout]; other boosters stay.
   Pool prefilled(Prefill prefill, {PackLayout? layout}) => copyWith(
