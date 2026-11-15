@@ -8,6 +8,7 @@ import '../../features/card_text/domain/card_text.dart';
 import '../../l10n/app_localizations.dart';
 import '../../features/packs/presentation/opening_mode.dart';
 import '../images/card_image_cache.dart';
+import 'card_tile.dart';
 
 /// App bar menu: UI language, card picture and card data languages, default
 /// card text version, pack opening mode and online pictures.
@@ -21,6 +22,7 @@ class SettingsMenu extends ConsumerWidget {
     final mode = ref.watch(textPreferencesProvider).mode;
     final images = ref.watch(cardImagesEnabledProvider);
     final hoverPreview = ref.watch(cardHoverPreviewProvider);
+    final marker = ref.watch(rarityMarkerProvider);
     final opening = ref.watch(openingModeProvider);
     final cardLanguages = ref.watch(cardLanguagesProvider);
     final languagesSetting = ref.read(cardLanguagesProvider.notifier);
@@ -68,6 +70,12 @@ class SettingsMenu extends ConsumerWidget {
             () => ref.read(cardImagesEnabledProvider.notifier).set(!images)),
         option(l10n.cardHoverPreview, hoverPreview,
             () => ref.read(cardHoverPreviewProvider.notifier).set(!hoverPreview)),
+        const PopupMenuDivider(),
+        PopupMenuItem(enabled: false, child: Text(l10n.rarityMarkerSetting)),
+        option(l10n.rarityMarkerBorder, marker == RarityMarker.border,
+            () => ref.read(rarityMarkerProvider.notifier).select(RarityMarker.border)),
+        option(l10n.rarityMarkerDot, marker == RarityMarker.dot,
+            () => ref.read(rarityMarkerProvider.notifier).select(RarityMarker.dot)),
       ],
     );
   }

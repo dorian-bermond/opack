@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/settings/card_languages.dart';
 import '../../features/card_text/presentation/card_details_sheet.dart';
+import '../../features/card_text/data/card_text_repository.dart';
 import '../../features/catalog/domain/models.dart';
 import '../../features/pools/presentation/pool_loader.dart';
 import '../../l10n/app_localizations.dart';
@@ -47,6 +48,26 @@ extension BoosterTypePresentation on BoosterType {
       };
 }
 
+/// How a revealed card shows its rarity: a colored border around it, or a
+/// small colored dot at its bottom center.
+enum RarityMarker { border, dot }
+
+/// The chosen [RarityMarker], saved across launches.
+final rarityMarkerProvider = NotifierProvider<RarityMarkerSetting, RarityMarker>(RarityMarkerSetting.new);
+
+class RarityMarkerSetting extends Notifier<RarityMarker> {
+  static const _key = 'rarityMarker';
+
+  @override
+  RarityMarker build() =>
+      RarityMarker.values.asNameMap()[ref.read(sharedPreferencesProvider).getString(_key)] ?? RarityMarker.border;
+
+  void select(RarityMarker marker) {
+    ref.read(sharedPreferencesProvider).setString(_key, marker.name);
+    state = marker;
+  }
+}
+
 /// Width over height of a card: Yu-Gi-Oh! cards are 59 × 86 mm, MtG ones
 /// 63 × 88 mm.
 double cardAspectRatio(CardData card) => card.passcode != null ? 59 / 86 : 63 / 88;
@@ -77,6 +98,8 @@ class CardTile extends ConsumerWidget {
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
 
     final preview = revealed && image != null && ref.watch(cardHoverPreviewProvider);
+    final marker = ref.watch(rarityMarkerProvider);
+    final dot = revealed && marker == RarityMarker.dot;
 
     return AspectRatio(
       aspectRatio: cardAspectRatio(card),
@@ -92,15 +115,18 @@ class CardTile extends ConsumerWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(
-            color: revealed ? card.rarity.color : theme.colorScheme.outline,
-            width: 3,
+            color: revealed && marker == RarityMarker.border ? card.rarity.color : theme.colorScheme.outline,
+            width: marker == RarityMarker.border ? 3 : 1,
           ),
         ),
         child: InkWell(
           onTap: onTap,
           onLongPress: revealed ? details : null,
           onSecondaryTap: revealed ? details : null,
-          child: AnimatedSwitcher(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+          AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             child: !revealed
                 ? ColoredBox(
@@ -160,6 +186,27 @@ class CardTile extends ConsumerWidget {
                           ],
                         ),
                       ),
+          ),
+              if (dot)
+                Positioned(
+                  bottom: 5,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      key: const Key('rarityDot'),
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: card.rarity.color,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                        boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 2)],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),

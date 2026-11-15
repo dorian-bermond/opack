@@ -87,4 +87,32 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     expect(find.byKey(const Key('cardPreview')), findsNothing);
   });
+
+  testWidgets('the rarity shows as a colored border, or as a dot by the setting', (tester) async {
+    final image = File('${Directory.systemTemp.path}/opack-dot-${DateTime.now().microsecondsSinceEpoch}.png');
+    await tester.runAsync(() => image.writeAsBytes(_png));
+    addTearDown(image.deleteSync);
+    final (app, container) = await _app(image);
+    addTearDown(container.dispose);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(app);
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    await tester.pump();
+
+    BorderSide side() => (tester.widget<Card>(find.byType(Card)).shape! as RoundedRectangleBorder).side;
+    expect(side().color, Rarity.rare.color);
+    expect(side().width, 3);
+    expect(find.byKey(const Key('rarityDot')), findsNothing);
+
+    container.read(rarityMarkerProvider.notifier).select(RarityMarker.dot);
+    await tester.pump();
+    expect(find.byKey(const Key('rarityDot')), findsOneWidget);
+    expect(side().width, 1);
+    expect(side().color, isNot(Rarity.rare.color));
+    final dot = tester.getRect(find.byKey(const Key('rarityDot')));
+    final tile = tester.getRect(find.byType(CardTile));
+    expect(dot.center.dx, closeTo(tile.center.dx, 1), reason: 'centered');
+    expect(dot.bottom, closeTo(tile.bottom - 5 - 3, 2), reason: 'at the bottom, inside the border');
+  });
 }

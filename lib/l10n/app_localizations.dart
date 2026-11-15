@@ -1238,6 +1238,24 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @rarityMarkerSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Rarity marker'**
+  String get rarityMarkerSetting;
+
+  /// No description provided for @rarityMarkerBorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored border'**
+  String get rarityMarkerBorder;
+
+  /// No description provided for @rarityMarkerDot.
+  ///
+  /// In en, this message translates to:
+  /// **'Small dot at the bottom'**
+  String get rarityMarkerDot;
+
   /// No description provided for @tagsHint.
   ///
   /// In en, this message translates to:

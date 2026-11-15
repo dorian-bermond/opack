@@ -719,6 +719,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get rarityMarkerSetting => 'Rarity marker';
+
+  @override
+  String get rarityMarkerBorder => 'Colored border';
+
+  @override
+  String get rarityMarkerDot => 'Small dot at the bottom';
+
+  @override
   String get tagsHint =>
       'A tag is a yes/no trait, like having facial hair: a card carries any number of tags.';
 
