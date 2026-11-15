@@ -500,6 +500,7 @@ class _Tier extends StatelessWidget {
                           _RankedCard(
                             card: card,
                             width: cardWidth,
+                            color: color,
                             onDropBefore: (dropped) => onDrop(dropped, before: card.id),
                           ),
                       ],
@@ -540,13 +541,15 @@ extension on _Tier {
   }
 }
 
-/// A card of a tier: dragged to rank it elsewhere, and a drop target that
-/// ranks the dropped card right before it.
+/// A card of a tier, sitting on its value's [color] with no rarity
+/// marker: dragged to rank it elsewhere, and a drop target that ranks the
+/// dropped card right before it.
 class _RankedCard extends StatelessWidget {
-  const _RankedCard({required this.card, required this.width, required this.onDropBefore});
+  const _RankedCard({required this.card, required this.width, required this.color, required this.onDropBefore});
 
   final CardData card;
   final double width;
+  final Color? color;
   final void Function(CardData card) onDropBefore;
 
   @override
@@ -560,7 +563,11 @@ class _RankedCard extends StatelessWidget {
         decoration: candidates.isEmpty
             ? null
             : BoxDecoration(border: Border(left: BorderSide(color: theme.colorScheme.primary, width: 3))),
-        child: DraggableCard(card: card, enabled: true, child: CardTile(card: card)),
+        child: DraggableCard(
+          card: card,
+          enabled: true,
+          child: CardTile(card: card, frameColor: color ?? Theme.of(context).colorScheme.surfaceContainerHighest),
+        ),
       ),
     );
   }

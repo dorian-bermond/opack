@@ -110,6 +110,28 @@ void main() {
     expect(find.byKey(const Key('rarityDot')), findsOneWidget);
     expect(side().width, 1);
     expect(side().color, isNot(Rarity.rare.color));
+    // A framed card (a tierlist value) wears the frame's color, no marker.
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(width: 120, height: 170, child: CardTile(card: _card, frameColor: Colors.green)),
+          ),
+        ),
+      ),
+    ));
+    await tester.pump();
+    expect(find.byKey(const Key('rarityDot')), findsNothing);
+    expect(side().color, Colors.green);
+    expect(side().width, 6);
+
+    await tester.pumpWidget(app);
+    await tester.pump();
     final dot = tester.getRect(find.byKey(const Key('rarityDot')));
     final tile = tester.getRect(find.byType(CardTile));
     expect(dot.center.dx, closeTo(tile.center.dx, 1), reason: 'centered');
