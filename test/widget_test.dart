@@ -27,7 +27,6 @@ import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:opack/features/pools/presentation/tierlist_screen.dart';
 import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
-import 'package:opack/shared/widgets/card_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Starts the app on the real bundled catalog, in [locale] or else the
