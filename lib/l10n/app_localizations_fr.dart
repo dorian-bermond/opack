@@ -721,6 +721,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get tagBaskets => 'Paniers de tags';
+
+  @override
+  String get basketsHint =>
+      'Glissez une carte sur un panier pour lui donner ce tag. Ctrl+Z annule le dernier dépôt.';
+
+  @override
+  String get undo => 'Annuler';
+
+  @override
   String get cardsPerRow => 'Par ligne';
 
   @override

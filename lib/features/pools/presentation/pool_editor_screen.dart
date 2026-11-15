@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -70,6 +71,30 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
   /// The panel's share of the window, dragged by the user.
   double _panelShare = 0.4;
+
+  /// Tag basket mode: one basket per tag above the cards, which are
+  /// dragged onto them to get the tag.
+  bool _baskets = false;
+
+  /// The pools before each drop, newest last, for Ctrl+Z.
+  final List<Pool> _undo = [];
+
+  /// Gives [card] the tag of [basket], remembering the pool for undo.
+  void _dropOnBasket(String basket, CardData card) {
+    final pool = _pool;
+    final ids = {for (final c in widget.pool.tagCards[basket] ?? const <CardData>[]) c.id};
+    if (!ids.add(card.id)) return;
+    setState(() => _undo.add(pool));
+    _save(_withTagCards(pool, basket, ids));
+  }
+
+  /// Restores the pool as it was before the last drop.
+  void _undoDrop() {
+    if (_undo.isEmpty) return;
+    final previous = _undo.removeLast();
+    setState(() {});
+    _save(previous.copyWith());
+  }
 
   Pool get _pool => widget.pool.pool;
 
@@ -266,6 +291,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           _save(pool.copyWith(config: config.withCard(card.id, copies, listed: listed[card.id] ?? 1))),
       tint: _taggingTint,
       onTap: tagging ? _toggleTagging : null,
+      draggable: _baskets,
       onTags: _editCardTags,
       tagsOf: (card) => [
         for (final tag in play.tagsOfCard(card.id))
@@ -364,6 +390,14 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       appBar: AppBar(
         title: InkWell(onTap: _rename, child: Text(pool.name)),
         actions: [
+          IconButton(
+            key: const Key('basketsToggle'),
+            tooltip: l10n.tagBaskets,
+            isSelected: _baskets,
+            icon: const Icon(Icons.shopping_basket_outlined),
+            selectedIcon: const Icon(Icons.shopping_basket),
+            onPressed: () => setState(() => _baskets = !_baskets),
+          ),
           if (ref.watch(cardSearchProvider) != null)
             IconButton(
               key: const Key('searchPanelToggle'),
@@ -446,7 +480,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       ),
       body: _withSearchPanel(
         play,
-        CustomScrollView(
+        _withBaskets(play, CustomScrollView(
         slivers: [
           SliverList.list(children: header),
           if (view == PoolView.stacks)
@@ -486,7 +520,68 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             ],
           const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
         ],
+      )),
       ),
+    );
+  }
+
+  /// [cards] alone, or under the tag baskets in basket mode, with Ctrl+Z
+  /// undoing the last drop.
+  Widget _withBaskets(PlayPool play, Widget cards) {
+    if (!_baskets) return cards;
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.keyZ, control: true): _undoDrop,
+        const SingleActivator(LogicalKeyboardKey.keyZ, meta: true): _undoDrop,
+      },
+      child: Focus(
+        autofocus: true,
+        child: Column(
+          children: [
+            Material(
+              color: theme.colorScheme.surfaceContainerLow,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: Text(l10n.basketsHint, style: theme.textTheme.bodySmall)),
+                        TextButton.icon(
+                          key: const Key('undoDrop'),
+                          icon: const Icon(Icons.undo, size: 18),
+                          label: Text(l10n.undo),
+                          onPressed: _undo.isEmpty ? null : _undoDrop,
+                        ),
+                      ],
+                    ),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final tag in play.tagNames)
+                          _Basket(
+                            key: ValueKey('basket-$tag'),
+                            label: '${tagLabel(l10n, tag)} · ${play.tagCards[tag]?.length ?? 0}',
+                            onDrop: (card) => _dropOnBasket(tag, card),
+                          ),
+                        ActionChip(
+                          avatar: const Icon(Icons.add, size: 18),
+                          label: Text(l10n.newTag),
+                          onPressed: () => newPoolTag(context, ref, _pool),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(child: cards),
+          ],
+        ),
       ),
     );
   }
@@ -588,6 +683,45 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             PoolView.stacks => const SliverToBoxAdapter(child: SizedBox.shrink()),
             PoolView.spoiler => PoolSpoilerSliver(items: items, actions: actions, language: language),
           };
+}
+
+/// A tag's basket: drop a card on it to give it the tag.
+class _Basket extends StatelessWidget {
+  const _Basket({super.key, required this.label, required this.onDrop});
+
+  final String label;
+  final void Function(CardData card) onDrop;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return DragTarget<CardData>(
+      onAcceptWithDetails: (details) => onDrop(details.data),
+      builder: (context, candidates, rejected) {
+        final hovered = candidates.isNotEmpty;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: hovered ? theme.colorScheme.primaryContainer : theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: hovered ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+              width: hovered ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(hovered ? Icons.shopping_basket : Icons.shopping_basket_outlined, size: 18),
+              const SizedBox(width: 6),
+              Text(label, style: theme.textTheme.labelLarge),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _Section extends StatelessWidget {

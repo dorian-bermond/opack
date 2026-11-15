@@ -350,6 +350,41 @@ void main() {
     expect(find.text('Search cards to add'), findsNothing);
   });
 
+  testWidgets('tag baskets: drag a card onto a tag, undo with Ctrl+Z', (tester) async {
+    await startApp(tester, locale: const Locale('en'));
+    await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
+
+    // Cards are not draggable until basket mode is on.
+    expect(find.byKey(const ValueKey('drag-CIBR-FR000')), findsNothing);
+    await tester.tap(find.byKey(const Key('basketsToggle')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('basket-rarity:rare')), findsOneWidget);
+    expect(find.text('Rarity: Rare · 20'), findsOneWidget);
+    expect(tester.widget<TextButton>(find.byKey(const Key('undoDrop'))).enabled, isFalse);
+
+    // Drop a secret rare card into the rare basket.
+    final card = find.byKey(const ValueKey('drag-CIBR-FR042'));
+    expect(card, findsOneWidget);
+    final from = tester.getCenter(card);
+    final to = tester.getCenter(find.byKey(const ValueKey('basket-rarity:rare')));
+    await tester.timedDrag(card, to - from, const Duration(milliseconds: 400));
+    await settleLoading(tester);
+    expect(find.text('Rarity: Rare · 21'), findsOneWidget);
+    expect(tester.widget<TextButton>(find.byKey(const Key('undoDrop'))).enabled, isTrue);
+
+    // Ctrl+Z puts the pool back as it was.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await settleLoading(tester);
+    expect(find.text('Rarity: Rare · 20'), findsOneWidget);
+    expect(tester.widget<TextButton>(find.byKey(const Key('undoDrop'))).enabled, isFalse);
+
+    await tester.tap(find.byKey(const Key('basketsToggle')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('basket-rarity:rare')), findsNothing);
+  });
+
   testWidgets('an empty pool cannot be played until it has a source', (tester) async {
     await startApp(tester, locale: const Locale('en'));
 

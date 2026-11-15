@@ -719,6 +719,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tagBaskets => 'Tag baskets';
+
+  @override
+  String get basketsHint =>
+      'Drag a card onto a basket to give it that tag. Ctrl+Z undoes the last drop.';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
   String get cardsPerRow => 'Per row';
 
   @override

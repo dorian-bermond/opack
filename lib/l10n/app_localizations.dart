@@ -1238,6 +1238,24 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @tagBaskets.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag baskets'**
+  String get tagBaskets;
+
+  /// No description provided for @basketsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag a card onto a basket to give it that tag. Ctrl+Z undoes the last drop.'**
+  String get basketsHint;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
   /// No description provided for @cardsPerRow.
   ///
   /// In en, this message translates to:

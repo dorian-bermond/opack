@@ -211,6 +211,7 @@ class PoolCardActions {
     required this.tagsOf,
     this.onTap,
     this.trailing,
+    this.draggable = false,
   });
 
   final int? Function(CardData card) copiesOf;
@@ -233,6 +234,35 @@ class PoolCardActions {
   /// Replaces the copies and tags controls of each card (cards shown
   /// outside the pool, such as search results); the copies badge goes too.
   final Widget Function(CardData card)? trailing;
+
+  /// Whether cards can be dragged (onto tag baskets).
+  final bool draggable;
+}
+
+/// [child] showing [card], dragged as a small picture of it when
+/// [enabled]; a press starts the drag at once, so the list does not
+/// scroll from a card in that mode.
+class DraggableCard extends StatelessWidget {
+  const DraggableCard({super.key, required this.card, required this.enabled, required this.child});
+
+  final CardData card;
+  final bool enabled;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) return child;
+    return Draggable<CardData>(
+      key: ValueKey('drag-${card.id}'),
+      data: card,
+      feedback: SizedBox(
+        width: 120,
+        child: Material(color: Colors.transparent, child: CardTile(card: card)),
+      ),
+      childWhenDragging: Opacity(opacity: 0.4, child: child),
+      child: child,
+    );
+  }
 }
 
 /// Asks for a copy count with a sheet of options; `null` when dismissed.
@@ -293,7 +323,10 @@ class _PictureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tint = actions.tint(card);
-    return Stack(
+    return DraggableCard(
+      card: card,
+      enabled: actions.draggable,
+      child: Stack(
       children: [
         CardTile(
           card: card,
@@ -324,6 +357,7 @@ class _PictureCard extends StatelessWidget {
             ),
           ),
       ],
+      ),
     );
   }
 }
@@ -476,7 +510,10 @@ class PoolSpoilerSliver extends StatelessWidget {
           _ => const <String>[],
         };
         final tags = actions.tagsOf(card);
-        return Material(
+        return DraggableCard(
+          card: card,
+          enabled: actions.draggable,
+          child: Material(
           color: actions.tint(card)?.withValues(alpha: 0.18) ?? Colors.transparent,
           child: InkWell(
             onTap: actions.onTap == null ? null : () => actions.onTap!(card),
@@ -539,6 +576,7 @@ class PoolSpoilerSliver extends StatelessWidget {
           ),
             ),
           ),
+          ),
         );
       },
     );
@@ -562,7 +600,10 @@ class PoolListSliver extends StatelessWidget {
         final (:card, :info, tags: _) = items[i];
         final listedTimes = actions.listedOf(card);
         final tags = actions.tagsOf(card);
-        return ListTile(
+        return DraggableCard(
+          card: card,
+          enabled: actions.draggable,
+          child: ListTile(
           dense: true,
           tileColor: actions.tint(card)?.withValues(alpha: 0.18),
           onTap: actions.onTap == null ? null : () => actions.onTap!(card),
@@ -596,6 +637,7 @@ class PoolListSliver extends StatelessWidget {
                   ),
                 ],
               ),
+          ),
         );
       },
     );
