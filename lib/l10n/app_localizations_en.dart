@@ -719,6 +719,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tagsHint =>
+      'A tag is a yes/no trait, like having facial hair: a card carries any number of tags.';
+
+  @override
+  String get qualitiesTitle => 'Qualities';
+
+  @override
+  String get qualitiesHint =>
+      'A quality is a trait with one value among several, like hair color: a card holds one value of it, or none. Values are ranked, best first, each with a color.';
+
+  @override
+  String get addValue => 'Add a value';
+
+  @override
+  String get valueName => 'Value';
+
+  @override
+  String get valueColor => 'Color';
+
+  @override
   String get cardHoverPreview => 'Large preview when hovering a card';
 
   @override

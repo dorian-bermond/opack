@@ -721,6 +721,26 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get tagsHint =>
+      'Un tag est un trait oui/non, comme porter la barbe : une carte porte autant de tags qu\'elle veut.';
+
+  @override
+  String get qualitiesTitle => 'Qualités';
+
+  @override
+  String get qualitiesHint =>
+      'Une qualité est un trait à une valeur parmi plusieurs, comme la couleur des cheveux : une carte en porte une valeur, ou aucune. Les valeurs sont classées, la meilleure en premier, chacune avec une couleur.';
+
+  @override
+  String get addValue => 'Ajouter une valeur';
+
+  @override
+  String get valueName => 'Valeur';
+
+  @override
+  String get valueColor => 'Couleur';
+
+  @override
   String get cardHoverPreview => 'Grand aperçu au survol d\'une carte';
 
   @override

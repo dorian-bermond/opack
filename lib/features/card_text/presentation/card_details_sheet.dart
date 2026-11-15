@@ -91,7 +91,8 @@ class CardDetailsSheet extends ConsumerWidget {
 
     return LayoutBuilder(builder: (context, constraints) {
       final height = constraints.maxHeight - 16;
-      final width = (height * 63 / 88).clamp(0.0, constraints.maxWidth * 0.5);
+      final ratio = cardAspectRatio(card);
+      final width = (height * ratio).clamp(0.0, constraints.maxWidth * 0.5);
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -99,7 +100,7 @@ class CardDetailsSheet extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: SizedBox(
               width: width,
-              height: width * 88 / 63,
+              height: width / ratio,
               child: image != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(width / 22),

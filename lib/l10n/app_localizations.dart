@@ -1238,6 +1238,42 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @tagsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A tag is a yes/no trait, like having facial hair: a card carries any number of tags.'**
+  String get tagsHint;
+
+  /// No description provided for @qualitiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Qualities'**
+  String get qualitiesTitle;
+
+  /// No description provided for @qualitiesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A quality is a trait with one value among several, like hair color: a card holds one value of it, or none. Values are ranked, best first, each with a color.'**
+  String get qualitiesHint;
+
+  /// No description provided for @addValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a value'**
+  String get addValue;
+
+  /// No description provided for @valueName.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get valueName;
+
+  /// No description provided for @valueColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get valueColor;
+
   /// No description provided for @cardHoverPreview.
   ///
   /// In en, this message translates to:

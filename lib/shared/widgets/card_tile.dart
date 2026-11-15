@@ -47,6 +47,10 @@ extension BoosterTypePresentation on BoosterType {
       };
 }
 
+/// Width over height of a card: Yu-Gi-Oh! cards are 59 × 86 mm, MtG ones
+/// 63 × 88 mm.
+double cardAspectRatio(CardData card) => card.passcode != null ? 59 / 86 : 63 / 88;
+
 /// A card face (its picture once downloaded, else name and rarity), or its
 /// back while [revealed] is false. Long-press or right-click a revealed card
 /// for its text and text versions.
@@ -75,10 +79,11 @@ class CardTile extends ConsumerWidget {
     final preview = revealed && image != null && ref.watch(cardHoverPreviewProvider);
 
     return AspectRatio(
-      aspectRatio: 63 / 88,
+      aspectRatio: cardAspectRatio(card),
       child: _HoverPreview(
         enabled: preview,
         image: image,
+        ratio: cardAspectRatio(card),
         child: _RarityGlow(
         enabled: !revealed,
         color: card.rarity.color,
@@ -168,10 +173,13 @@ class CardTile extends ConsumerWidget {
 /// for a moment, until it leaves; nothing on touch screens, where there is
 /// no hover.
 class _HoverPreview extends StatefulWidget {
-  const _HoverPreview({required this.enabled, required this.image, required this.child});
+  const _HoverPreview({required this.enabled, required this.image, required this.ratio, required this.child});
 
   final bool enabled;
   final File? image;
+
+  /// Width over height of the card, so the preview has no bars.
+  final double ratio;
   final Widget child;
 
   /// How long the pointer rests on the card before the preview shows.
@@ -227,7 +235,7 @@ class _HoverPreviewState extends State<_HoverPreview> {
     _entry = OverlayEntry(builder: (context) {
       final size = MediaQuery.sizeOf(context);
       const width = _HoverPreview.width;
-      const height = width * 88 / 63;
+      final height = width / widget.ratio;
       // Beside the pointer, flipped to the left or clamped when short on room.
       var left = _pointer.dx + 24;
       if (left + width > size.width) left = _pointer.dx - 24 - width;
@@ -244,7 +252,7 @@ class _HoverPreviewState extends State<_HoverPreview> {
             child: SizedBox(
               width: width,
               height: height,
-              child: Image.file(image, fit: BoxFit.contain),
+              child: Image.file(image, fit: BoxFit.cover),
             ),
           ),
         ),

@@ -2,7 +2,87 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../domain/play_pool.dart';
+import '../domain/pool.dart';
 import '../domain/pool_config.dart';
+
+/// The colors a quality's values pick from, in tierlist order (best first).
+const qualityPalette = <Color>[
+  Color(0xFFE53935), // red
+  Color(0xFFFB8C00), // orange
+  Color(0xFFFDD835), // yellow
+  Color(0xFF7CB342), // light green
+  Color(0xFF00897B), // teal
+  Color(0xFF1E88E5), // blue
+  Color(0xFF5E35B1), // deep purple
+  Color(0xFFD81B60), // pink
+  Color(0xFF6D4C41), // brown
+  Color(0xFF546E7A), // blue grey
+];
+
+/// The palette color of a value by rank, for new values.
+Color defaultValueColor(int rank) => qualityPalette[rank % qualityPalette.length];
+
+/// The color of [tag] in [pool], `null` when it has none.
+Color? tagColor(Pool pool, String tag) => switch (pool.tags[tag]?.color) {
+      final argb? => Color(argb),
+      null => null,
+    };
+
+/// A row of swatches to pick one of [qualityPalette], or none.
+class ColorPicker extends StatelessWidget {
+  const ColorPicker({super.key, required this.value, required this.onChanged});
+
+  final Color? value;
+  final ValueChanged<Color?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (final color in qualityPalette)
+          InkWell(
+            key: ValueKey('swatch-${color.toARGB32()}'),
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => onChanged(color),
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: value == color ? theme.colorScheme.onSurface : Colors.transparent,
+                  width: 3,
+                ),
+              ),
+              child: value == color ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// A small colored dot, or nothing without a color.
+class ColorDot extends StatelessWidget {
+  const ColorDot(this.color, {super.key, this.size = 12});
+
+  final Color? color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => color == null
+      ? SizedBox(width: size, height: size)
+      : Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        );
+}
+
 
 /// Preset buttons for a pool's copy counts. Applying a preset over
 /// single-card changes asks first, since it drops them.

@@ -149,9 +149,9 @@ void main() {
     // Tag a card in bulk, pull one such card per pack, then drop the slot.
     await tester.tap(find.byTooltip('Pool details'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('New tag').first);
+    await tester.tap(find.text('New tag'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const Key('tagNameField')), 'mine');
+    await tester.enterText(find.byType(TextField).last, 'mine');
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
     expect(find.text('mine · 0'), findsOneWidget);
@@ -464,12 +464,15 @@ void main() {
     await tester.tap(find.text('New quality…'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('qualityNameField')), 'Power');
-    await tester.enterText(find.byKey(const Key('qualityValuesField')), 'S\nA\nB');
+    await tester.enterText(find.byKey(const ValueKey('qualityValue-0')), 'S');
+    await tester.enterText(find.byKey(const ValueKey('qualityValue-1')), 'A');
+    await tester.enterText(find.byKey(const ValueKey('qualityValue-2')), 'B');
     await tester.tap(find.text('Apply'));
     await settleLoading(tester);
     expect(find.text('Quality: Power'), findsOneWidget);
     expect(find.byKey(const ValueKey('tier-power:S')), findsOneWidget);
     expect(top(find.byKey(const ValueKey('tier-power:S'))), lessThan(top(find.byKey(const ValueKey('tier-power:B')))));
+    expect(container.read(poolsProvider).value!.single.tags['power:S']!.color, 0xFFE53935, reason: 'the first palette color');
     expect(find.textContaining('Ctrl+Z undoes. · 0'), findsNothing, reason: 'nothing valued yet: all in the feed');
     await tester.tap(find.byKey(const Key('tierlistQuality')));
     await tester.pumpAndSettle();
@@ -501,11 +504,13 @@ void main() {
     // A new tier is a new value of the quality.
     await tester.tap(find.byKey(const Key('addTier')));
     await tester.pumpAndSettle();
-    expect(tester.widget<TextField>(find.byKey(const Key('tagQualityField'))).controller!.text, 'rarity');
-    await tester.enterText(find.byKey(const Key('tagNameField')), 'bonus');
+    await tester.enterText(find.byKey(const Key('valueNameField')), 'bonus');
+    await tester.tap(find.byKey(ValueKey('swatch-${const Color(0xFF1E88E5).toARGB32()}')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Apply'));
     await settleLoading(tester);
     expect(find.byKey(const ValueKey('tier-rarity:bonus')), findsOneWidget);
+    expect(container.read(poolsProvider).value!.single.tags['rarity:bonus']!.color, 0xFF1E88E5);
   });
 
   testWidgets('an empty pool cannot be played until it has a source', (tester) async {

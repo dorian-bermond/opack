@@ -117,9 +117,79 @@ class _PoolDetails extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(l10n.tagsHint, style: theme.textTheme.bodySmall),
                 Text(l10n.tagChipHint, style: theme.textTheme.bodySmall),
-                Text(l10n.qualityHint, style: theme.textTheme.bodySmall),
                 const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final name in saved.plainTags)
+                      InputChip(
+                        avatar: const Icon(Icons.label_outline, size: 18),
+                        label: Text('${tagLabel(l10n, name)} · ${play.tagCards[name]?.length ?? 0}'),
+                        tooltip: l10n.tagCardsAction,
+                        onPressed: () => context.push(
+                            '${poolModePath(saved.game, saved.id, 'edit')}?tag=${Uri.encodeQueryComponent(name)}'),
+                        onDeleted: () => deletePoolTag(context, ref, play, name),
+                      ),
+                    ActionChip(
+                      avatar: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.newTag),
+                      onPressed: () => newPoolTag(context, ref, saved),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          PoolSection(
+            title: l10n.qualitiesTitle,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.qualitiesHint, style: theme.textTheme.bodySmall),
+                Text(l10n.tagChipHint, style: theme.textTheme.bodySmall),
+                for (final quality in saved.qualities) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.category_outlined, size: 18),
+                      const SizedBox(width: 6),
+                      Text(qualityLabel(l10n, quality), style: theme.textTheme.titleSmall),
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                        icon: const Icon(Icons.leaderboard_outlined, size: 18),
+                        label: Text(l10n.tierlist),
+                        onPressed: () => context.push(
+                            '${poolModePath(saved.game, saved.id, 'tierlist')}?quality=${Uri.encodeQueryComponent(quality)}'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final name in saved.valuesOf(quality))
+                        InputChip(
+                          avatar: ColorDot(tagColor(saved, name) ?? theme.colorScheme.outline, size: 14),
+                          label: Text('${tagLabel(l10n, name.substring(quality.length + 1))}'
+                              ' · ${play.tagCards[name]?.length ?? 0}'),
+                          tooltip: l10n.tagCardsAction,
+                          onPressed: () => context.push(
+                              '${poolModePath(saved.game, saved.id, 'edit')}?tag=${Uri.encodeQueryComponent(name)}'),
+                          onDeleted: () => deletePoolTag(context, ref, play, name),
+                        ),
+                      ActionChip(
+                        avatar: const Icon(Icons.add, size: 18),
+                        label: Text(l10n.addValue),
+                        onPressed: () => newQualityValue(context, ref, saved, quality),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: ActionChip(
@@ -129,35 +199,6 @@ class _PoolDetails extends ConsumerWidget {
                     onPressed: () => newPoolQuality(context, ref, saved),
                   ),
                 ),
-                for (final (quality, names) in tagsByQuality(saved)) ...[
-                  const SizedBox(height: 8),
-                  if (quality != null)
-                    Text(qualityLabel(l10n, quality), style: theme.textTheme.labelMedium)
-                  else if (saved.qualities.isNotEmpty)
-                    Text(l10n.plainTags, style: theme.textTheme.labelMedium),
-                  const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final name in names)
-                        InputChip(
-                          avatar: Icon(quality == null ? Icons.label_outline : Icons.radio_button_checked, size: 18),
-                          label: Text('${quality == null ? tagLabel(l10n, name) : tagLabel(l10n, name.substring(quality.length + 1))}'
-                              ' · ${play.tagCards[name]?.length ?? 0}'),
-                          tooltip: l10n.tagCardsAction,
-                          onPressed: () => context.push(
-                              '${poolModePath(saved.game, saved.id, 'edit')}?tag=${Uri.encodeQueryComponent(name)}'),
-                          onDeleted: () => deletePoolTag(context, ref, play, name),
-                        ),
-                      ActionChip(
-                        avatar: const Icon(Icons.add, size: 18),
-                        label: Text(l10n.newTag),
-                        onPressed: () => newPoolTag(context, ref, saved, quality: quality),
-                      ),
-                    ],
-                  ),
-                ],
               ],
             ),
           ),
@@ -173,17 +214,6 @@ class _PoolDetails extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// The pool's tags grouped by quality, plain tags first (under `null`),
-/// each quality in the order its tags list them; the plain group is
-/// always present so a tag can be added there.
-List<(String?, List<String>)> tagsByQuality(Pool pool) {
-  final groups = <String?, List<String>>{null: []};
-  for (final tag in pool.tags.keys) {
-    (groups[Pool.qualityOf(tag)] ??= []).add(tag);
-  }
-  return [for (final MapEntry(:key, :value) in groups.entries) (key, value)];
 }
 
 /// A titled block of a pool page.

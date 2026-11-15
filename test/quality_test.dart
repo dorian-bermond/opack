@@ -69,4 +69,19 @@ void main() {
     expect(pool.withTagBefore('nope', 'tier:S').tags.keys.toList(), ['tier:S', 'mine', 'tier:A']);
     expect(pool.qualities, ['tier']);
   });
+
+  test('a value keeps its color through edits and saving', () {
+    var pool = Pool.empty(Game.mtg, name: 'p').withTag('tier:S', ['a']).withTagColor('tier:S', 0xFFE53935);
+    expect(pool.tags['tier:S']!.color, 0xFFE53935);
+    pool = pool.withTag('tier:S', ['a', 'b']);
+    expect(pool.tags['tier:S']!.color, 0xFFE53935, reason: 'withCards keeps it');
+    pool = pool.copyWith(tags: {'tier:S': pool.tags['tier:S']!.plus(['c'])});
+    expect(pool.tags['tier:S']!.color, 0xFFE53935, reason: 'plus keeps it');
+    final json = pool.toJson();
+    expect(Pool.fromJson(json).tags['tier:S']!.color, 0xFFE53935);
+    expect(pool.withTagColor('tier:S', null).tags['tier:S']!.color, isNull);
+    expect(pool.withTagColor('new', 0xFF000000).tags['new']!.cards, isEmpty);
+    expect(pool.plainTags, isEmpty);
+    expect(pool.valuesOf('tier'), ['tier:S']);
+  });
 }

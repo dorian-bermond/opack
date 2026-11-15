@@ -16,6 +16,7 @@ import '../domain/pool.dart';
 import 'pool_actions.dart';
 import 'pool_loader.dart';
 import 'pool_view.dart';
+import 'pool_widgets.dart';
 
 /// Tierlist mode: gives cards a value of one quality by dragging them.
 /// A quality is chosen, then a group of cards (every card, a tag, or a
@@ -143,7 +144,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
   Future<void> _addTier() async {
     final quality = _quality;
     if (quality == null) return;
-    await newPoolTag(context, ref, _pool, quality: quality);
+    await newQualityValue(context, ref, _pool, quality);
   }
 
   /// Picks a quality, or makes a new one through the new tag dialog.
@@ -332,6 +333,8 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                             _Tier(
                               key: ValueKey('tier-$tier'),
                               label: tagLabel(l10n, tier.substring(quality.length + 1)),
+                              color: tagColor(_pool, tier),
+                              onColor: (c) => setTagColor(ref, _pool, tier, c),
                               cards: valued[tier]!,
                               cardWidth: cardWidth,
                               onDrop: (card, {before}) => _dropOnTier(tier, card, before: before),
@@ -382,6 +385,8 @@ class _Tier extends StatelessWidget {
   const _Tier({
     super.key,
     required this.label,
+    this.color,
+    this.onColor,
     required this.cards,
     required this.cardWidth,
     required this.onDrop,
@@ -390,6 +395,10 @@ class _Tier extends StatelessWidget {
   });
 
   final String label;
+
+  /// The value's color, behind the tier; tapping the label changes it.
+  final Color? color;
+  final ValueChanged<Color?>? onColor;
   final List<CardData> cards;
   final double cardWidth;
   final void Function(CardData card, {String? before}) onDrop;
@@ -404,28 +413,39 @@ class _Tier extends StatelessWidget {
       onAcceptWithDetails: (d) => onDrop(d.data),
       builder: (context, candidates, _) {
         final hovered = candidates.isNotEmpty;
+        final tint = color ?? theme.colorScheme.primary;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
-            color: hovered ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceContainerLow,
+            color: hovered
+                ? tint.withValues(alpha: 0.4)
+                : color?.withValues(alpha: 0.18) ?? theme.colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: hovered ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+              color: hovered ? tint : color ?? theme.colorScheme.outlineVariant,
               width: hovered ? 2 : 1,
             ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
+              Container(
                 width: 96,
+                decoration: BoxDecoration(
+                  color: color?.withValues(alpha: 0.55),
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(label, style: theme.textTheme.titleSmall, textAlign: TextAlign.center),
+                      InkWell(
+                        key: ValueKey('tierColor-$label'),
+                        onTap: onColor == null ? null : () => _pickColor(context),
+                        child: Text(label, style: theme.textTheme.titleSmall, textAlign: TextAlign.center),
+                      ),
                       Text('${cards.length}', style: theme.textTheme.labelMedium),
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -473,6 +493,31 @@ class _Tier extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+extension on _Tier {
+  /// A sheet of swatches recoloring the value.
+  Future<void> _pickColor(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final chosen = await showModalBottomSheet<Color?>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${l10n.valueColor} · $label', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 12),
+              ColorPicker(value: color, onChanged: (c) => Navigator.pop(context, c)),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (chosen != null) onColor?.call(chosen);
   }
 }
 

@@ -136,6 +136,7 @@ class TagDef {
     this.foil = false,
     this.balanceColors = false,
     this.allowDuplicates = false,
+    this.color,
   });
 
   /// Reads either an id list (older pools) or a full definition.
@@ -147,6 +148,7 @@ class TagDef {
             foil: map['foil'] as bool? ?? false,
             balanceColors: map['balanceColors'] as bool? ?? false,
             allowDuplicates: map['allowDuplicates'] as bool? ?? false,
+            color: map['color'] as int?,
           ),
         _ => throw FormatException('Unknown tag $json'),
       };
@@ -160,13 +162,26 @@ class TagDef {
   final bool balanceColors;
   final bool allowDuplicates;
 
+  /// The tag's color (ARGB), shown behind its tier and basket.
+  final int? color;
+
   Map<String, Object?> toJson() => {
         'cards': cards,
         if (weights.isNotEmpty) 'weights': weights,
         if (foil) 'foil': true,
         if (balanceColors) 'balanceColors': true,
         if (allowDuplicates) 'allowDuplicates': true,
+        'color': ?color,
       };
+
+  TagDef withColor(int? color) => TagDef(
+        cards,
+        weights: weights,
+        foil: foil,
+        balanceColors: balanceColors,
+        allowDuplicates: allowDuplicates,
+        color: color,
+      );
 
   /// This tag on exactly [ids], keeping known weights and flags.
   TagDef withCards(Iterable<String> ids) {
@@ -177,6 +192,7 @@ class TagDef {
       foil: foil,
       balanceColors: balanceColors,
       allowDuplicates: allowDuplicates,
+      color: color,
     );
   }
 
@@ -190,6 +206,7 @@ class TagDef {
       foil: foil,
       balanceColors: balanceColors,
       allowDuplicates: allowDuplicates,
+      color: color,
     );
   }
 }
@@ -651,6 +668,16 @@ class Pool {
 
   /// Every quality of the pool, in the order its tags list them.
   List<String> get qualities => {for (final tag in tags.keys) ?qualityOf(tag)}.toList();
+
+  /// The values of [quality], ranked: its tags in the pool's order.
+  List<String> valuesOf(String quality) => [for (final tag in tags.keys) if (qualityOf(tag) == quality) tag];
+
+  /// The plain tags: yes/no traits, outside any quality.
+  List<String> get plainTags => [for (final tag in tags.keys) if (qualityOf(tag) == null) tag];
+
+  /// Colors [tag] (`null` clears), creating it when new.
+  Pool withTagColor(String tag, int? color) =>
+      copyWith(tags: {...tags, tag: (tags[tag] ?? const TagDef([])).withColor(color)});
 
   /// The other tags of [tag]'s quality, none for a plain tag.
   Iterable<String> siblingsOf(String tag) {

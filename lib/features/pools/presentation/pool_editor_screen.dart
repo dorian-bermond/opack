@@ -21,8 +21,8 @@ import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
 import 'pool_actions.dart';
-import 'pool_details_screen.dart';
 import 'pool_loader.dart';
+import 'pool_widgets.dart';
 import 'pool_view.dart';
 
 /// Edits a saved pool: its name, sources, pack layout and the copies of
@@ -223,22 +223,47 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final tag in all)
+                // Tags: any number of them. Qualities: one value, or none.
+                if (pool.plainTags.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                    child: Text(l10n.poolTags, style: Theme.of(context).textTheme.labelLarge),
+                  ),
+                for (final tag in pool.plainTags)
                   CheckboxListTile(
                     dense: true,
                     value: chosen.contains(tag),
                     title: Text(tagLabel(l10n, tag)),
-                    // A quality tag replaces the others of its quality.
-                    onChanged: (on) => setState(() {
-                      if (on == true) {
-                        chosen.removeAll(pool.siblingsOf(tag));
-                        chosen.add(tag);
-                      } else {
-                        chosen.remove(tag);
-                      }
-                    }),
+                    onChanged: (on) => setState(() => on == true ? chosen.add(tag) : chosen.remove(tag)),
                   ),
+                for (final quality in pool.qualities) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: Text(qualityLabel(l10n, quality), style: Theme.of(context).textTheme.labelLarge),
+                  ),
+                  RadioGroup<String>(
+                    groupValue: chosen.where((t) => Pool.qualityOf(t) == quality).firstOrNull,
+                    onChanged: (value) => setState(() {
+                      chosen.removeAll(pool.valuesOf(quality));
+                      if (value != null) chosen.add(value);
+                    }),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final tag in pool.valuesOf(quality))
+                          RadioListTile<String>(
+                            dense: true,
+                            value: tag,
+                            toggleable: true,
+                            secondary: ColorDot(tagColor(pool, tag), size: 14),
+                            title: Text(tagLabel(l10n, tag.substring(quality.length + 1))),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -573,32 +598,53 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                         ),
                       ],
                     ),
-                    for (final (quality, names) in tagsByQuality(play.pool))
-                      if (names.isNotEmpty || quality == null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              if (quality != null)
-                                Text('${qualityLabel(l10n, quality)}:', style: theme.textTheme.labelMedium),
-                              for (final tag in names)
-                                _Basket(
-                                  key: ValueKey('basket-$tag'),
-                                  label: '${quality == null ? tagLabel(l10n, tag) : tagLabel(l10n, tag.substring(quality.length + 1))}'
-                                      ' · ${play.tagCards[tag]?.length ?? 0}',
-                                  onDrop: (card) => _dropOnBasket(tag, card),
-                                ),
-                              ActionChip(
-                                avatar: const Icon(Icons.add, size: 18),
-                                label: Text(l10n.newTag),
-                                onPressed: () => newPoolTag(context, ref, _pool, quality: quality),
-                              ),
-                            ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text('${l10n.poolTags}:', style: theme.textTheme.labelMedium),
+                          for (final tag in play.pool.plainTags)
+                            _Basket(
+                              key: ValueKey('basket-$tag'),
+                              label: '${tagLabel(l10n, tag)} · ${play.tagCards[tag]?.length ?? 0}',
+                              onDrop: (card) => _dropOnBasket(tag, card),
+                            ),
+                          ActionChip(
+                            avatar: const Icon(Icons.add, size: 18),
+                            label: Text(l10n.newTag),
+                            onPressed: () => newPoolTag(context, ref, _pool),
                           ),
+                        ],
+                      ),
+                    ),
+                    for (final quality in play.pool.qualities)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text('${qualityLabel(l10n, quality)}:', style: theme.textTheme.labelMedium),
+                            for (final tag in play.pool.valuesOf(quality))
+                              _Basket(
+                                key: ValueKey('basket-$tag'),
+                                label: '${tagLabel(l10n, tag.substring(quality.length + 1))}'
+                                    ' · ${play.tagCards[tag]?.length ?? 0}',
+                                color: tagColor(play.pool, tag),
+                                onDrop: (card) => _dropOnBasket(tag, card),
+                              ),
+                            ActionChip(
+                              avatar: const Icon(Icons.add, size: 18),
+                              label: Text(l10n.addValue),
+                              onPressed: () => newQualityValue(context, ref, _pool, quality),
+                            ),
+                          ],
                         ),
+                      ),
                   ],
                 ),
               ),
@@ -709,11 +755,13 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           };
 }
 
-/// A tag's basket: drop a card on it to give it the tag.
+/// A tag's basket: drop a card on it to give it the tag. A value's basket
+/// wears its color.
 class _Basket extends StatelessWidget {
-  const _Basket({super.key, required this.label, required this.onDrop});
+  const _Basket({super.key, required this.label, required this.onDrop, this.color});
 
   final String label;
+  final Color? color;
   final void Function(CardData card) onDrop;
 
   @override
@@ -723,14 +771,17 @@ class _Basket extends StatelessWidget {
       onAcceptWithDetails: (details) => onDrop(details.data),
       builder: (context, candidates, rejected) {
         final hovered = candidates.isNotEmpty;
+        final tint = color ?? theme.colorScheme.primary;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: hovered ? theme.colorScheme.primaryContainer : theme.colorScheme.surface,
+            color: hovered
+                ? tint.withValues(alpha: 0.45)
+                : color?.withValues(alpha: 0.18) ?? theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: hovered ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+              color: hovered ? tint : color ?? theme.colorScheme.outlineVariant,
               width: hovered ? 2 : 1,
             ),
           ),
