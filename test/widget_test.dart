@@ -1,14 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:opack/app.dart';
 import 'package:opack/core/router.dart';
 import 'package:opack/core/settings/locale_controller.dart';
 import 'package:opack/features/card_text/data/card_text_repository.dart';
 import 'package:opack/features/card_info/data/card_info_repository.dart';
+import 'package:opack/features/card_info/data/card_search.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_info/presentation/card_search_sheet.dart';
 import 'package:opack/features/catalog/data/catalog_repository.dart';
@@ -23,7 +27,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Starts the app on the real bundled catalog, in [locale] or else the
 /// device language.
-Future<ProviderContainer> startApp(WidgetTester tester, {Locale? locale}) async {
+/// With [cardSearch], online search is on (through its mock client).
+Future<ProviderContainer> startApp(WidgetTester tester, {Locale? locale, CardSearch? cardSearch}) async {
   // A tall window so the editor's long header and its card list fit at once.
   tester.view.physicalSize = const Size(1200, 3200);
   tester.view.devicePixelRatio = 1;
@@ -41,7 +46,7 @@ Future<ProviderContainer> startApp(WidgetTester tester, {Locale? locale}) async 
       cardImageCacheProvider.overrideWithValue(null),
       cardInfoFetcherProvider.overrideWithValue(null),
       cardInfoStoreProvider.overrideWithValue(MemoryCardInfoStore()),
-      cardSearchProvider.overrideWithValue(null),
+      cardSearchProvider.overrideWithValue(cardSearch),
       artworkSearchProvider.overrideWithValue(null),
     ],
   );
@@ -221,6 +226,75 @@ void main() {
     await settleLoading(tester);
     expect(find.text('Sealed pool'), findsOneWidget);
     expect(find.textContaining('Closed ×1 · 5 packs · 45 cards'), findsOneWidget);
+  });
+
+  testWidgets('the search panel adds and removes found cards beside the pool', (tester) async {
+    final search = CardSearch(
+      client: MockClient((request) async {
+        expect(request.url.host, 'db.ygoprodeck.com');
+        expect(request.url.queryParameters['fname'], 'mock');
+        return http.Response(jsonEncode({
+          'data': [
+            {
+              'id': 12345678,
+              'name': 'Mock Dragon',
+              'type': 'Effect Monster',
+              'frameType': 'effect',
+              'race': 'Dragon',
+              'attribute': 'LIGHT',
+              'level': 8,
+              'atk': 3000,
+              'def': 2500,
+              'desc': 'A mock.',
+              'card_sets': [
+                {'set_code': 'MOCK-EN001', 'set_rarity': 'Ultra Rare'},
+              ],
+            },
+          ],
+        }), 200);
+      }),
+    );
+    await startApp(tester, locale: const Locale('en'), cardSearch: search);
+    await tester.tap(find.text('New pool'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Yu-Gi-Oh!'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Empty pool'));
+    await settleLoading(tester);
+
+    // The + icon opens the panel on the right; the pool stays on the left.
+    await tester.tap(find.byKey(const Key('searchPanelToggle')));
+    await tester.pumpAndSettle();
+    expect(find.text('Search cards to add'), findsOneWidget);
+    expect(find.text('Cards from'), findsOneWidget, reason: 'the pool is still shown');
+    expect(find.text('Add cards'), findsNothing, reason: 'the chip moved into the panel');
+
+    await tester.enterText(find.byKey(const Key('panelSearch')), 'mock');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Search'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mock Dragon'), findsOneWidget);
+    expect(find.text('1 card'), findsOneWidget);
+
+    // Tapping the add icon puts the card in the pool, shown on both sides.
+    await tester.tap(find.byKey(const ValueKey('result-MOCK-EN001')));
+    await settleLoading(tester);
+    expect(find.text('Mock Dragon'), findsNWidgets(2));
+    expect(find.textContaining('In the pool'), findsWidgets);
+    await tester.tap(find.byKey(const ValueKey('result-MOCK-EN001')));
+    await settleLoading(tester);
+    expect(find.text('Mock Dragon'), findsOneWidget);
+
+    // The former Add cards page is the panel's advanced search.
+    await tester.tap(find.byKey(const Key('advancedSearch')));
+    await tester.pumpAndSettle();
+    expect(find.text('Search cards online'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close).last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    expect(find.text('Search cards to add'), findsNothing);
   });
 
   testWidgets('an empty pool cannot be played until it has a source', (tester) async {

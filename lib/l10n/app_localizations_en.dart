@@ -670,7 +670,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nonFoil => 'Non-foil';
 
   @override
-  String get addCards => 'Add cards';
+  String get advancedSearch => 'Advanced search';
 
   @override
   String pickedCards(int count) {
@@ -717,6 +717,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String searchFailed(String error) {
     return 'Search failed: $error';
   }
+
+  @override
+  String get searchPanel => 'Search cards to add';
+
+  @override
+  String get searchPanelHint =>
+      'Tap a card to add it to the pool; tap it again to take it out.';
+
+  @override
+  String get cardInPool => 'In the pool';
+
+  @override
+  String get cardFromSource => 'From a set or cube of the pool';
 
   @override
   String get viewList => 'List';

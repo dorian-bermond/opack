@@ -95,10 +95,7 @@ class _CardSearchState extends ConsumerState<_CardSearch> {
                   onSubmitted: (_) => _search(),
                 ),
                 const SizedBox(height: 8),
-                ...switch (widget.game) {
-                  Game.mtg => _mtgFacets(l10n, theme),
-                  Game.ygo => _ygoFacets(l10n, theme),
-                },
+                SearchFacets(game: widget.game, query: _query, onChanged: _update),
                 const SizedBox(height: 12),
                 FilledButton.icon(
                   icon: _searching
@@ -158,6 +155,35 @@ class _CardSearchState extends ConsumerState<_CardSearch> {
       ),
     );
   }
+
+}
+
+/// The facets of an online search for [game]: rarity, color, type, mana
+/// value, keyword and set for MtG; kind, attribute, race, archetype,
+/// level, ATK and DEF for Yu-Gi-Oh!.
+class SearchFacets extends StatelessWidget {
+  const SearchFacets({super.key, required this.game, required this.query, required this.onChanged});
+
+  final Game game;
+  final SearchQuery query;
+  final ValueChanged<SearchQuery> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: switch (game) {
+        Game.mtg => _mtgFacets(l10n, theme),
+        Game.ygo => _ygoFacets(l10n, theme),
+      },
+    );
+  }
+
+  SearchQuery get _query => query;
+
+  void _update(SearchQuery query) => onChanged(query);
 
   Widget _section(String title, ThemeData theme, Widget child) => Padding(
         padding: const EdgeInsets.only(top: 10),

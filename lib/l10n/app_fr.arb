@@ -232,7 +232,7 @@
   "kindTrap": "Piège",
   "noArchetype": "Sans archétype",
   "nonFoil": "Non premium",
-  "addCards": "Ajouter des cartes",
+  "advancedSearch": "Recherche avancée",
   "pickedCards": "{count, plural, =1{1 carte choisie} other{{count} cartes choisies}}",
   "@pickedCards": {
     "placeholders": {
@@ -256,6 +256,10 @@
   },
   "addSelected": "Ajouter au pool",
   "searchFailed": "Recherche impossible : {error}",
+  "searchPanel": "Chercher des cartes à ajouter",
+  "searchPanelHint": "Touchez une carte pour l'ajouter au pool ; touchez-la encore pour la retirer.",
+  "cardInPool": "Dans le pool",
+  "cardFromSource": "Issue d'une extension ou d'un cube du pool",
   "@searchFailed": {
     "placeholders": {
       "error": {

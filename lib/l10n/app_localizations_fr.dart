@@ -671,7 +671,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nonFoil => 'Non premium';
 
   @override
-  String get addCards => 'Ajouter des cartes';
+  String get advancedSearch => 'Recherche avancée';
 
   @override
   String pickedCards(int count) {
@@ -719,6 +719,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String searchFailed(String error) {
     return 'Recherche impossible : $error';
   }
+
+  @override
+  String get searchPanel => 'Chercher des cartes à ajouter';
+
+  @override
+  String get searchPanelHint =>
+      'Touchez une carte pour l\'ajouter au pool ; touchez-la encore pour la retirer.';
+
+  @override
+  String get cardInPool => 'Dans le pool';
+
+  @override
+  String get cardFromSource => 'Issue d\'une extension ou d\'un cube du pool';
 
   @override
   String get viewList => 'Liste';

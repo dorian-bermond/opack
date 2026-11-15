@@ -7,7 +7,9 @@ import '../../card_info/domain/card_filter.dart';
 import '../../card_info/domain/card_info.dart';
 import '../../card_info/presentation/labels.dart';
 import '../../card_text/data/card_text_repository.dart';
+import '../../card_text/presentation/card_details_sheet.dart';
 import '../../catalog/domain/models.dart';
+import 'pool_loader.dart';
 import 'pool_widgets.dart';
 
 /// How the editor lays out a pool's cards: compact rows, a picture grid,
@@ -151,6 +153,7 @@ class PoolCardActions {
     required this.onTags,
     required this.tagsOf,
     this.onTap,
+    this.trailing,
   });
 
   final int? Function(CardData card) copiesOf;
@@ -169,6 +172,10 @@ class PoolCardActions {
 
   /// Replaces the copies sheet on tap (bulk tagging).
   final void Function(CardData card)? onTap;
+
+  /// Replaces the copies and tags controls of each card (cards shown
+  /// outside the pool, such as search results); the copies badge goes too.
+  final Widget Function(CardData card)? trailing;
 }
 
 /// Asks for a copy count with a sheet of options; `null` when dismissed.
@@ -251,13 +258,14 @@ class _PictureCard extends StatelessWidget {
               ),
             ),
           ),
-        Positioned(
-          right: 8,
-          bottom: 8,
-          child: IgnorePointer(
-            child: _CopiesBadge(copies: actions.copiesOf(card), changed: actions.changed(card)),
+        if (actions.trailing == null)
+          Positioned(
+            right: 8,
+            bottom: 8,
+            child: IgnorePointer(
+              child: _CopiesBadge(copies: actions.copiesOf(card), changed: actions.changed(card)),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -447,23 +455,81 @@ class PoolSpoilerSliver extends StatelessWidget {
                   ],
                 ),
               ),
-              Column(
-                children: [
-                  CopiesDropdown(
-                    value: actions.copiesOf(card),
-                    onChanged: (value) => actions.setCopies(card, value),
+              actions.trailing?.call(card) ??
+                  Column(
+                    children: [
+                      CopiesDropdown(
+                        value: actions.copiesOf(card),
+                        onChanged: (value) => actions.setCopies(card, value),
+                      ),
+                      IconButton(
+                        tooltip: l10n.cardTags,
+                        icon: const Icon(Icons.label_outline, size: 20),
+                        onPressed: () => actions.onTags(card),
+                      ),
+                    ],
                   ),
+            ],
+          ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Compact rows: name, code, rarity, tags and the card's details line.
+class PoolListSliver extends StatelessWidget {
+  const PoolListSliver({super.key, required this.items, required this.actions, required this.language});
+
+  final List<CardWithInfo> items;
+  final PoolCardActions actions;
+  final String language;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SliverList.builder(
+      itemCount: items.length,
+      itemBuilder: (context, i) {
+        final (:card, :info, tags: _) = items[i];
+        final listedTimes = actions.listedOf(card);
+        final tags = actions.tagsOf(card);
+        return ListTile(
+          dense: true,
+          tileColor: actions.tint(card)?.withValues(alpha: 0.18),
+          onTap: actions.onTap == null ? null : () => actions.onTap!(card),
+          onLongPress: () => showCardDetails(context, card, poolId: PoolScope.of(context)),
+          title: Text(
+            card.nameFor(language),
+            style: actions.changed(card) ? const TextStyle(fontWeight: FontWeight.bold) : null,
+          ),
+          subtitle: Text([
+            [
+              card.id,
+              card.rarity.label(l10n),
+              if (listedTimes > 1) l10n.listedTimes(listedTimes),
+              if (tags.isNotEmpty) tags.join(', '),
+            ].join(' · '),
+            ?cardInfoLine(info),
+          ].join('\n')),
+          isThreeLine: info != null,
+          trailing: actions.trailing?.call(card) ??
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   IconButton(
                     tooltip: l10n.cardTags,
                     icon: const Icon(Icons.label_outline, size: 20),
                     onPressed: () => actions.onTags(card),
                   ),
+                  CopiesDropdown(
+                    value: actions.copiesOf(card),
+                    onChanged: (value) => actions.setCopies(card, value),
+                  ),
                 ],
               ),
-            ],
-          ),
-            ),
-          ),
         );
       },
     );

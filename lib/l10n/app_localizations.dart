@@ -1178,11 +1178,11 @@ abstract class AppLocalizations {
   /// **'Non-foil'**
   String get nonFoil;
 
-  /// No description provided for @addCards.
+  /// No description provided for @advancedSearch.
   ///
   /// In en, this message translates to:
-  /// **'Add cards'**
-  String get addCards;
+  /// **'Advanced search'**
+  String get advancedSearch;
 
   /// No description provided for @pickedCards.
   ///
@@ -1237,6 +1237,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search failed: {error}'**
   String searchFailed(String error);
+
+  /// No description provided for @searchPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search cards to add'**
+  String get searchPanel;
+
+  /// No description provided for @searchPanelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a card to add it to the pool; tap it again to take it out.'**
+  String get searchPanelHint;
+
+  /// No description provided for @cardInPool.
+  ///
+  /// In en, this message translates to:
+  /// **'In the pool'**
+  String get cardInPool;
+
+  /// No description provided for @cardFromSource.
+  ///
+  /// In en, this message translates to:
+  /// **'From a set or cube of the pool'**
+  String get cardFromSource;
 
   /// No description provided for @viewList.
   ///

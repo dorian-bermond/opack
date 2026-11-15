@@ -6,15 +6,15 @@ import '../../../core/router.dart';
 import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/images/card_image_cache.dart';
-import '../../../shared/widgets/card_tile.dart';
 import '../../card_info/data/card_info_repository.dart';
+import '../../card_info/data/card_search.dart';
 import '../../card_info/domain/card_filter.dart';
 import '../../card_info/domain/card_info.dart';
 import '../../card_info/presentation/card_search_sheet.dart';
 import '../../card_info/presentation/filter_sheet.dart';
 import '../../card_info/presentation/labels.dart';
 import '../../card_info/presentation/metrics_sheet.dart';
-import '../../card_text/presentation/card_details_sheet.dart';
+import '../../card_info/presentation/search_panel.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../../cube/data/cube_repository.dart';
@@ -65,6 +65,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// Which card list a download was already asked for, so it runs once.
   String? _fetchedFor;
 
+  /// Whether the search panel is open beside (or over) the pool.
+  bool _searchOpen = false;
+
   Pool get _pool => widget.pool.pool;
 
   /// Downloads the details still missing, once per card list, when online
@@ -82,25 +85,30 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     });
   }
 
-  /// Searches cards online and adds the chosen ones as picked cards, with
-  /// their details.
-  Future<void> _addCards() async {
+    /// Adds one found card as a picked card, with its details; it joins the
+  /// rarity tags so it gets dealt.
+  Future<void> _addFound(FoundCard found) async {
     final pool = _pool;
     final picked = pool.sources.whereType<CardsSource>().firstOrNull ?? const CardsSource([]);
-    final found = await showCardSearch(
-      context,
-      game: pool.game,
-      excludeIds: {for (final e in widget.pool.entries) e.card.id},
-    );
-    if (found == null || found.isEmpty) return;
+    final rest = [for (final source in pool.sources) if (source is! CardsSource) source];
+    _save(pool.copyWith(sources: rest).withSource(
+      picked.plus([found.card]),
+      cards: [found.card],
+      existing: widget.pool.entries.map((e) => e.card),
+    ));
+    await ref.read(poolCardInfoProvider(pool.id).notifier).addInfos({found.card.id: found.info});
+  }
+
+  /// Takes a picked card out of the pool.
+  void _removePicked(CardData card) {
+    final pool = _pool;
     _save(pool.copyWith(sources: [
       for (final source in pool.sources)
-        if (source is! CardsSource) source,
-      picked.plus(found.map((f) => f.card)),
+        if (source case CardsSource(:final cards)) ...[
+          if (cards.any((c) => c.id != card.id)) CardsSource([for (final c in cards) if (c.id != card.id) c]),
+        ] else
+          source,
     ]));
-    await ref
-        .read(poolCardInfoProvider(pool.id).notifier)
-        .addInfos({for (final f in found) f.card.id: f.info});
   }
 
   void _save(Pool pool) => ref.read(poolsProvider.notifier).save(pool);
@@ -341,12 +349,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               label: Text(l10n.addSource),
               onPressed: _addSource,
             ),
-            if (ref.watch(cardSearchProvider) != null)
-              ActionChip(
-                avatar: const Icon(Icons.travel_explore, size: 18),
-                label: Text(l10n.addCards),
-                onPressed: _addCards,
-              ),
           ],
         ),
       ),
@@ -488,6 +490,15 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       appBar: AppBar(
         title: InkWell(onTap: _rename, child: Text(pool.name)),
         actions: [
+          if (ref.watch(cardSearchProvider) != null)
+            IconButton(
+              key: const Key('searchPanelToggle'),
+              tooltip: l10n.searchPanel,
+              isSelected: _searchOpen,
+              icon: const Icon(Icons.add),
+              selectedIcon: const Icon(Icons.playlist_add_check),
+              onPressed: () => setState(() => _searchOpen = !_searchOpen),
+            ),
           PopupMenuButton<CardSort>(
             tooltip: l10n.sortBy,
             icon: const Icon(Icons.sort),
@@ -554,7 +565,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             ),
         ],
       ),
-      body: CustomScrollView(
+      body: _withSearchPanel(
+        play,
+        CustomScrollView(
         slivers: [
           SliverList.list(children: header),
           if (view == PoolView.stacks)
@@ -595,7 +608,30 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
         ],
       ),
+      ),
     );
+  }
+
+  /// [poolBody] alone, or with the search panel: beside it on a wide
+  /// window, in its place on a narrow one.
+  Widget _withSearchPanel(PlayPool play, Widget poolBody) {
+    if (!_searchOpen) return poolBody;
+    final panel = SearchPanel(
+      pool: play,
+      onAdd: _addFound,
+      onRemove: _removePicked,
+      onClose: () => setState(() => _searchOpen = false),
+    );
+    return LayoutBuilder(builder: (context, constraints) {
+      if (constraints.maxWidth < 900) return panel;
+      return Row(
+        children: [
+          Expanded(child: poolBody),
+          const VerticalDivider(width: 1),
+          SizedBox(width: (constraints.maxWidth * 0.4).clamp(360.0, 520.0), child: panel),
+        ],
+      );
+    });
   }
 
   /// The listed cards split by [_groupBy], in the order groups first
@@ -641,48 +677,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     AppLocalizations l10n,
   ) =>
       switch (view) {
-            PoolView.list => SliverList.builder(
-                itemCount: items.length,
-                itemBuilder: (context, i) {
-                  final (:card, :info, tags: _) = items[i];
-                  final listedTimes = actions.listedOf(card);
-                  final tags = actions.tagsOf(card);
-                  return ListTile(
-                    dense: true,
-                    tileColor: actions.tint(card)?.withValues(alpha: 0.18),
-                    onTap: actions.onTap == null ? null : () => actions.onTap!(card),
-                    onLongPress: () => showCardDetails(context, card, poolId: PoolScope.of(context)),
-                    title: Text(
-                      card.nameFor(language),
-                      style: actions.changed(card) ? const TextStyle(fontWeight: FontWeight.bold) : null,
-                    ),
-                    subtitle: Text([
-                      [
-                        card.id,
-                        card.rarity.label(l10n),
-                        if (listedTimes > 1) l10n.listedTimes(listedTimes),
-                        if (tags.isNotEmpty) tags.join(', '),
-                      ].join(' · '),
-                      ?cardInfoLine(info),
-                    ].join('\n')),
-                    isThreeLine: info != null,
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          tooltip: l10n.cardTags,
-                          icon: const Icon(Icons.label_outline, size: 20),
-                          onPressed: () => actions.onTags(card),
-                        ),
-                        CopiesDropdown(
-                          value: actions.copiesOf(card),
-                          onChanged: (value) => actions.setCopies(card, value),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+            PoolView.list => PoolListSliver(items: items, actions: actions, language: language),
             PoolView.gallery => PoolGallerySliver(items: items, actions: actions),
             // Stacks are laid out as a whole, see build.
             PoolView.stacks => const SliverToBoxAdapter(child: SizedBox.shrink()),

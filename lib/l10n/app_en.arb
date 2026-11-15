@@ -288,7 +288,7 @@
   "kindTrap": "Trap",
   "noArchetype": "No archetype",
   "nonFoil": "Non-foil",
-  "addCards": "Add cards",
+  "advancedSearch": "Advanced search",
   "pickedCards": "{count, plural, =1{1 picked card} other{{count} picked cards}}",
   "@pickedCards": {
     "placeholders": {
@@ -312,6 +312,10 @@
   },
   "addSelected": "Add to the pool",
   "searchFailed": "Search failed: {error}",
+  "searchPanel": "Search cards to add",
+  "searchPanelHint": "Tap a card to add it to the pool; tap it again to take it out.",
+  "cardInPool": "In the pool",
+  "cardFromSource": "From a set or cube of the pool",
   "@searchFailed": {
     "placeholders": {
       "error": {
