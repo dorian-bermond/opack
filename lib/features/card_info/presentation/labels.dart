@@ -75,11 +75,21 @@ String metricLabel(AppLocalizations l10n, Metric metric) => switch (metric) {
 /// built-in sheet names such as `foilCommon` spelled out, user tags as is.
 String tagLabel(AppLocalizations l10n, String tag) {
   if (tag.startsWith('rarity:')) return '${l10n.facetRarity}: ${valueLabel(l10n, tag)}';
+  if (tag.indexOf(':') case final i when i > 0) {
+    return '${qualityLabel(l10n, tag.substring(0, i))}: ${tagLabel(l10n, tag.substring(i + 1))}';
+  }
   if (tag == 'pool' || Rarity.values.any((r) => r.name == tag)) return valueLabel(l10n, tag);
   if (!RegExp(r'^[a-z]+[A-Z]').hasMatch(tag)) return tag;
   final words = tag.replaceAllMapped(RegExp(r'([a-z0-9])([A-Z])'), (m) => '${m[1]} ${m[2]!.toLowerCase()}');
   return words[0].toUpperCase() + words.substring(1);
 }
+
+/// A quality name as the user reads it: the rarity's own label, else the
+/// name capitalized.
+String qualityLabel(AppLocalizations l10n, String quality) => switch (quality) {
+      'rarity' => l10n.facetRarity,
+      _ => quality.isEmpty ? quality : quality[0].toUpperCase() + quality.substring(1),
+    };
 
 /// One line of details under a card: cost and type line, or attribute,
 /// monster type, level and ATK/DEF; `null` without details.

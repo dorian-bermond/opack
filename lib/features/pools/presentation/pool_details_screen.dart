@@ -113,27 +113,36 @@ class _PoolDetails extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.tagChipHint, style: theme.textTheme.bodySmall),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final name in play.tagNames)
-                      InputChip(
-                        avatar: const Icon(Icons.label_outline, size: 18),
-                        label: Text('${tagLabel(l10n, name)} · ${play.tagCards[name]?.length ?? 0}'),
-                        tooltip: l10n.tagCardsAction,
-                        onPressed: () => context.push(
-                            '${poolModePath(saved.game, saved.id, 'edit')}?tag=${Uri.encodeQueryComponent(name)}'),
-                        onDeleted: () => deletePoolTag(context, ref, play, name),
+                Text(l10n.qualityHint, style: theme.textTheme.bodySmall),
+                for (final (quality, names) in tagsByQuality(saved)) ...[
+                  const SizedBox(height: 8),
+                  if (quality != null)
+                    Text(qualityLabel(l10n, quality), style: theme.textTheme.labelMedium)
+                  else if (saved.qualities.isNotEmpty)
+                    Text(l10n.plainTags, style: theme.textTheme.labelMedium),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final name in names)
+                        InputChip(
+                          avatar: Icon(quality == null ? Icons.label_outline : Icons.radio_button_checked, size: 18),
+                          label: Text('${quality == null ? tagLabel(l10n, name) : tagLabel(l10n, name.substring(quality.length + 1))}'
+                              ' · ${play.tagCards[name]?.length ?? 0}'),
+                          tooltip: l10n.tagCardsAction,
+                          onPressed: () => context.push(
+                              '${poolModePath(saved.game, saved.id, 'edit')}?tag=${Uri.encodeQueryComponent(name)}'),
+                          onDeleted: () => deletePoolTag(context, ref, play, name),
+                        ),
+                      ActionChip(
+                        avatar: const Icon(Icons.add, size: 18),
+                        label: Text(l10n.newTag),
+                        onPressed: () => newPoolTag(context, ref, saved, quality: quality),
                       ),
-                    ActionChip(
-                      avatar: const Icon(Icons.add, size: 18),
-                      label: Text(l10n.newTag),
-                      onPressed: () => newPoolTag(context, ref, saved),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -149,6 +158,17 @@ class _PoolDetails extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// The pool's tags grouped by quality, plain tags first (under `null`),
+/// each quality in the order its tags list them; the plain group is
+/// always present so a tag can be added there.
+List<(String?, List<String>)> tagsByQuality(Pool pool) {
+  final groups = <String?, List<String>>{null: []};
+  for (final tag in pool.tags.keys) {
+    (groups[Pool.qualityOf(tag)] ??= []).add(tag);
+  }
+  return [for (final MapEntry(:key, :value) in groups.entries) (key, value)];
 }
 
 /// A titled block of a pool page.

@@ -721,6 +721,20 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get tagQuality => 'Qualité (facultatif)';
+
+  @override
+  String get tagQualityHint =>
+      'Les tags d\'une qualité sont exclusifs : une carte n\'en porte qu\'un, comme une rareté.';
+
+  @override
+  String get qualityHint =>
+      'Les tags d\'une qualité sont exclusifs : en donner un à une carte lui retire les autres.';
+
+  @override
+  String get plainTags => 'Autres tags';
+
+  @override
   String get tagBaskets => 'Paniers de tags';
 
   @override

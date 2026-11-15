@@ -49,14 +49,96 @@ Future<void> addPoolSource(BuildContext context, WidgetRef ref, PlayPool play) a
   }
 }
 
-/// Creates an empty tag and answers its name, `null` when dismissed or
-/// already taken.
-Future<String?> newPoolTag(BuildContext context, WidgetRef ref, Pool pool) async {
-  final l10n = AppLocalizations.of(context);
-  final name = await askName(context, l10n.newTag, label: l10n.tagName);
-  if (name == null || pool.tags.containsKey(name)) return null;
+/// Creates an empty tag, plain or within a quality (a group of exclusive
+/// tags, like the rarities), and answers its name; `null` when dismissed
+/// or already taken.
+Future<String?> newPoolTag(BuildContext context, WidgetRef ref, Pool pool, {String? quality}) async {
+  final result = await showDialog<(String, String)>(
+    context: context,
+    builder: (context) => _NewTagDialog(qualities: pool.qualities, quality: quality),
+  );
+  if (result == null) return null;
+  final (value, chosenQuality) = result;
+  final name = chosenQuality.isEmpty ? value : Pool.qualityTag(chosenQuality, value);
+  if (pool.tags.containsKey(name)) return null;
   savePool(ref, pool.withTag(name, const []));
   return name;
+}
+
+/// Asks a tag name and, optionally, the quality it belongs to.
+class _NewTagDialog extends StatefulWidget {
+  const _NewTagDialog({required this.qualities, this.quality});
+
+  final List<String> qualities;
+  final String? quality;
+
+  @override
+  State<_NewTagDialog> createState() => _NewTagDialogState();
+}
+
+class _NewTagDialogState extends State<_NewTagDialog> {
+  late final _name = TextEditingController();
+  late final _quality = TextEditingController(text: widget.quality ?? '');
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _quality.dispose();
+    super.dispose();
+  }
+
+  String _clean(String s) => s.trim().replaceAll(':', '');
+
+  void _submit() {
+    final name = _clean(_name.text);
+    if (name.isEmpty) return;
+    Navigator.pop(context, (name, _clean(_quality.text).toLowerCase()));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l10n.newTag),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            key: const Key('tagNameField'),
+            controller: _name,
+            autofocus: true,
+            decoration: InputDecoration(labelText: l10n.tagName),
+            onSubmitted: (_) => _submit(),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('tagQualityField'),
+            controller: _quality,
+            decoration: InputDecoration(labelText: l10n.tagQuality, helperText: l10n.tagQualityHint),
+            onSubmitted: (_) => _submit(),
+          ),
+          if (widget.qualities.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              children: [
+                for (final quality in widget.qualities)
+                  ActionChip(
+                    label: Text(qualityLabel(l10n, quality)),
+                    onPressed: () => setState(() => _quality.text = quality),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+        FilledButton(onPressed: _submit, child: Text(l10n.apply)),
+      ],
+    );
+  }
 }
 
 /// Deletes [tag] after a warning listing the slots pulling from it; they

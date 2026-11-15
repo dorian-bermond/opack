@@ -719,6 +719,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tagQuality => 'Quality (optional)';
+
+  @override
+  String get tagQualityHint =>
+      'Tags of one quality are exclusive: a card holds only one, like a rarity.';
+
+  @override
+  String get qualityHint =>
+      'Tags of one quality are exclusive: giving a card one takes the others away.';
+
+  @override
+  String get plainTags => 'Other tags';
+
+  @override
   String get tagBaskets => 'Tag baskets';
 
   @override

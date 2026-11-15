@@ -1238,6 +1238,30 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @tagQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality (optional)'**
+  String get tagQuality;
+
+  /// No description provided for @tagQualityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags of one quality are exclusive: a card holds only one, like a rarity.'**
+  String get tagQualityHint;
+
+  /// No description provided for @qualityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags of one quality are exclusive: giving a card one takes the others away.'**
+  String get qualityHint;
+
+  /// No description provided for @plainTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Other tags'**
+  String get plainTags;
+
   /// No description provided for @tagBaskets.
   ///
   /// In en, this message translates to:

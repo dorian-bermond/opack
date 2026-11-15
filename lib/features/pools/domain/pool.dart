@@ -638,11 +638,40 @@ class Pool {
           if (def.cards.contains(cardId)) tag,
       ];
 
-  /// Sets which cards carry [tag] (creating it when new).
-  Pool withTag(String tag, Iterable<String> cardIds) => copyWith(tags: {
-        ...tags,
-        tag: (tags[tag] ?? const TagDef([])).withCards(cardIds),
-      });
+  /// The quality a tag belongs to: the part before `:` in `rarity:rare`,
+  /// `null` for a plain tag. Tags of one quality are exclusive: a card
+  /// holds at most one of them.
+  static String? qualityOf(String tag) {
+    final i = tag.indexOf(':');
+    return i > 0 ? tag.substring(0, i) : null;
+  }
+
+  /// The tag `quality:value`.
+  static String qualityTag(String quality, String value) => '$quality:$value';
+
+  /// Every quality of the pool, in the order its tags list them.
+  List<String> get qualities => {for (final tag in tags.keys) ?qualityOf(tag)}.toList();
+
+  /// The other tags of [tag]'s quality, none for a plain tag.
+  Iterable<String> siblingsOf(String tag) {
+    final quality = qualityOf(tag);
+    if (quality == null) return const [];
+    return tags.keys.where((t) => t != tag && qualityOf(t) == quality);
+  }
+
+  /// Sets which cards carry [tag] (creating it when new); cards gaining
+  /// a quality tag lose the other tags of that quality.
+  Pool withTag(String tag, Iterable<String> cardIds) {
+    final ids = cardIds.toSet();
+    final gained = ids.difference({...?tags[tag]?.cards});
+    return copyWith(tags: {
+      ...tags,
+      for (final sibling in siblingsOf(tag))
+        if (gained.isNotEmpty && tags[sibling]!.cards.any(gained.contains))
+          sibling: tags[sibling]!.withCards(tags[sibling]!.cards.where((id) => !gained.contains(id))),
+      tag: (tags[tag] ?? const TagDef([])).withCards(ids),
+    });
+  }
 
   /// Drops [tag]; slots of every booster lose that option, and go when
   /// nothing is left.

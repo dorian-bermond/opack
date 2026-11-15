@@ -21,6 +21,7 @@ import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
 import 'pool_actions.dart';
+import 'pool_details_screen.dart';
 import 'pool_loader.dart';
 import 'pool_view.dart';
 
@@ -228,7 +229,15 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                     dense: true,
                     value: chosen.contains(tag),
                     title: Text(tagLabel(l10n, tag)),
-                    onChanged: (on) => setState(() => on == true ? chosen.add(tag) : chosen.remove(tag)),
+                    // A quality tag replaces the others of its quality.
+                    onChanged: (on) => setState(() {
+                      if (on == true) {
+                        chosen.removeAll(pool.siblingsOf(tag));
+                        chosen.add(tag);
+                      } else {
+                        chosen.remove(tag);
+                      }
+                    }),
                   ),
               ],
             ),
@@ -558,23 +567,32 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                         ),
                       ],
                     ),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final tag in play.tagNames)
-                          _Basket(
-                            key: ValueKey('basket-$tag'),
-                            label: '${tagLabel(l10n, tag)} · ${play.tagCards[tag]?.length ?? 0}',
-                            onDrop: (card) => _dropOnBasket(tag, card),
+                    for (final (quality, names) in tagsByQuality(play.pool))
+                      if (names.isNotEmpty || quality == null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              if (quality != null)
+                                Text('${qualityLabel(l10n, quality)}:', style: theme.textTheme.labelMedium),
+                              for (final tag in names)
+                                _Basket(
+                                  key: ValueKey('basket-$tag'),
+                                  label: '${quality == null ? tagLabel(l10n, tag) : tagLabel(l10n, tag.substring(quality.length + 1))}'
+                                      ' · ${play.tagCards[tag]?.length ?? 0}',
+                                  onDrop: (card) => _dropOnBasket(tag, card),
+                                ),
+                              ActionChip(
+                                avatar: const Icon(Icons.add, size: 18),
+                                label: Text(l10n.newTag),
+                                onPressed: () => newPoolTag(context, ref, _pool, quality: quality),
+                              ),
+                            ],
                           ),
-                        ActionChip(
-                          avatar: const Icon(Icons.add, size: 18),
-                          label: Text(l10n.newTag),
-                          onPressed: () => newPoolTag(context, ref, _pool),
                         ),
-                      ],
-                    ),
                   ],
                 ),
               ),

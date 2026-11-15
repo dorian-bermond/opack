@@ -147,9 +147,9 @@ void main() {
     // Tag a card in bulk, pull one such card per pack, then drop the slot.
     await tester.tap(find.byTooltip('Pool details'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('New tag'));
+    await tester.tap(find.text('New tag').first);
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField).last, 'mine');
+    await tester.enterText(find.byKey(const Key('tagNameField')), 'mine');
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
     expect(find.text('mine · 0'), findsOneWidget);
@@ -197,7 +197,7 @@ void main() {
     await tester.tap(find.byTooltip('Pool details'));
     await tester.pumpAndSettle();
     final commonChip =
-        find.descendant(of: find.byType(InputChip), matching: find.textContaining(RegExp(r'^Common · ')));
+        find.descendant(of: find.byType(InputChip), matching: find.textContaining(RegExp(r'^Common · '))).first;
     expect(commonChip, findsOneWidget);
     await tester.tap(commonChip);
     await settleLoading(tester);
@@ -208,7 +208,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.pageBack();
     await tester.pumpAndSettle();
-    expect(find.textContaining(RegExp(r'^Common · ')), findsOneWidget);
+    expect(find.textContaining(RegExp(r'^Common · ')), findsNWidgets(2), reason: 'the sheet tag and the rarity value');
 
     // Deleting a tag warns about the slots pulling from it.
     final commonChipWidget = find.ancestor(of: commonChip, matching: find.byType(InputChip));
@@ -359,7 +359,7 @@ void main() {
     await tester.tap(find.byKey(const Key('basketsToggle')));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('basket-rarity:rare')), findsOneWidget);
-    expect(find.text('Rarity: Rare · 20'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('basket-rarity:rare')), matching: find.text('Rare · 20')), findsOneWidget);
     expect(tester.widget<TextButton>(find.byKey(const Key('undoDrop'))).enabled, isFalse);
 
     // Drop a secret rare card into the rare basket.
@@ -369,7 +369,7 @@ void main() {
     final to = tester.getCenter(find.byKey(const ValueKey('basket-rarity:rare')));
     await tester.timedDrag(card, to - from, const Duration(milliseconds: 400));
     await settleLoading(tester);
-    expect(find.text('Rarity: Rare · 21'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('basket-rarity:rare')), matching: find.text('Rare · 21')), findsOneWidget);
     expect(tester.widget<TextButton>(find.byKey(const Key('undoDrop'))).enabled, isTrue);
 
     // Ctrl+Z puts the pool back as it was.
@@ -377,7 +377,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
     await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
     await settleLoading(tester);
-    expect(find.text('Rarity: Rare · 20'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('basket-rarity:rare')), matching: find.text('Rare · 20')), findsOneWidget);
     expect(tester.widget<TextButton>(find.byKey(const Key('undoDrop'))).enabled, isFalse);
 
     await tester.tap(find.byKey(const Key('basketsToggle')));
