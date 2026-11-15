@@ -21,6 +21,7 @@ import 'package:opack/features/cube/data/cube_repository.dart';
 import 'package:opack/features/cube/domain/cube.dart';
 import 'package:opack/features/pools/data/pool_repository.dart';
 import 'package:opack/features/pools/domain/pool.dart';
+import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 import 'package:opack/shared/widgets/card_tile.dart';
@@ -429,6 +430,50 @@ void main() {
     await settleLoading(tester);
     expect(find.descendant(of: secret, matching: find.text('8')), findsOneWidget);
     expect(tester.widget<IconButton>(find.byKey(const Key('tierlistUndo'))).onPressed, isNull);
+
+    // Dropping a card on another ranks it right before that one.
+    final first = find.descendant(of: rare, matching: find.byType(DraggableCard)).first;
+    final firstId = tester.widget<DraggableCard>(first).card.id;
+    final third = find.descendant(of: rare, matching: find.byType(DraggableCard)).at(2);
+    final thirdId = tester.widget<DraggableCard>(third).card.id;
+    await tester.timedDrag(third, tester.getCenter(first) - tester.getCenter(third), const Duration(milliseconds: 400));
+    await settleLoading(tester);
+    final ranked = [
+      for (final w in tester.widgetList<DraggableCard>(find.descendant(of: rare, matching: find.byType(DraggableCard))))
+        w.card.id,
+    ];
+    expect(ranked.take(2), [thirdId, firstId]);
+    await tester.tap(find.byKey(const Key('tierlistUndo')));
+    await settleLoading(tester);
+
+    // Tiers rank by their arrows; the first cannot go up.
+    double top(Finder tier) => tester.getTopLeft(tier).dy;
+    expect(tester.widget<IconButton>(find.byKey(const ValueKey('tierUp-Common'))).onPressed, isNull);
+    expect(top(find.byKey(const ValueKey('tier-rarity:common'))), lessThan(top(rare)));
+    await tester.tap(find.byKey(const ValueKey('tierDown-Common')));
+    await settleLoading(tester);
+    expect(top(find.byKey(const ValueKey('tier-rarity:common'))), greaterThan(top(rare)));
+    await tester.tap(find.byKey(const Key('tierlistUndo')));
+    await settleLoading(tester);
+    expect(top(find.byKey(const ValueKey('tier-rarity:common'))), lessThan(top(rare)));
+
+    // A new quality comes with its ranked values and becomes the current one.
+    await tester.tap(find.byKey(const Key('tierlistQuality')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('New quality…'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('qualityNameField')), 'Power');
+    await tester.enterText(find.byKey(const Key('qualityValuesField')), 'S\nA\nB');
+    await tester.tap(find.text('Apply'));
+    await settleLoading(tester);
+    expect(find.text('Quality: Power'), findsOneWidget);
+    expect(find.byKey(const ValueKey('tier-power:S')), findsOneWidget);
+    expect(top(find.byKey(const ValueKey('tier-power:S'))), lessThan(top(find.byKey(const ValueKey('tier-power:B')))));
+    expect(find.textContaining('Ctrl+Z undoes. · 0'), findsNothing, reason: 'nothing valued yet: all in the feed');
+    await tester.tap(find.byKey(const Key('tierlistQuality')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Rarity'));
+    await tester.pumpAndSettle();
 
     // A new tier is a new value of the quality.
     await tester.tap(find.byKey(const Key('addTier')));

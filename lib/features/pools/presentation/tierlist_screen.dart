@@ -78,12 +78,25 @@ class _TierlistState extends ConsumerState<_Tierlist> {
           if (Pool.qualityOf(tag) == _quality) tag,
       ];
 
-  /// Moves [card] into [tier] (its other value of the quality goes).
-  void _dropOnTier(String tier, CardData card) {
-    final ids = {for (final c in widget.pool.tagCards[tier] ?? const <CardData>[]) c.id};
-    if (!ids.add(card.id)) return;
+  /// Puts [card] in [tier] right before [before], or last; its other
+  /// value of the quality goes.
+  void _dropOnTier(String tier, CardData card, {String? before}) {
+    final cards = [for (final c in widget.pool.tagCards[tier] ?? const <CardData>[]) c.id];
+    final at = before == null ? cards.length : cards.indexOf(before);
+    if (cards.indexOf(card.id) case final i when i >= 0 && (i == at || i + 1 == at)) return;
     setState(() => _undo.add(_pool));
-    _save(_pool.withTag(tier, ids));
+    _save(_pool.withCardInTag(tier, card.id, before: before));
+  }
+
+  /// Moves [tier] one rank up ([by] -1) or down (+1) among its quality's
+  /// values.
+  void _moveTier(String tier, int by) {
+    final tiers = _tiers;
+    final i = tiers.indexOf(tier);
+    final j = i + by;
+    if (i < 0 || j < 0 || j >= tiers.length) return;
+    setState(() => _undo.add(_pool));
+    _save(_pool.withTagBefore(tier, by < 0 ? tiers[j] : (j + 1 < tiers.length ? tiers[j + 1] : null)));
   }
 
   /// Takes [card] out of its tier, back to the feed.
@@ -137,9 +150,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
     );
     if (chosen == null || !mounted) return;
     if (chosen.isNotEmpty) return setState(() => _quality = chosen);
-    // A new quality is born with its first value.
-    final name = await newPoolTag(context, ref, _pool);
-    final quality = name == null ? null : Pool.qualityOf(name);
+    final quality = await newPoolQuality(context, ref, _pool);
     if (quality != null) setState(() => _quality = quality);
   }
 
@@ -189,11 +200,13 @@ class _TierlistState extends ConsumerState<_Tierlist> {
         if ((inTag == null || inTag.contains(item.card.id)) && _filter.matches(item)) item,
     ];
     final tiers = _tiers;
+    // A tier's cards in the tag's order: their rank within the value.
+    final groupIds = {for (final item in group) item.card.id};
     final valued = <String, List<CardData>>{
       for (final tier in tiers)
         tier: [
-          for (final item in group)
-            if (item.tags.contains(tier)) item.card,
+          for (final card in play.tagCards[tier] ?? const <CardData>[])
+            if (groupIds.contains(card.id)) card,
         ],
     };
     final placed = {for (final cards in valued.values) for (final c in cards) c.id};
@@ -271,12 +284,14 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                     : ListView(
                         padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                         children: [
-                          for (final tier in tiers)
+                          for (final (i, tier) in tiers.indexed)
                             _Tier(
                               key: ValueKey('tier-$tier'),
                               label: tagLabel(l10n, tier.substring(quality.length + 1)),
                               cards: valued[tier]!,
-                              onDrop: (card) => _dropOnTier(tier, card),
+                              onDrop: (card, {before}) => _dropOnTier(tier, card, before: before),
+                              onMoveUp: i == 0 ? null : () => _moveTier(tier, -1),
+                              onMoveDown: i == tiers.length - 1 ? null : () => _moveTier(tier, 1),
                             ),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -303,20 +318,31 @@ class _TierlistState extends ConsumerState<_Tierlist> {
   }
 }
 
-/// One tier: its label, then its cards in a row that scrolls sideways.
-/// A drop target for cards of the feed or of other tiers.
+/// One tier: its label and rank arrows, then its cards in a row that
+/// scrolls sideways, ranked left to right. A drop target for cards of the
+/// feed or of other tiers; dropping on a card ranks before it, on the
+/// row's free space last.
 class _Tier extends StatelessWidget {
-  const _Tier({super.key, required this.label, required this.cards, required this.onDrop});
+  const _Tier({
+    super.key,
+    required this.label,
+    required this.cards,
+    required this.onDrop,
+    this.onMoveUp,
+    this.onMoveDown,
+  });
 
   final String label;
   final List<CardData> cards;
-  final void Function(CardData card) onDrop;
+  final void Function(CardData card, {String? before}) onDrop;
+  final VoidCallback? onMoveUp;
+  final VoidCallback? onMoveDown;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return DragTarget<CardData>(
-      onWillAcceptWithDetails: (d) => !cards.any((c) => c.id == d.data.id),
+      onWillAcceptWithDetails: (d) => cards.lastOrNull?.id != d.data.id,
       onAcceptWithDetails: (d) => onDrop(d.data),
       builder: (context, candidates, _) {
         final hovered = candidates.isNotEmpty;
@@ -343,6 +369,23 @@ class _Tier extends StatelessWidget {
                     children: [
                       Text(label, style: theme.textTheme.titleSmall, textAlign: TextAlign.center),
                       Text('${cards.length}', style: theme.textTheme.labelMedium),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            key: ValueKey('tierUp-$label'),
+                            icon: const Icon(Icons.arrow_upward, size: 16),
+                            visualDensity: VisualDensity.compact,
+                            onPressed: onMoveUp,
+                          ),
+                          IconButton(
+                            key: ValueKey('tierDown-$label'),
+                            icon: const Icon(Icons.arrow_downward, size: 16),
+                            visualDensity: VisualDensity.compact,
+                            onPressed: onMoveDown,
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -355,9 +398,9 @@ class _Tier extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     itemCount: cards.length,
                     separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, i) => SizedBox(
-                      width: 96,
-                      child: DraggableCard(card: cards[i], enabled: true, child: CardTile(card: cards[i])),
+                    itemBuilder: (context, i) => _RankedCard(
+                      card: cards[i],
+                      onDropBefore: (card) => onDrop(card, before: cards[i].id),
                     ),
                   ),
                 ),
@@ -366,6 +409,31 @@ class _Tier extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// A card of a tier: dragged to rank it elsewhere, and a drop target that
+/// ranks the dropped card right before it.
+class _RankedCard extends StatelessWidget {
+  const _RankedCard({required this.card, required this.onDropBefore});
+
+  final CardData card;
+  final void Function(CardData card) onDropBefore;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return DragTarget<CardData>(
+      onWillAcceptWithDetails: (d) => d.data.id != card.id,
+      onAcceptWithDetails: (d) => onDropBefore(d.data),
+      builder: (context, candidates, _) => Container(
+        width: 96,
+        decoration: candidates.isEmpty
+            ? null
+            : BoxDecoration(border: Border(left: BorderSide(color: theme.colorScheme.primary, width: 3))),
+        child: DraggableCard(card: card, enabled: true, child: CardTile(card: card)),
+      ),
     );
   }
 }

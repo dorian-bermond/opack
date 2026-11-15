@@ -65,6 +65,97 @@ Future<String?> newPoolTag(BuildContext context, WidgetRef ref, Pool pool, {Stri
   return name;
 }
 
+/// Creates a quality (a group of exclusive tags) with its first values,
+/// ranked as listed, and answers its name; `null` when dismissed, blank
+/// or already there.
+Future<String?> newPoolQuality(BuildContext context, WidgetRef ref, Pool pool) async {
+  final result = await showDialog<(String, List<String>)>(
+    context: context,
+    builder: (context) => const _NewQualityDialog(),
+  );
+  if (result == null) return null;
+  final (quality, values) = result;
+  if (pool.qualities.contains(quality)) return null;
+  var updated = pool;
+  for (final value in values) {
+    updated = updated.withTag(Pool.qualityTag(quality, value), const []);
+  }
+  savePool(ref, updated);
+  return quality;
+}
+
+/// Asks a quality name and its values, one per line, best first.
+class _NewQualityDialog extends StatefulWidget {
+  const _NewQualityDialog();
+
+  @override
+  State<_NewQualityDialog> createState() => _NewQualityDialogState();
+}
+
+class _NewQualityDialogState extends State<_NewQualityDialog> {
+  late final _name = TextEditingController();
+  late final _values = TextEditingController();
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _values.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _name.text.trim().replaceAll(':', '').toLowerCase();
+    final values = {
+      for (final line in _values.text.split(RegExp(r'[\n,]')))
+        if (line.trim().replaceAll(':', '').isNotEmpty) line.trim().replaceAll(':', ''),
+    }.toList();
+    if (name.isEmpty || values.isEmpty) return;
+    Navigator.pop(context, (name, values));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l10n.newQualityTitle),
+      content: SizedBox(
+        width: 360,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.newQualityHint, style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 12),
+            TextField(
+              key: const Key('qualityNameField'),
+              controller: _name,
+              autofocus: true,
+              decoration: InputDecoration(labelText: l10n.qualityName, hintText: 'power'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              key: const Key('qualityValuesField'),
+              controller: _values,
+              minLines: 3,
+              maxLines: 8,
+              decoration: InputDecoration(
+                labelText: l10n.qualityValues,
+                helperText: l10n.qualityValuesHint,
+                hintText: 'S\nA\nB\nC',
+                alignLabelWithHint: true,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+        FilledButton(onPressed: _submit, child: Text(l10n.apply)),
+      ],
+    );
+  }
+}
+
 /// Asks a tag name and, optionally, the quality it belongs to.
 class _NewTagDialog extends StatefulWidget {
   const _NewTagDialog({required this.qualities, this.quality});

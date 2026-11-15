@@ -659,8 +659,32 @@ class Pool {
     return tags.keys.where((t) => t != tag && qualityOf(t) == quality);
   }
 
-  /// Sets which cards carry [tag] (creating it when new); cards gaining
-  /// a quality tag lose the other tags of that quality.
+  /// Puts [cardId] in [tag] right before [before] (last when `null` or
+  /// not in the tag): the order of a tag's cards is their rank within it.
+  Pool withCardInTag(String tag, String cardId, {String? before}) {
+    final cards = [for (final id in tags[tag]?.cards ?? const <String>[]) if (id != cardId) id];
+    final at = before == null ? -1 : cards.indexOf(before);
+    cards.insert(at < 0 ? cards.length : at, cardId);
+    return withTag(tag, cards);
+  }
+
+  /// Moves [tag] right before [before] (last when `null`) among the
+  /// pool's tags: the order of a quality's tags ranks its values.
+  Pool withTagBefore(String tag, String? before) {
+    final def = tags[tag];
+    if (def == null || tag == before) return this;
+    final ordered = <String, TagDef>{};
+    for (final MapEntry(:key, :value) in tags.entries) {
+      if (key == tag) continue;
+      if (key == before) ordered[tag] = def;
+      ordered[key] = value;
+    }
+    if (!ordered.containsKey(tag)) ordered[tag] = def;
+    return copyWith(tags: ordered);
+  }
+
+  /// Sets which cards carry [tag] (creating it when new), in that order;
+  /// cards gaining a quality tag lose the other tags of that quality.
   Pool withTag(String tag, Iterable<String> cardIds) {
     final ids = cardIds.toSet();
     final gained = ids.difference({...?tags[tag]?.cards});

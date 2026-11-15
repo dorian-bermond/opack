@@ -721,6 +721,22 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get newQualityTitle => 'Ajouter une qualité';
+
+  @override
+  String get newQualityHint =>
+      'Une qualité est un ensemble de valeurs exclusives dont une carte porte une seule, comme une rareté. Ses valeurs sont classées, la meilleure en premier.';
+
+  @override
+  String get qualityName => 'Nom de la qualité';
+
+  @override
+  String get qualityValues => 'Valeurs';
+
+  @override
+  String get qualityValuesHint => 'Une par ligne, la meilleure en premier.';
+
+  @override
   String get tierlist => 'Tierlist';
 
   @override

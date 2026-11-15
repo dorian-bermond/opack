@@ -1238,6 +1238,36 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @newQualityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a quality'**
+  String get newQualityTitle;
+
+  /// No description provided for @newQualityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A quality is a set of exclusive values a card can hold one of, like a rarity. Its values are ranked, best first.'**
+  String get newQualityHint;
+
+  /// No description provided for @qualityName.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality name'**
+  String get qualityName;
+
+  /// No description provided for @qualityValues.
+  ///
+  /// In en, this message translates to:
+  /// **'Values'**
+  String get qualityValues;
+
+  /// No description provided for @qualityValuesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One per line, best first.'**
+  String get qualityValuesHint;
+
   /// No description provided for @tierlist.
   ///
   /// In en, this message translates to:

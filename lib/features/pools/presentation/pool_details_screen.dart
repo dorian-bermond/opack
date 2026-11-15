@@ -119,6 +119,16 @@ class _PoolDetails extends ConsumerWidget {
               children: [
                 Text(l10n.tagChipHint, style: theme.textTheme.bodySmall),
                 Text(l10n.qualityHint, style: theme.textTheme.bodySmall),
+                const SizedBox(height: 6),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ActionChip(
+                    key: const Key('addQuality'),
+                    avatar: const Icon(Icons.category_outlined, size: 18),
+                    label: Text(l10n.newQualityTitle),
+                    onPressed: () => newPoolQuality(context, ref, saved),
+                  ),
+                ),
                 for (final (quality, names) in tagsByQuality(saved)) ...[
                   const SizedBox(height: 8),
                   if (quality != null)

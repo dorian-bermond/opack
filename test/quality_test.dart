@@ -40,4 +40,33 @@ void main() {
     expect(pool.tags['rarity:common']!.cards, ['b']);
     expect(pool.tags['rarity:common']!.weights, {'b': 3});
   });
+
+  test('cards rank within a value, values rank within a quality', () {
+    var pool = Pool.empty(Game.mtg, name: 'p')
+        .withTag('tier:S', ['a', 'b'])
+        .withTag('tier:A', ['c'])
+        .withTag('mine', ['a']);
+
+    // Before a card, last, or moved within its own tag.
+    pool = pool.withCardInTag('tier:S', 'c', before: 'b');
+    expect(pool.tags['tier:S']!.cards, ['a', 'c', 'b']);
+    expect(pool.tags['tier:A']!.cards, isEmpty, reason: 'the quality stays exclusive');
+    pool = pool.withCardInTag('tier:S', 'a');
+    expect(pool.tags['tier:S']!.cards, ['c', 'b', 'a']);
+    pool = pool.withCardInTag('tier:S', 'a', before: 'zzz');
+    expect(pool.tags['tier:S']!.cards, ['c', 'b', 'a'], reason: 'an unknown anchor means last');
+    pool = pool.withCardInTag('tier:A', 'b', before: 'c');
+    expect(pool.tags['tier:A']!.cards, ['b']);
+    expect(pool.tags['tier:S']!.cards, ['c', 'a']);
+
+    // Values: moved before another, to the end, or left alone.
+    expect(pool.tags.keys.toList(), ['tier:S', 'tier:A', 'mine']);
+    pool = pool.withTagBefore('tier:A', 'tier:S');
+    expect(pool.tags.keys.toList(), ['tier:A', 'tier:S', 'mine']);
+    pool = pool.withTagBefore('tier:A', null);
+    expect(pool.tags.keys.toList(), ['tier:S', 'mine', 'tier:A']);
+    expect(pool.withTagBefore('tier:A', 'tier:A').tags.keys.toList(), ['tier:S', 'mine', 'tier:A']);
+    expect(pool.withTagBefore('nope', 'tier:S').tags.keys.toList(), ['tier:S', 'mine', 'tier:A']);
+    expect(pool.qualities, ['tier']);
+  });
 }
