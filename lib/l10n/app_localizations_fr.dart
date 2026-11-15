@@ -721,6 +721,45 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get batchImport => 'Import en lot';
+
+  @override
+  String get batchImportHint =>
+      'Collez une liste, une carte par ligne (« 1 Nom » ou juste « Nom »). Chaque ligne est cherchée en ligne ; la carte nommée exactement comme elle l\'emporte, sinon la première trouvée.';
+
+  @override
+  String get batchLookUp => 'Chercher';
+
+  @override
+  String batchFound(int found, int unknown) {
+    String _temp0 = intl.Intl.pluralLogic(
+      found,
+      locale: localeName,
+      other: '$found cartes trouvées',
+      one: '1 carte trouvée',
+      zero: 'Aucune carte trouvée',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      unknown,
+      locale: localeName,
+      other: '$unknown lignes inconnues',
+      one: '1 ligne inconnue',
+      zero: 'toutes les lignes reconnues',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String get batchTags => 'Tags pour tout le lot';
+
+  @override
+  String get batchTagsHint =>
+      'Chaque carte importée reçoit chaque tag coché ; saisissez un nom pour en créer un.';
+
+  @override
+  String get batchAdd => 'Ajouter au pool';
+
+  @override
   String get cardSpacing => 'Espacement des cartes';
 
   @override

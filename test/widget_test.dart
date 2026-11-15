@@ -261,9 +261,27 @@ void main() {
     final search = CardSearch(
       client: MockClient((request) async {
         expect(request.url.host, 'db.ygoprodeck.com');
-        expect(request.url.queryParameters['fname'], 'mock');
+        final fname = request.url.queryParameters['fname']!.toLowerCase();
+        // "mock" finds the dragon (and a decoy first); anything else nothing.
+        if (!fname.contains('mock')) return http.Response('', 400);
         return http.Response(jsonEncode({
           'data': [
+            if (fname == 'mock dragon')
+              {
+                'id': 11111111,
+                'name': 'Mock Dragon Lord',
+                'type': 'Effect Monster',
+                'frameType': 'effect',
+                'race': 'Dragon',
+                'attribute': 'DARK',
+                'level': 10,
+                'atk': 4000,
+                'def': 3000,
+                'desc': 'A decoy sharing the name.',
+                'card_sets': [
+                  {'set_code': 'MOCK-EN002', 'set_rarity': 'Rare'},
+                ],
+              },
             {
               'id': 12345678,
               'name': 'Mock Dragon',
@@ -283,7 +301,7 @@ void main() {
         }), 200);
       }),
     );
-    await startApp(tester, locale: const Locale('en'), cardSearch: search);
+    final container = await startApp(tester, locale: const Locale('en'), cardSearch: search);
     await tester.tap(find.text('New pool'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Yu-Gi-Oh!'));
@@ -340,6 +358,25 @@ void main() {
     await tester.pumpAndSettle();
     // Touch slop eats the first few pixels of the drag.
     expect(panelWidth(), inInclusiveRange(before + 90, before + 120));
+
+    // A batch import: each line looked up, exact name first, then tagged.
+    await tester.tap(find.byKey(const Key('batchImport')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('batchList')), '1 Mock Dragon\n\nNope Card\n2x Mock Dragon');
+    await tester.tap(find.byKey(const Key('batchLookUp')));
+    await tester.pumpAndSettle();
+    expect(find.text('1 card found · 1 line unmatched'), findsOneWidget, reason: 'the decoy loses, duplicates merge');
+    expect(find.text('Nope Card'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('batchNewTag')), 'imported');
+    await tester.tap(find.byKey(const Key('batchAddTag')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('batchTag-imported')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('batchApply')));
+    await settleLoading(tester);
+    final imported = container.read(poolsProvider).value!.single;
+    expect(imported.tags['imported']!.cards, ['MOCK-EN001']);
+    expect(imported.sources.whereType<CardsSource>().single.cards.map((c) => c.id), ['MOCK-EN001']);
+    expect(find.text('Mock Dragon'), findsNWidgets(2), reason: 'in the pool and in the results');
 
     // The former Add cards page is the panel's advanced search.
     await tester.tap(find.byKey(const Key('advancedSearch')));

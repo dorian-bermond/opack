@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/images/card_image_cache.dart';
 import '../../card_info/data/card_info_repository.dart';
 import '../../card_info/data/card_search.dart';
+import '../../card_info/presentation/batch_import.dart';
 import '../../card_info/domain/card_filter.dart';
 import '../../card_info/domain/card_info.dart';
 import '../../card_info/presentation/card_search_sheet.dart';
@@ -134,6 +135,26 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       existing: widget.pool.entries.map((e) => e.card),
     ));
     await ref.read(poolCardInfoProvider(pool.id).notifier).addInfos({found.card.id: found.info});
+  }
+
+  /// Adds every card of [batch] as picked cards, with their details, and
+  /// gives them all the batch's tags (created when new).
+  Future<void> _addBatch(BatchImport batch) async {
+    final pool = _pool;
+    final picked = pool.sources.whereType<CardsSource>().firstOrNull ?? const CardsSource([]);
+    final rest = [for (final source in pool.sources) if (source is! CardsSource) source];
+    final cards = [for (final f in batch.found) f.card];
+    var updated = pool.copyWith(sources: rest).withSource(
+      picked.plus(cards),
+      cards: cards,
+      existing: widget.pool.entries.map((e) => e.card),
+    );
+    for (final tag in batch.tags) {
+      final ids = {for (final c in widget.pool.tagCards[tag] ?? const <CardData>[]) c.id, for (final c in cards) c.id};
+      updated = updated.withTag(tag, ids);
+    }
+    _save(updated);
+    await ref.read(poolCardInfoProvider(pool.id).notifier).addInfos({for (final f in batch.found) f.card.id: f.info});
   }
 
   /// Takes a picked card out of the pool.
@@ -663,6 +684,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     final panel = SearchPanel(
       pool: play,
       onAdd: _addFound,
+      onAddBatch: _addBatch,
       onRemove: _removePicked,
       onClose: () => setState(() => _searchOpen = false),
     );

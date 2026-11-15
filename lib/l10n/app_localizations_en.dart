@@ -719,6 +719,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get batchImport => 'Batch import';
+
+  @override
+  String get batchImportHint =>
+      'Paste a list, one card per line (\"1 Name\" or just \"Name\"). Each line is looked up online; the card named exactly like it wins, else the first match.';
+
+  @override
+  String get batchLookUp => 'Look up';
+
+  @override
+  String batchFound(int found, int unknown) {
+    String _temp0 = intl.Intl.pluralLogic(
+      found,
+      locale: localeName,
+      other: '$found cards found',
+      one: '1 card found',
+      zero: 'No card found',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      unknown,
+      locale: localeName,
+      other: '$unknown lines unmatched',
+      one: '1 line unmatched',
+      zero: 'every line matched',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String get batchTags => 'Tags for the whole batch';
+
+  @override
+  String get batchTagsHint =>
+      'Every imported card gets each tag ticked; type a name to make a new one.';
+
+  @override
+  String get batchAdd => 'Add to the pool';
+
+  @override
   String get cardSpacing => 'Card spacing';
 
   @override

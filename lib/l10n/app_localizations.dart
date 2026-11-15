@@ -1238,6 +1238,48 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @batchImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch import'**
+  String get batchImport;
+
+  /// No description provided for @batchImportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a list, one card per line (\"1 Name\" or just \"Name\"). Each line is looked up online; the card named exactly like it wins, else the first match.'**
+  String get batchImportHint;
+
+  /// No description provided for @batchLookUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up'**
+  String get batchLookUp;
+
+  /// No description provided for @batchFound.
+  ///
+  /// In en, this message translates to:
+  /// **'{found, plural, =0{No card found} =1{1 card found} other{{found} cards found}} · {unknown, plural, =0{every line matched} =1{1 line unmatched} other{{unknown} lines unmatched}}'**
+  String batchFound(int found, int unknown);
+
+  /// No description provided for @batchTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags for the whole batch'**
+  String get batchTags;
+
+  /// No description provided for @batchTagsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every imported card gets each tag ticked; type a name to make a new one.'**
+  String get batchTagsHint;
+
+  /// No description provided for @batchAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to the pool'**
+  String get batchAdd;
+
   /// No description provided for @cardSpacing.
   ///
   /// In en, this message translates to:

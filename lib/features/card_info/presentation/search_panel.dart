@@ -11,6 +11,7 @@ import '../../pools/domain/pool.dart';
 import '../../pools/presentation/pool_view.dart';
 import '../data/card_search.dart';
 import '../domain/card_filter.dart';
+import 'batch_import.dart';
 import 'card_search_sheet.dart';
 import 'labels.dart';
 
@@ -24,12 +25,14 @@ class SearchPanel extends ConsumerStatefulWidget {
     super.key,
     required this.pool,
     required this.onAdd,
+    required this.onAddBatch,
     required this.onRemove,
     required this.onClose,
   });
 
   final PlayPool pool;
   final void Function(FoundCard found) onAdd;
+  final void Function(BatchImport batch) onAddBatch;
   final void Function(CardData card) onRemove;
   final VoidCallback onClose;
 
@@ -93,6 +96,12 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
     for (final f in found ?? const <FoundCard>[]) {
       widget.onAdd(f);
     }
+  }
+
+  /// Pastes a list; the cards found join the pool with the chosen tags.
+  Future<void> _batch() async {
+    final batch = await showBatchImport(context, pool: widget.pool.pool);
+    if (batch != null) widget.onAddBatch(batch);
   }
 
   void _toggle(CardData card) {
@@ -213,6 +222,12 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                 icon: const Icon(Icons.manage_search),
                 label: Text(l10n.advancedSearch),
                 onPressed: _advanced,
+              ),
+              TextButton.icon(
+                key: const Key('batchImport'),
+                icon: const Icon(Icons.playlist_add),
+                label: Text(l10n.batchImport),
+                onPressed: _batch,
               ),
               if (view == PoolView.gallery) const GalleryColumnsControl(settingKey: 'search'),
             ],
