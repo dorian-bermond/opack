@@ -719,6 +719,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get valueCopies => 'Copies of each card holding this value';
+
+  @override
+  String get valueCopiesHint =>
+      '× sets how many copies of each card with that value the pool holds (—: the pool\'s own count, ∞: unlimited). A card\'s own count still wins.';
+
+  @override
   String get batchImport => 'Batch import';
 
   @override

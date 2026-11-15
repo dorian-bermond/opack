@@ -339,7 +339,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     final view = ref.watch(poolViewProvider);
     final tagging = _taggingTag != null;
     final actions = PoolCardActions(
-      copiesOf: (card) => config.copiesOf(card.id, listed: listed[card.id] ?? 1),
+      copiesOf: (card) => pool.copiesOf(card.id, listed: listed[card.id] ?? 1),
       listedOf: (card) => listed[card.id] ?? 1,
       changed: (card) => config.overrides.containsKey(card.id),
       setCopies: (card, copies) =>

@@ -574,6 +574,10 @@ void main() {
     expect(tester.widget<TextField>(find.byKey(const ValueKey('qualityValue-0'))).controller!.text, 'secretRare',
         reason: 'values listed best first');
     await tester.enterText(find.byKey(const ValueKey('qualityValue-0')), 'secret');
+    await tester.tap(find.byKey(const ValueKey('qualityValueCopies-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('×3').last);
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('qualityValueDelete-1')), warnIfMissed: false);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('qualityValueDown-0')));
@@ -584,6 +588,8 @@ void main() {
     expect(tags.tags.containsKey('rarity:ultraRare'), isFalse, reason: 'deleted');
     expect(tags.tags.containsKey('rarity:secretRare'), isFalse, reason: 'renamed');
     expect(tags.tags['rarity:secret']!.cards.length, 8, reason: 'kept its cards');
+    expect(tags.tags['rarity:secret']!.copies, 3, reason: 'copies set on the value');
+    expect(tags.copiesOf('CIBR-FR042'), 3, reason: 'a secret rare card has 3 copies now');
     expect(tags.orderedValuesOf('rarity').take(2), ['rarity:superRare', 'rarity:secret'], reason: 'moved down one');
     expect(find.byKey(const ValueKey('tier-rarity:secret')), findsOneWidget);
     expect(find.byKey(const ValueKey('tier-rarity:ultraRare')), findsNothing);

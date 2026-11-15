@@ -721,6 +721,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get valueCopies => 'Exemplaires de chaque carte portant cette valeur';
+
+  @override
+  String get valueCopiesHint =>
+      '× fixe le nombre d\'exemplaires de chaque carte portant cette valeur (— : le nombre du pool, ∞ : illimité). Le nombre propre à une carte l\'emporte.';
+
+  @override
   String get batchImport => 'Import en lot';
 
   @override

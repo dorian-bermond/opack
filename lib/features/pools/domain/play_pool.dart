@@ -61,8 +61,7 @@ class PlayPool {
     }
     final entries = byId.values.toList();
     final pool = migrated(saved, sets: sets, cards: entries.map((e) => e.card));
-    int? copiesOf(CardData card) =>
-        pool.config.copiesOf(card.id, listed: byId[card.id]?.listed ?? 1);
+    int? copiesOf(CardData card) => pool.copiesOf(card.id, listed: byId[card.id]?.listed ?? 1);
 
     final layoutSet = switch (pool.layout) {
       BoosterLayout(:final setCode) => sets[setCode],

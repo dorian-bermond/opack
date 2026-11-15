@@ -87,7 +87,7 @@ void setTagColor(WidgetRef ref, Pool pool, String tag, Color? color) =>
 
 /// One value as the quality dialog edits it: the tag it came from (`null`
 /// when new), its name and color.
-typedef QualityValueEdit = ({String? tag, String value, Color? color});
+typedef QualityValueEdit = ({String? tag, String value, Color? color, bool copiesSet, int? copies});
 
 /// What the quality dialog answers: the quality's name and its values in
 /// their preferred order; or a request to delete the whole quality.
@@ -104,10 +104,13 @@ Future<String?> newPoolQuality(BuildContext context, WidgetRef ref, Pool pool) a
   if (edit == null || edit.delete) return null;
   if (pool.qualities.contains(edit.quality)) return null;
   var updated = pool;
-  for (final (:tag, :value, :color) in edit.values) {
+  for (final (:tag, :value, :color, :copiesSet, :copies) in edit.values) {
     assert(tag == null);
     final name = Pool.qualityTag(edit.quality, value);
-    updated = updated.withTag(name, const []).withTagColor(name, color?.toARGB32());
+    updated = updated
+        .withTag(name, const [])
+        .withTagColor(name, color?.toARGB32())
+        .withTagCopies(name, set: copiesSet, copies: copies);
   }
   savePool(ref, updated);
   return edit.quality;
@@ -124,7 +127,13 @@ Future<String?> editPoolQuality(BuildContext context, WidgetRef ref, Pool pool, 
       quality: quality,
       values: [
         for (final tag in pool.orderedValuesOf(quality))
-          (tag: tag, value: tag.substring(quality.length + 1), color: valueColor(pool, tag)),
+          (
+            tag: tag,
+            value: tag.substring(quality.length + 1),
+            color: valueColor(pool, tag),
+            copiesSet: pool.tags[tag]!.copiesSet,
+            copies: pool.tags[tag]!.copies,
+          ),
       ],
       descending: pool.isDescending(quality),
     ),
@@ -165,14 +174,20 @@ Pool applyQualityEdit(Pool pool, String quality, QualityEdit edit) {
   }
   // Two passes: temporary names first, so swapping two values' names works.
   final finalNames = <String, String>{};
-  for (final (i, (:tag, :value, :color)) in edit.values.indexed) {
+  for (final (i, (:tag, :value, :color, :copiesSet, :copies)) in edit.values.indexed) {
     final name = Pool.qualityTag(quality, value);
     if (tag == null) {
-      updated = updated.withTag(name, const []).withTagColor(name, color?.toARGB32());
+      updated = updated
+          .withTag(name, const [])
+          .withTagColor(name, color?.toARGB32())
+          .withTagCopies(name, set: copiesSet, copies: copies);
       finalNames[name] = name;
     } else {
       final temporary = Pool.qualityTag(quality, '\u0000$i');
-      updated = updated.withTagRenamed(tag, temporary).withTagColor(temporary, color?.toARGB32());
+      updated = updated
+          .withTagRenamed(tag, temporary)
+          .withTagColor(temporary, color?.toARGB32())
+          .withTagCopies(temporary, set: copiesSet, copies: copies);
       finalNames[temporary] = name;
     }
   }
@@ -204,13 +219,13 @@ class QualityDialog extends StatefulWidget {
 
 class _QualityDialogState extends State<QualityDialog> {
   late final _name = TextEditingController(text: widget.quality ?? '');
-  final _rows = <({String? tag, TextEditingController name, Color? color})>[];
+  final _rows = <({String? tag, TextEditingController name, Color? color, bool copiesSet, int? copies})>[];
 
   @override
   void initState() {
     super.initState();
-    for (final (:tag, :value, :color) in widget.values) {
-      _rows.add((tag: tag, name: TextEditingController(text: value), color: color));
+    for (final (:tag, :value, :color, :copiesSet, :copies) in widget.values) {
+      _rows.add((tag: tag, name: TextEditingController(text: value), color: color, copiesSet: copiesSet, copies: copies));
     }
     if (_rows.isEmpty) {
       for (var i = 0; i < 3; i++) {
@@ -219,7 +234,8 @@ class _QualityDialogState extends State<QualityDialog> {
     }
   }
 
-  void _addRow() => _rows.add((tag: null, name: TextEditingController(), color: defaultValueColor(_rows.length)));
+  void _addRow() => _rows.add(
+      (tag: null, name: TextEditingController(), color: defaultValueColor(_rows.length), copiesSet: false, copies: null));
 
   @override
   void dispose() {
@@ -236,7 +252,7 @@ class _QualityDialogState extends State<QualityDialog> {
     final values = <QualityValueEdit>[
       for (final row in _rows)
         if (row.name.text.trim().replaceAll(':', '') case final value when value.isNotEmpty && seen.add(value))
-          (tag: row.tag, value: value, color: row.color),
+          (tag: row.tag, value: value, color: row.color, copiesSet: row.copiesSet, copies: row.copies),
     ];
     if (name.isEmpty || values.isEmpty) return;
     Navigator.pop(context, (quality: name, values: values, delete: false));
@@ -268,6 +284,7 @@ class _QualityDialogState extends State<QualityDialog> {
               Text(l10n.qualityValues, style: theme.textTheme.labelLarge),
               Text(widget.descending ? l10n.qualityValuesHint : l10n.qualityValuesHintAscending,
                   style: theme.textTheme.bodySmall),
+              Text(l10n.valueCopiesHint, style: theme.textTheme.bodySmall),
               for (final (i, row) in _rows.indexed)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
@@ -287,11 +304,35 @@ class _QualityDialogState extends State<QualityDialog> {
                         key: ValueKey('qualityValueColor-$i'),
                         tooltip: l10n.valueColor,
                         icon: ColorDot(row.color, size: 24),
-                        onSelected: (c) => setState(() => _rows[i] = (tag: row.tag, name: row.name, color: c)),
+                        onSelected: (c) => setState(() => _rows[i] =
+                            (tag: row.tag, name: row.name, color: c, copiesSet: row.copiesSet, copies: row.copies)),
                         itemBuilder: (context) => [
                           for (final c in qualityPalette)
                             PopupMenuItem(value: c, child: ColorDot(c, size: 20)),
                         ],
+                      ),
+                      // Copies: left to the pool (—), unlimited (∞) or a count.
+                      Tooltip(
+                        message: l10n.valueCopies,
+                        child: DropdownButton<int>(
+                          key: ValueKey('qualityValueCopies-$i'),
+                          value: row.copiesSet ? (row.copies ?? -1) : -2,
+                          isDense: true,
+                          underline: const SizedBox.shrink(),
+                          items: [
+                            DropdownMenuItem(value: -2, child: Text('×—', style: theme.textTheme.labelLarge)),
+                            DropdownMenuItem(value: -1, child: Text('×∞', style: theme.textTheme.labelLarge)),
+                            for (var n = 0; n <= PresetPicker.maxCopies; n++)
+                              DropdownMenuItem(value: n, child: Text('×$n', style: theme.textTheme.labelLarge)),
+                          ],
+                          onChanged: (v) => setState(() => _rows[i] = (
+                                tag: row.tag,
+                                name: row.name,
+                                color: row.color,
+                                copiesSet: v != -2,
+                                copies: v == null || v < 0 ? null : v,
+                              )),
+                        ),
                       ),
                       IconButton(
                         key: ValueKey('qualityValueUp-$i'),

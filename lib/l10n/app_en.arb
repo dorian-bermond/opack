@@ -312,6 +312,8 @@
   },
   "addSelected": "Add to the pool",
   "searchFailed": "Search failed: {error}",
+  "valueCopies": "Copies of each card holding this value",
+  "valueCopiesHint": "× sets how many copies of each card with that value the pool holds (—: the pool's own count, ∞: unlimited). A card's own count still wins.",
   "batchImport": "Batch import",
   "batchImportHint": "Paste a list, one card per line (\"1 Name\" or just \"Name\"). Each line is looked up online; the card named exactly like it wins, else the first match.",
   "batchLookUp": "Look up",

@@ -256,6 +256,8 @@
   },
   "addSelected": "Ajouter au pool",
   "searchFailed": "Recherche impossible : {error}",
+  "valueCopies": "Exemplaires de chaque carte portant cette valeur",
+  "valueCopiesHint": "× fixe le nombre d'exemplaires de chaque carte portant cette valeur (— : le nombre du pool, ∞ : illimité). Le nombre propre à une carte l'emporte.",
   "batchImport": "Import en lot",
   "batchImportHint": "Collez une liste, une carte par ligne (« 1 Nom » ou juste « Nom »). Chaque ligne est cherchée en ligne ; la carte nommée exactement comme elle l'emporte, sinon la première trouvée.",
   "batchLookUp": "Chercher",

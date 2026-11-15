@@ -137,6 +137,8 @@ class TagDef {
     this.balanceColors = false,
     this.allowDuplicates = false,
     this.color,
+    this.copiesSet = false,
+    this.copies,
   });
 
   /// Reads either an id list (older pools) or a full definition.
@@ -149,6 +151,8 @@ class TagDef {
             balanceColors: map['balanceColors'] as bool? ?? false,
             allowDuplicates: map['allowDuplicates'] as bool? ?? false,
             color: map['color'] as int?,
+            copiesSet: map.containsKey('copies'),
+            copies: switch (map['copies']) { final int n when n >= 0 => n, _ => null },
           ),
         _ => throw FormatException('Unknown tag $json'),
       };
@@ -165,6 +169,11 @@ class TagDef {
   /// The tag's color (ARGB), shown behind its tier and basket.
   final int? color;
 
+  /// Whether the tag sets how many copies its cards have ([copies], `null`
+  /// being unlimited), over the pool's preset; a value of a quality does.
+  final bool copiesSet;
+  final int? copies;
+
   Map<String, Object?> toJson() => {
         'cards': cards,
         if (weights.isNotEmpty) 'weights': weights,
@@ -172,6 +181,7 @@ class TagDef {
         if (balanceColors) 'balanceColors': true,
         if (allowDuplicates) 'allowDuplicates': true,
         'color': ?color,
+        if (copiesSet) 'copies': copies ?? -1,
       };
 
   TagDef withColor(int? color) => TagDef(
@@ -181,6 +191,21 @@ class TagDef {
         balanceColors: balanceColors,
         allowDuplicates: allowDuplicates,
         color: color,
+        copiesSet: copiesSet,
+        copies: copies,
+      );
+
+  /// This tag setting its cards' copies to [copies] (`null` unlimited)
+  /// when [set], else leaving them to the pool.
+  TagDef withCopies({required bool set, int? copies}) => TagDef(
+        cards,
+        weights: weights,
+        foil: foil,
+        balanceColors: balanceColors,
+        allowDuplicates: allowDuplicates,
+        color: color,
+        copiesSet: set,
+        copies: set ? copies : null,
       );
 
   /// This tag on exactly [ids], keeping known weights and flags.
@@ -193,6 +218,8 @@ class TagDef {
       balanceColors: balanceColors,
       allowDuplicates: allowDuplicates,
       color: color,
+      copiesSet: copiesSet,
+      copies: copies,
     );
   }
 
@@ -207,6 +234,8 @@ class TagDef {
       balanceColors: balanceColors,
       allowDuplicates: allowDuplicates,
       color: color,
+      copiesSet: copiesSet,
+      copies: copies,
     );
   }
 }
@@ -713,6 +742,29 @@ class Pool {
 
   /// The plain tags: yes/no traits, outside any quality.
   List<String> get plainTags => [for (final tag in tags.keys) if (qualityOf(tag) == null) tag];
+
+  /// Sets the copies [tag] gives its cards (see [TagDef.copiesSet]).
+  Pool withTagCopies(String tag, {required bool set, int? copies}) =>
+      copyWith(tags: {...tags, tag: (tags[tag] ?? const TagDef([])).withCopies(set: set, copies: copies)});
+
+  /// The copies a quality value sets for card [id], listed [listed]
+  /// times: `(set: false)` when no value of its sets any.
+  ({bool set, int? copies}) valueCopiesOf(String id, {int listed = 1}) {
+    for (final MapEntry(key: tag, value: def) in tags.entries) {
+      if (def.copiesSet && qualityOf(tag) != null && def.cards.contains(id)) {
+        return (set: true, copies: def.copies == null ? null : def.copies! * listed);
+      }
+    }
+    return (set: false, copies: null);
+  }
+
+  /// Copies of card [id] in the pool: its own count when set, else its
+  /// quality value's, else the pool's preset.
+  int? copiesOf(String id, {int listed = 1}) {
+    if (config.overrides.containsKey(id)) return config.overrides[id];
+    final byValue = valueCopiesOf(id, listed: listed);
+    return byValue.set ? byValue.copies : config.copiesOf(id, listed: listed);
+  }
 
   /// Colors [tag] (`null` clears), creating it when new.
   Pool withTagColor(String tag, int? color) =>

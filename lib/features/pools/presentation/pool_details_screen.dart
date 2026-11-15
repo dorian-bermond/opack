@@ -190,7 +190,8 @@ class _PoolDetails extends ConsumerWidget {
                         InputChip(
                           avatar: ColorDot(valueColor(saved, name), size: 14),
                           label: Text('${tagLabel(l10n, name.substring(quality.length + 1))}'
-                              ' · ${play.tagCards[name]?.length ?? 0}'),
+                              ' · ${play.tagCards[name]?.length ?? 0}'
+                              '${saved.tags[name]!.copiesSet ? ' · ×${copiesLabel(saved.tags[name]!.copies)}' : ''}'),
                           tooltip: l10n.tagCardsAction,
                           onPressed: () => context.push(
                               '${poolModePath(saved.game, saved.id, 'edit')}?tag=${Uri.encodeQueryComponent(name)}'),

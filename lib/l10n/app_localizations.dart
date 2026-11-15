@@ -1238,6 +1238,18 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @valueCopies.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies of each card holding this value'**
+  String get valueCopies;
+
+  /// No description provided for @valueCopiesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'× sets how many copies of each card with that value the pool holds (—: the pool\'s own count, ∞: unlimited). A card\'s own count still wins.'**
+  String get valueCopiesHint;
+
   /// No description provided for @batchImport.
   ///
   /// In en, this message translates to:

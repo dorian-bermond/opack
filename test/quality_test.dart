@@ -114,6 +114,34 @@ void main() {
     expect(pool.isDescending('grade'), isTrue);
   });
 
+  test('a quality value sets the copies of its cards, under a card\'s own count', () {
+    var pool = Pool.empty(Game.mtg, name: 'p')
+        .withTag('rarity:common', ['a', 'b'])
+        .withTag('rarity:rare', ['c'])
+        .withTag('mine', ['a', 'c']);
+    expect(pool.copiesOf('a'), 1, reason: 'the closed preset');
+    pool = pool.withTagCopies('rarity:common', set: true, copies: 4).withTagCopies('mine', set: true, copies: 7);
+    expect(pool.copiesOf('a'), 4, reason: 'the value, not the plain tag');
+    expect(pool.copiesOf('a', listed: 2), 8, reason: 'per listing, like the preset');
+    expect(pool.copiesOf('b'), 4);
+    expect(pool.copiesOf('c'), 1, reason: 'rare sets nothing');
+    pool = pool.withTagCopies('rarity:rare', set: true, copies: null);
+    expect(pool.copiesOf('c'), isNull, reason: 'unlimited');
+    pool = pool.copyWith(config: pool.config.withCard('a', 2));
+    expect(pool.copiesOf('a'), 2, reason: 'the card\'s own count wins');
+    expect(pool.valueCopiesOf('b'), (set: true, copies: 4));
+    expect(pool.valueCopiesOf('zzz'), (set: false, copies: null));
+
+    final reloaded = Pool.fromJson(pool.toJson());
+    expect(reloaded.tags['rarity:common']!.copies, 4);
+    expect(reloaded.tags['rarity:rare']!.copiesSet, isTrue);
+    expect(reloaded.tags['rarity:rare']!.copies, isNull);
+    expect(reloaded.tags['mine']!.copies, 7);
+    expect(pool.withTagCopies('rarity:common', set: false).tags['rarity:common']!.copiesSet, isFalse);
+    expect(pool.withTag('rarity:common', ['a', 'b', 'c']).tags['rarity:common']!.copies, 4, reason: 'kept by withCards');
+    expect(pool.withTagRenamed('rarity:common', 'rarity:c').tags['rarity:c']!.copies, 4);
+  });
+
   test('a value keeps its color through edits and saving', () {
     var pool = Pool.empty(Game.mtg, name: 'p').withTag('tier:S', ['a']).withTagColor('tier:S', 0xFFE53935);
     expect(pool.tags['tier:S']!.color, 0xFFE53935);
