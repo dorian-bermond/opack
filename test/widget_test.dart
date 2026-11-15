@@ -113,13 +113,20 @@ void main() {
     await startApp(tester, locale: const Locale('en'));
     expect(find.text('Opack'), findsOneWidget);
     await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
+    expect(find.text('Booster composition'), findsOneWidget);
+    expect(find.text('Cards from'), findsNothing, reason: 'sources live on the details page');
+
+    // The details page holds the sources, tags and copies.
+    await tester.tap(find.byTooltip('Pool details'));
+    await tester.pumpAndSettle();
     expect(find.text('Cards from'), findsOneWidget);
     expect(find.text('Unlimited packs'), findsOneWidget);
-
     await tester.tap(find.text('Closed'));
     await tester.pumpAndSettle();
     expect(find.text('1 × each card'), findsOneWidget);
     expect(find.textContaining('of 9 cards available'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
 
     // Every view shows the same cards; the stacks group them by rarity.
     await tester.tap(find.text('Gallery'));
@@ -128,8 +135,8 @@ void main() {
     expect(find.textContaining('×'), findsWidgets);
     await tester.tap(find.text('Stacks'));
     await tester.pumpAndSettle();
-    // The stacks column header, next to the layout tag chip of the same name.
-    expect(find.textContaining('Secret rare · '), findsNWidgets(2));
+    // The stacks column header (the layout tag chip is on the details page).
+    expect(find.textContaining('Secret rare · '), findsOneWidget);
     await tester.tap(find.text('Spoiler'));
     await tester.pumpAndSettle();
     expect(find.textContaining('CIBR-FR0'), findsWidgets);
@@ -138,24 +145,35 @@ void main() {
 
     // Tag a card in bulk, pull one such card per pack, then drop the slot.
     expect(find.textContaining('7 × Common'), findsOneWidget);
+    await tester.tap(find.byTooltip('Pool details'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('New tag'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).last, 'mine');
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
+    expect(find.text('mine · 0'), findsOneWidget);
+    // Tapping the tag opens the editor to pick its cards.
+    await tester.tap(find.text('mine · 0'));
+    await settleLoading(tester);
     expect(find.text('Tagging: mine'), findsOneWidget);
     // Tap a card row that is on screen (the last built one may lie below).
     await tester.tap(find.ancestor(of: find.textContaining('CIBR-FR0'), matching: find.byType(ListTile)).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
-    expect(find.text('mine · 1'), findsOneWidget);
+    expect(find.text('Tagging: mine'), findsNothing);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('mine · 1'), findsOneWidget, reason: 'the chip on the details page');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
     // Group the list by tag: the tagged card sits under its own header.
     await tester.tap(find.byTooltip('Group by'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Tag').last);
     await tester.pumpAndSettle();
-    expect(find.text('mine · 1'), findsNWidgets(2), reason: 'the chip and the group header');
+    expect(find.text('mine · 1'), findsOneWidget, reason: 'the group header');
     // Headers fold their section.
     expect(find.byIcon(Icons.expand_more), findsNothing);
     await tester.tap(find.text('mine · 1').last);
@@ -176,15 +194,19 @@ void main() {
     await tester.pumpAndSettle();
 
     // A layout tag is editable too: drop one card from the commons.
+    await tester.tap(find.byTooltip('Pool details'));
+    await tester.pumpAndSettle();
     final commonChip =
         find.descendant(of: find.byType(InputChip), matching: find.textContaining(RegExp(r'^Common · ')));
     expect(commonChip, findsOneWidget);
     await tester.tap(commonChip);
-    await tester.pumpAndSettle();
+    await settleLoading(tester);
     expect(find.text('Tagging: common'), findsOneWidget);
     await tester.tap(find.ancestor(of: find.textContaining('CIBR-FR0'), matching: find.byType(ListTile)).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+    await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.textContaining(RegExp(r'^Common · ')), findsOneWidget);
 
@@ -193,10 +215,12 @@ void main() {
     await tester.tap(find.descendant(of: commonChipWidget, matching: find.byTooltip('Delete')));
     await tester.pumpAndSettle();
     expect(find.text('Delete the tag Common?'), findsOneWidget);
-    expect(find.textContaining('7 × Common'), findsNWidgets(2), reason: 'summary and warning');
+    expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the warning');
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(commonChip, findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('Edit composition'));
     await settleLoading(tester);
@@ -215,7 +239,7 @@ void main() {
     expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the prefilled slots stay');
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
-    expect(find.text('Cards from'), findsOneWidget);
+    expect(find.text('Booster composition'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -266,7 +290,7 @@ void main() {
     await tester.tap(find.byKey(const Key('searchPanelToggle')));
     await tester.pumpAndSettle();
     expect(find.text('Search cards to add'), findsOneWidget);
-    expect(find.text('Cards from'), findsOneWidget, reason: 'the pool is still shown');
+    expect(find.text('Booster composition'), findsOneWidget, reason: 'the pool is still shown');
     expect(find.text('Add cards'), findsNothing, reason: 'the chip moved into the panel');
 
     await tester.enterText(find.byKey(const Key('panelSearch')), 'mock');
@@ -306,8 +330,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Empty pool'));
     await settleLoading(tester);
-    expect(find.text('Cards from'), findsOneWidget);
-    expect(find.text('Add a set or cube'), findsOneWidget);
+    expect(find.text('Booster composition'), findsOneWidget);
+    expect(find.text('Add a set or cube'), findsNothing, reason: 'sources are added from the details page');
 
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -317,7 +341,7 @@ void main() {
       isFalse,
     );
 
-    await tester.tap(find.text('Edit'));
+    await tester.tap(find.text('Pool details'));
     await settleLoading(tester);
     await tester.tap(find.text('Add a set or cube'));
     await tester.pumpAndSettle();

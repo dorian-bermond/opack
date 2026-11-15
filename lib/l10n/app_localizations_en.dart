@@ -719,6 +719,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get poolDetails => 'Pool details';
+
+  @override
+  String get tagChipHint => 'Tap a tag to pick its cards in the editor.';
+
+  @override
   String get searchPanel => 'Search cards to add';
 
   @override

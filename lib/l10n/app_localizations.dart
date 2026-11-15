@@ -1238,6 +1238,18 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @poolDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Pool details'**
+  String get poolDetails;
+
+  /// No description provided for @tagChipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a tag to pick its cards in the editor.'**
+  String get tagChipHint;
+
   /// No description provided for @searchPanel.
   ///
   /// In en, this message translates to:

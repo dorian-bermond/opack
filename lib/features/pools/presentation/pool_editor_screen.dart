@@ -15,36 +15,37 @@ import '../../card_info/presentation/filter_sheet.dart';
 import '../../card_info/presentation/labels.dart';
 import '../../card_info/presentation/metrics_sheet.dart';
 import '../../card_info/presentation/search_panel.dart';
-import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
-import '../../cube/data/cube_repository.dart';
 import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
+import 'pool_actions.dart';
 import 'pool_composition_screen.dart';
 import 'pool_loader.dart';
 import 'pool_view.dart';
-import 'pool_widgets.dart';
-import 'source_picker.dart';
 
 /// Edits a saved pool: its name, sources, pack layout and the copies of
 /// each card.
 class PoolEditorScreen extends StatelessWidget {
-  const PoolEditorScreen({super.key, required this.poolId});
+  const PoolEditorScreen({super.key, required this.poolId, this.taggingTag});
 
   final String poolId;
+
+  /// A tag to start picking cards for right away (from the details page).
+  final String? taggingTag;
 
   @override
   Widget build(BuildContext context) => PoolLoader(
         poolId: poolId,
-        builder: (context, pool) => _PoolEditor(pool: pool),
+        builder: (context, pool) => _PoolEditor(pool: pool, taggingTag: taggingTag),
       );
 }
 
 class _PoolEditor extends ConsumerStatefulWidget {
-  const _PoolEditor({required this.pool});
+  const _PoolEditor({required this.pool, this.taggingTag});
 
   final PlayPool pool;
+  final String? taggingTag;
 
   @override
   ConsumerState<_PoolEditor> createState() => _PoolEditorState();
@@ -69,6 +70,14 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   bool _searchOpen = false;
 
   Pool get _pool => widget.pool.pool;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.taggingTag case final tag? when widget.pool.pool.tags.containsKey(tag)) {
+      _startTagging(tag, (widget.pool.tagCards[tag] ?? const []).map((c) => c.id));
+    }
+  }
 
   /// Downloads the details still missing, once per card list, when online
   /// downloads are allowed and the last attempt did not fail.
@@ -113,29 +122,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
   void _save(Pool pool) => ref.read(poolsProvider.notifier).save(pool);
 
-  Future<void> _rename() async {
-    final name = await _askName(AppLocalizations.of(context).renamePool, initial: _pool.name);
-    if (name != null) _save(_pool.copyWith(name: name));
-  }
-
-  /// Adds a set or a cube; its cards join the tags the pool already has
-  /// (rarities, all cards, and the set's own sheet names).
-  Future<void> _addSource() async {
-    final pool = _pool;
-    final source = await pickPoolSource(context, game: pool.game, exclude: pool.sources);
-    if (source == null) return;
-    final existing = widget.pool.entries.map((e) => e.card);
-    switch (source) {
-      case SetSource(:final code):
-        final set = await ref.read(catalogRepositoryProvider).loadSet(pool.game, code);
-        _save(pool.withSource(source, cards: set.cards, existing: existing, set: set));
-      case CubeSource(:final id):
-        final cube = (await ref.read(cubesProvider.future)).where((c) => c.id == id).firstOrNull;
-        _save(pool.withSource(source, cards: cube?.cards ?? const [], existing: existing));
-      case CardsSource(:final cards):
-        _save(pool.withSource(source, cards: cards, existing: existing));
-    }
-  }
+  Future<void> _rename() => renamePool(context, ref, _pool);
 
   /// The tag being assigned in bulk, the cards that had it, and the cards
   /// that will have it once applied.
@@ -143,21 +130,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   Set<String> _taggingBefore = const {};
   Set<String> _taggingNow = {};
 
-  Future<String?> _askName(String title, {String initial = '', String? label}) async {
-    final name = await showDialog<String>(
-      context: context,
-      builder: (context) => _NameDialog(title: title, initial: initial, label: label),
-    );
-    final trimmed = name?.trim() ?? '';
-    return trimmed.isEmpty ? null : trimmed;
-  }
-
   Future<void> _newTag() async {
-    final l10n = AppLocalizations.of(context);
-    final name = await _askName(l10n.newTag, label: l10n.tagName);
-    if (name == null || _pool.tags.containsKey(name)) return;
-    _save(_pool.withTag(name, const []));
-    _startTagging(name, const []);
+    final name = await newPoolTag(context, ref, _pool);
+    if (name != null) _startTagging(name, const []);
   }
 
   void _startTagging(String tag, Iterable<String> ids) => setState(() {
@@ -179,40 +154,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   Pool _withTagCards(Pool pool, String tag, Set<String> cardIds) => pool.withTag(tag, cardIds);
 
   List<String> _visibleTags(PlayPool play) => play.tagNames;
-
-  /// Deletes [tag] after a warning listing the slots pulling from it; they
-  /// lose that option, and go when nothing is left.
-  Future<void> _deleteTag(PlayPool play, String tag) async {
-    final l10n = AppLocalizations.of(context);
-    final pool = play.pool;
-    final affected = [
-      for (final slot in pool.slots)
-        if (slot.options.any((o) => o.tag == tag)) l10n.slotRow(slot.count, slotOptionsLabel(l10n, slot)),
-    ];
-    if (affected.isNotEmpty) {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(l10n.deleteTagTitle(tagLabel(l10n, tag))),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.deleteTagAffects),
-              const SizedBox(height: 8),
-              for (final line in affected) Text('• $line'),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.cancel)),
-            FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(l10n.deleteTag)),
-          ],
-        ),
-      );
-      if (confirmed != true) return;
-    }
-    _save(pool.withoutTag(tag));
-  }
 
   void _toggleTagging(CardData card) => setState(() {
         _taggingNow.contains(card.id) ? _taggingNow.remove(card.id) : _taggingNow.add(card.id);
@@ -289,7 +230,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final language = dataLanguage(ref, context);
-    final uiLanguage = Localizations.localeOf(context).languageCode;
     final play = widget.pool;
     final pool = _pool;
     final config = pool.config;
@@ -333,26 +273,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
     final header = <Widget>[
       _Section(
-        title: l10n.poolSources,
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final source in pool.sources)
-              InputChip(
-                avatar: Icon(source is SetSource ? Icons.style : Icons.view_module, size: 18),
-                label: Text(sourceName(ref, pool.game, source, uiLanguage)),
-                onDeleted: () => _save(pool.withoutSource(source)),
-              ),
-            ActionChip(
-              avatar: const Icon(Icons.add, size: 18),
-              label: Text(l10n.addSource),
-              onPressed: _addSource,
-            ),
-          ],
-        ),
-      ),
-      _Section(
         title: l10n.boosterComposition,
         child: Row(
           children: [
@@ -379,52 +299,23 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           ],
         ),
       ),
-      _Section(
-        title: l10n.poolTags,
-        child: switch (_taggingTag) {
-          final tag? => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.taggingTitle(tag), style: theme.textTheme.titleSmall),
-                Text(l10n.taggingHint, style: theme.textTheme.bodySmall),
-                Row(
-                  children: [
-                    TextButton(onPressed: () => _stopTagging(apply: false), child: Text(l10n.cancel)),
-                    FilledButton(onPressed: () => _stopTagging(apply: true), child: Text(l10n.apply)),
-                  ],
-                ),
-              ],
-            ),
-          null => Wrap(
-                spacing: 8,
-                runSpacing: 8,
+      if (_taggingTag case final tag?)
+        _Section(
+          title: l10n.poolTags,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.taggingTitle(tag), style: theme.textTheme.titleSmall),
+              Text(l10n.taggingHint, style: theme.textTheme.bodySmall),
+              Row(
                 children: [
-                  for (final name in _visibleTags(play))
-                    InputChip(
-                      avatar: const Icon(Icons.label_outline, size: 18),
-                      label: Text('${tagLabel(l10n, name)} · ${play.tagCards[name]?.length ?? 0}'),
-                      tooltip: l10n.tagCardsAction,
-                      onPressed: () =>
-                          _startTagging(name, (play.tagCards[name] ?? const []).map((c) => c.id)),
-                      onDeleted: () => _deleteTag(play, name),
-                    ),
-                  ActionChip(
-                    avatar: const Icon(Icons.add, size: 18),
-                    label: Text(l10n.newTag),
-                    onPressed: _newTag,
-                  ),
+                  TextButton(onPressed: () => _stopTagging(apply: false), child: Text(l10n.cancel)),
+                  FilledButton(onPressed: () => _stopTagging(apply: true), child: Text(l10n.apply)),
                 ],
               ),
-        },
-      ),
-      _Section(
-        title: l10n.poolCopies,
-        child: PresetPicker(config: config, onChanged: (c) => _save(pool.copyWith(config: c))),
-      ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-        child: Text(play.summary(l10n), style: theme.textTheme.bodyMedium),
-      ),
+            ],
+          ),
+        ),
       if (infoState != null && (missing > 0 || infoState.fetching))
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
@@ -556,6 +447,11 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             icon: const Icon(Icons.bar_chart),
             onPressed: () => showMetricsSheet(context, game: pool.game, items: items),
           ),
+          IconButton(
+            tooltip: l10n.poolDetails,
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => context.push(poolModePath(pool.game, pool.id, 'details')),
+          ),
           IconButton(tooltip: l10n.renamePool, icon: const Icon(Icons.edit), onPressed: _rename),
           if (config.overrides.isNotEmpty)
             IconButton(
@@ -683,47 +579,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             PoolView.stacks => const SliverToBoxAdapter(child: SizedBox.shrink()),
             PoolView.spoiler => PoolSpoilerSliver(items: items, actions: actions, language: language),
           };
-}
-
-/// Asks for a name; owns its text controller for as long as the dialog
-/// animates.
-class _NameDialog extends StatefulWidget {
-  const _NameDialog({required this.title, required this.initial, this.label});
-
-  final String title;
-  final String initial;
-  final String? label;
-
-  @override
-  State<_NameDialog> createState() => _NameDialogState();
-}
-
-class _NameDialogState extends State<_NameDialog> {
-  late final _controller = TextEditingController(text: widget.initial);
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(widget.title),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        decoration: InputDecoration(labelText: widget.label),
-        onSubmitted: (value) => Navigator.pop(context, value),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-        FilledButton(onPressed: () => Navigator.pop(context, _controller.text), child: Text(l10n.apply)),
-      ],
-    );
-  }
 }
 
 class _Section extends StatelessWidget {

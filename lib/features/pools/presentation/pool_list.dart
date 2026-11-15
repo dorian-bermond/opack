@@ -223,6 +223,11 @@ class _PoolTile extends ConsumerWidget {
                     onPressed: pool.sources.isEmpty ? null : () => _play(context, pool, kind),
                   ),
                 OutlinedButton.icon(
+                  icon: const Icon(Icons.info_outline),
+                  label: Text(l10n.poolDetails),
+                  onPressed: () => context.go(poolModePath(pool.game, pool.id, 'details')),
+                ),
+                OutlinedButton.icon(
                   icon: const Icon(Icons.edit_note),
                   label: Text(l10n.editPool),
                   onPressed: () => context.go(poolModePath(pool.game, pool.id, 'edit')),

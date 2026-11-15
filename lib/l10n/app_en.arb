@@ -312,6 +312,8 @@
   },
   "addSelected": "Add to the pool",
   "searchFailed": "Search failed: {error}",
+  "poolDetails": "Pool details",
+  "tagChipHint": "Tap a tag to pick its cards in the editor.",
   "searchPanel": "Search cards to add",
   "searchPanelHint": "Tap a card to add it to the pool; tap it again to take it out.",
   "cardInPool": "In the pool",

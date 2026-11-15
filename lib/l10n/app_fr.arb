@@ -256,6 +256,8 @@
   },
   "addSelected": "Ajouter au pool",
   "searchFailed": "Recherche impossible : {error}",
+  "poolDetails": "Détails du pool",
+  "tagChipHint": "Touchez un tag pour choisir ses cartes dans l'éditeur.",
   "searchPanel": "Chercher des cartes à ajouter",
   "searchPanelHint": "Touchez une carte pour l'ajouter au pool ; touchez-la encore pour la retirer.",
   "cardInPool": "Dans le pool",
