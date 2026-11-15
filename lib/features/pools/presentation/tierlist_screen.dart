@@ -352,7 +352,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                             _Tier(
                               key: ValueKey('tier-$tier'),
                               label: tagLabel(l10n, tier.substring(quality.length + 1)),
-                              color: tagColor(_pool, tier),
+                              color: valueColor(_pool, tier),
                               onColor: (c) => setTagColor(ref, _pool, tier, c),
                               cards: valued[tier]!,
                               cardWidth: cardWidth,
@@ -434,16 +434,17 @@ class _Tier extends StatelessWidget {
         final hovered = candidates.isNotEmpty;
         final tint = color ?? theme.colorScheme.primary;
         return AnimatedContainer(
+          key: ValueKey('tierRow-$label'),
           duration: const Duration(milliseconds: 120),
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
             color: hovered
-                ? tint.withValues(alpha: 0.4)
-                : color?.withValues(alpha: 0.18) ?? theme.colorScheme.surfaceContainerLow,
+                ? tint.withValues(alpha: 0.75)
+                : color?.withValues(alpha: 0.5) ?? theme.colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: hovered ? tint : color ?? theme.colorScheme.outlineVariant,
-              width: hovered ? 2 : 1,
+              color: hovered ? Colors.white : tint,
+              width: hovered ? 3 : 2,
             ),
           ),
           child: Row(
@@ -452,8 +453,8 @@ class _Tier extends StatelessWidget {
               Container(
                 width: 96,
                 decoration: BoxDecoration(
-                  color: color?.withValues(alpha: 0.55),
-                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
+                  color: color,
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8),
@@ -566,7 +567,7 @@ class _RankedCard extends StatelessWidget {
         child: DraggableCard(
           card: card,
           enabled: true,
-          child: CardTile(card: card, frameColor: color ?? Theme.of(context).colorScheme.surfaceContainerHighest),
+          child: CardTile(card: card, hideRarity: true),
         ),
       ),
     );

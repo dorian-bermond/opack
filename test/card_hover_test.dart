@@ -110,7 +110,7 @@ void main() {
     expect(find.byKey(const Key('rarityDot')), findsOneWidget);
     expect(side().width, 1);
     expect(side().color, isNot(Rarity.rare.color));
-    // A framed card (a tierlist value) wears the frame's color, no marker.
+    // With the marker hidden (a tierlist card), neither border nor dot.
     await tester.pumpWidget(UncontrolledProviderScope(
       container: container,
       child: MaterialApp(
@@ -120,15 +120,15 @@ void main() {
         home: const Scaffold(
           body: Align(
             alignment: Alignment.topLeft,
-            child: SizedBox(width: 120, height: 170, child: CardTile(card: _card, frameColor: Colors.green)),
+            child: SizedBox(width: 120, height: 170, child: CardTile(card: _card, hideRarity: true)),
           ),
         ),
       ),
     ));
     await tester.pump();
     expect(find.byKey(const Key('rarityDot')), findsNothing);
-    expect(side().color, Colors.green);
-    expect(side().width, 6);
+    expect(side().color, isNot(Rarity.rare.color));
+    expect(side().width, 1);
 
     await tester.pumpWidget(app);
     await tester.pump();

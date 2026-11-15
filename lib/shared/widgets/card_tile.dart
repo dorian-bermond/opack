@@ -81,16 +81,15 @@ class CardTile extends ConsumerWidget {
     required this.card,
     this.revealed = true,
     this.onTap,
-    this.frameColor,
+    this.hideRarity = false,
   });
 
   final CardData card;
   final bool revealed;
   final VoidCallback? onTap;
 
-  /// A color the card sits on, as a thick frame around it, instead of its
-  /// rarity marker (a tierlist value's color).
-  final Color? frameColor;
+  /// Leaves the rarity marker out (in a tierlist, the tier says it all).
+  final bool hideRarity;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -103,8 +102,7 @@ class CardTile extends ConsumerWidget {
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
 
     final preview = revealed && image != null && ref.watch(cardHoverPreviewProvider);
-    final frame = frameColor;
-    final marker = frame != null ? null : ref.watch(rarityMarkerProvider);
+    final marker = hideRarity ? null : ref.watch(rarityMarkerProvider);
     final dot = revealed && marker == RarityMarker.dot;
 
     return AspectRatio(
@@ -121,8 +119,8 @@ class CardTile extends ConsumerWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(
-            color: frame ?? (revealed && marker == RarityMarker.border ? card.rarity.color : theme.colorScheme.outline),
-            width: frame != null ? 6 : marker == RarityMarker.border ? 3 : 1,
+            color: revealed && marker == RarityMarker.border ? card.rarity.color : theme.colorScheme.outline,
+            width: marker == RarityMarker.border ? 3 : 1,
           ),
         ),
         child: InkWell(

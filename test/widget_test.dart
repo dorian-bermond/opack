@@ -17,10 +17,12 @@ import 'package:opack/features/card_info/presentation/search_panel.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_info/presentation/card_search_sheet.dart';
 import 'package:opack/features/catalog/data/catalog_repository.dart';
+import 'package:opack/features/catalog/domain/models.dart';
 import 'package:opack/features/cube/data/cube_repository.dart';
 import 'package:opack/features/cube/domain/cube.dart';
 import 'package:opack/features/pools/data/pool_repository.dart';
 import 'package:opack/features/pools/domain/pool.dart';
+import 'package:opack/shared/widgets/card_tile.dart';
 import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:opack/features/pools/presentation/tierlist_screen.dart';
 import 'package:opack/shared/images/artwork_search.dart';
@@ -449,6 +451,13 @@ void main() {
 
     // Tiers rank by their arrows; the first cannot go up.
     double top(Finder tier) => tester.getTopLeft(tier).dy;
+    // Each tier row wears its value's color: a rarity's usual one when unset.
+    Color rowColor(String label) =>
+        (tester.widget<AnimatedContainer>(find.byKey(ValueKey('tierRow-$label'))).decoration! as BoxDecoration).color!;
+    expect(rowColor('Secret rare'), Rarity.secretRare.color.withValues(alpha: 0.5), reason: 'the marker color');
+    expect(rowColor('Ultra rare'), Rarity.ultraRare.color.withValues(alpha: 0.5));
+    expect(find.byKey(const Key('rarityDot')), findsNothing);
+
     // Rarities read best first: secret rare on top, common at the bottom.
     final common = find.byKey(const ValueKey('tier-rarity:common'));
     expect(find.text('Best first'), findsOneWidget);
@@ -513,7 +522,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.getSize(feedZone).height, greaterThan(feedBefore + 60));
 
-    // A new tier is a new value of the quality.
+    // A new tier is a new value of the quality (the button sits under the tiers).
+    await tester.scrollUntilVisible(find.byKey(const Key('addTier')), 400, scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('addTier')));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('valueNameField')), 'bonus');

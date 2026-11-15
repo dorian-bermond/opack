@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/card_tile.dart';
+import '../../catalog/domain/models.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
 import '../domain/pool_config.dart';
@@ -27,6 +29,20 @@ Color? tagColor(Pool pool, String tag) => switch (pool.tags[tag]?.color) {
       final argb? => Color(argb),
       null => null,
     };
+
+/// The color of a quality's value: its own, else the rarity's usual color
+/// (the one of its marker) for a rarity, else the palette's by its rank
+/// among the values (best first), so every value has one.
+Color valueColor(Pool pool, String tag) {
+  if (tagColor(pool, tag) case final color?) return color;
+  final quality = Pool.qualityOf(tag);
+  if (quality == 'rarity') {
+    final rarity = Rarity.values.where((r) => r.name == tag.substring('rarity:'.length)).firstOrNull;
+    if (rarity != null) return rarity.color;
+  }
+  final rank = quality == null ? 0 : pool.orderedValuesOf(quality).indexOf(tag);
+  return defaultValueColor(rank < 0 ? 0 : rank);
+}
 
 /// A row of swatches to pick one of [qualityPalette], or none.
 class ColorPicker extends StatelessWidget {

@@ -181,7 +181,7 @@ class _PoolDetails extends ConsumerWidget {
                     children: [
                       for (final name in saved.orderedValuesOf(quality))
                         InputChip(
-                          avatar: ColorDot(tagColor(saved, name) ?? theme.colorScheme.outline, size: 14),
+                          avatar: ColorDot(valueColor(saved, name), size: 14),
                           label: Text('${tagLabel(l10n, name.substring(quality.length + 1))}'
                               ' · ${play.tagCards[name]?.length ?? 0}'),
                           tooltip: l10n.tagCardsAction,

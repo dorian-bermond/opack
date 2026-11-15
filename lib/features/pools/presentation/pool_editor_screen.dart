@@ -257,7 +257,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                             dense: true,
                             value: tag,
                             toggleable: true,
-                            secondary: ColorDot(tagColor(pool, tag), size: 14),
+                            secondary: ColorDot(valueColor(pool, tag), size: 14),
                             title: Text(tagLabel(l10n, tag.substring(quality.length + 1))),
                           ),
                       ],
@@ -634,7 +634,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                                 key: ValueKey('basket-$tag'),
                                 label: '${tagLabel(l10n, tag.substring(quality.length + 1))}'
                                     ' · ${play.tagCards[tag]?.length ?? 0}',
-                                color: tagColor(play.pool, tag),
+                                color: valueColor(play.pool, tag),
                                 onDrop: (card) => _dropOnBasket(tag, card),
                               ),
                             ActionChip(
