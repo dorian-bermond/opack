@@ -719,6 +719,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get groupWhichQuality => 'Group by which quality?';
+
+  @override
+  String get allQualities => 'Every quality';
+
+  @override
   String get noQualityGroup => 'Without quality value';
 
   @override

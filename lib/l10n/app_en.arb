@@ -312,6 +312,8 @@
   },
   "addSelected": "Add to the pool",
   "searchFailed": "Search failed: {error}",
+  "groupWhichQuality": "Group by which quality?",
+  "allQualities": "Every quality",
   "noQualityGroup": "Without quality value",
   "valueCopies": "Copies of each card holding this value",
   "valueCopiesHint": "× sets how many copies of each card with that value the pool holds (—: the pool's own count, ∞: unlimited). A card's own count still wins.",

@@ -14,6 +14,10 @@ void main() {
     expect(GroupBy.tag.labelsOf(item, 'en'), ['mine']);
     expect(GroupBy.quality.labelsOf(item, 'en'), ['rarity:rare', 'tier:S']);
     expect(GroupBy.tagAndQuality.labelsOf(item, 'en'), unorderedEquals(['mine', 'rarity:rare', 'tier:S']));
+    expect(GroupBy.quality.labelsOf(item, 'en', quality: 'tier'), ['tier:S']);
+    expect(GroupBy.tagAndQuality.labelsOf(item, 'en', quality: 'tier'), unorderedEquals(['mine', 'tier:S']));
+    expect(GroupBy.quality.labelsOf(item, 'en', quality: 'nope'), ['']);
+    expect(GroupBy.tag.labelsOf(item, 'en', quality: 'tier'), ['mine'], reason: 'tags ignore the quality');
     final bare = (card: card, info: null, tags: <String>{'rarity:rare'});
     expect(GroupBy.tag.labelsOf(bare, 'en'), [''], reason: 'a quality value is not a tag');
     expect(GroupBy.quality.labelsOf((card: card, info: null, tags: <String>{'mine'}), 'en'), ['']);

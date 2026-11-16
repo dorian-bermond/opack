@@ -61,6 +61,75 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// A second grouping inside each primary group.
   GroupBy _groupBy2 = GroupBy.none;
 
+  /// The quality each grouping is narrowed to, `null` for every quality.
+  String? _groupQuality;
+  String? _groupQuality2;
+
+  /// Asks which quality a quality grouping takes, when the pool has
+  /// several; `null` for all of them. Answers `false` when dismissed.
+  Future<(bool, String?)> _askQuality() async {
+    final qualities = _pool.qualities;
+    if (qualities.length < 2) return (true, null);
+    final l10n = AppLocalizations.of(context);
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            ListTile(title: Text(l10n.groupWhichQuality, style: Theme.of(context).textTheme.titleMedium)),
+            ListTile(
+              key: const Key('groupAllQualities'),
+              leading: const Icon(Icons.select_all),
+              title: Text(l10n.allQualities),
+              onTap: () => Navigator.pop(context, ''),
+            ),
+            for (final quality in qualities)
+              ListTile(
+                key: ValueKey('groupQuality-$quality'),
+                leading: const Icon(Icons.category_outlined),
+                title: Text(qualityLabel(l10n, quality)),
+                onTap: () => Navigator.pop(context, quality),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (chosen == null) return (false, null);
+    return (true, chosen.isEmpty ? null : chosen);
+  }
+
+  Future<void> _selectGroup(GroupBy group) async {
+    var quality = _groupQuality;
+    if (group.asksQuality) {
+      final (ok, chosen) = await _askQuality();
+      if (!ok) return;
+      quality = chosen;
+    }
+    setState(() {
+      _groupBy = group;
+      _groupQuality = quality;
+      if (group == GroupBy.none || group == _groupBy2) _groupBy2 = GroupBy.none;
+    });
+  }
+
+  Future<void> _selectGroup2(GroupBy group) async {
+    var quality = _groupQuality2;
+    if (group.asksQuality) {
+      final (ok, chosen) = await _askQuality();
+      if (!ok) return;
+      quality = chosen;
+    }
+    setState(() {
+      _groupBy2 = group;
+      _groupQuality2 = quality;
+    });
+  }
+
+  /// A grouping's name, with the quality it is narrowed to.
+  String _groupName(AppLocalizations l10n, GroupBy group, String? quality) =>
+      quality == null ? groupLabel(l10n, group) : '${groupLabel(l10n, group)} · ${qualityLabel(l10n, quality)}';
+
   /// Group labels folded away by the user.
   final Set<String> _collapsed = {};
   CardFilter _filter = const CardFilter();
@@ -482,14 +551,13 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             tooltip: l10n.groupBy,
             icon: Icon(_groupBy == GroupBy.none ? Icons.segment : Icons.view_agenda),
             initialValue: _groupBy,
-            onSelected: (group) => setState(() {
-              _groupBy = group;
-              if (group == GroupBy.none || group == _groupBy2) _groupBy2 = GroupBy.none;
-            }),
+            onSelected: _selectGroup,
             itemBuilder: (context) => [
               for (final group in GroupBy.forGame(pool.game))
                 CheckedPopupMenuItem(
-                    value: group, checked: group == _groupBy, child: Text(groupLabel(l10n, group))),
+                    value: group,
+                    checked: group == _groupBy,
+                    child: Text(group == _groupBy ? _groupName(l10n, group, _groupQuality) : groupLabel(l10n, group))),
             ],
           ),
           if (_groupBy != GroupBy.none)
@@ -497,12 +565,15 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               tooltip: l10n.thenBy,
               icon: Icon(_groupBy2 == GroupBy.none ? Icons.subdirectory_arrow_right : Icons.account_tree),
               initialValue: _groupBy2,
-              onSelected: (group) => setState(() => _groupBy2 = group),
+              onSelected: _selectGroup2,
               itemBuilder: (context) => [
                 for (final group in GroupBy.forGame(pool.game))
                   if (group != _groupBy)
                     CheckedPopupMenuItem(
-                        value: group, checked: group == _groupBy2, child: Text(groupLabel(l10n, group))),
+                        value: group,
+                        checked: group == _groupBy2,
+                        child: Text(
+                            group == _groupBy2 ? _groupName(l10n, group, _groupQuality2) : groupLabel(l10n, group))),
               ],
             ),
           IconButton(
@@ -550,13 +621,13 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               actions: actions,
               labelOf: (item) => _groupBy == GroupBy.none
                   ? [stackLabel(_sort, item, language)]
-                  : _groupBy.labelsOf(item, language),
+                  : _groupBy.labelsOf(item, language, quality: _groupQuality),
               header: (label) => _groupBy == GroupBy.none
                   ? valueLabel(l10n, label)
                   : groupHeader(l10n, _groupBy, label),
             )
           else
-            for (final (label, group) in _grouped(items, language, _groupBy)) ...[
+            for (final (label, group) in _grouped(items, language, _groupBy, _groupQuality)) ...[
               if (label != null)
                 _groupHeader(
                   key: label,
@@ -568,7 +639,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                 if (_groupBy2 == GroupBy.none || label == null)
                   _viewSliver(view, group, actions, language, l10n)
                 else
-                  for (final (sub, subgroup) in _grouped(group, language, _groupBy2)) ...[
+                  for (final (sub, subgroup) in _grouped(group, language, _groupBy2, _groupQuality2)) ...[
                     _groupHeader(
                       key: '$label/$sub',
                       title: '${groupHeader(l10n, _groupBy2, sub!)} · ${subgroup.length}',
@@ -727,11 +798,12 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
   /// The listed cards split by [_groupBy], in the order groups first
   /// appear; a single unnamed group without grouping.
-  List<(String?, List<CardWithInfo>)> _grouped(List<CardWithInfo> items, String language, GroupBy group) {
+  List<(String?, List<CardWithInfo>)> _grouped(
+      List<CardWithInfo> items, String language, GroupBy group, String? quality) {
     if (group == GroupBy.none) return [(null, items)];
     final groups = <String, List<CardWithInfo>>{};
     for (final item in items) {
-      for (final label in group.labelsOf(item, language)) {
+      for (final label in group.labelsOf(item, language, quality: quality)) {
         (groups[label] ??= []).add(item);
       }
     }

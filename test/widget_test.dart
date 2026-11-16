@@ -617,6 +617,26 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.getSize(feedZone).height, greaterThan(feedBefore + 60));
 
+    // Back in the editor, grouping by quality asks which one now that
+    // the pool has two.
+    await tester.pageBack();
+    await settleLoading(tester);
+    await tester.tap(find.byTooltip('Group by'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Quality').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Group by which quality?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('groupQuality-power')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Without quality value · '), findsOneWidget, reason: 'nothing holds a Power value');
+    expect(find.textContaining('Rarity: '), findsNothing, reason: 'rarity left out');
+    await tester.tap(find.byTooltip('Group by'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('No grouping'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tierlistButton')));
+    await settleLoading(tester);
+
     // A new tier is a new value of the quality (the button sits under the tiers).
     await tester.scrollUntilVisible(find.byKey(const Key('addTier')), 400, scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();

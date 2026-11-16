@@ -1238,6 +1238,18 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @groupWhichQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Group by which quality?'**
+  String get groupWhichQuality;
+
+  /// No description provided for @allQualities.
+  ///
+  /// In en, this message translates to:
+  /// **'Every quality'**
+  String get allQualities;
+
   /// No description provided for @noQualityGroup.
   ///
   /// In en, this message translates to:

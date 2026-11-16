@@ -181,20 +181,27 @@ enum GroupBy {
         archetype => CardSort.archetype,
       };
 
-  /// The groups a card belongs to (raw labels; `''` for cards without tag).
-  List<String> labelsOf(CardWithInfo item, String language) => switch (this) {
+  /// The groups a card belongs to (raw labels; `''` for cards without
+  /// tag). The quality groupings take every quality, or only [quality].
+  List<String> labelsOf(CardWithInfo item, String language, {String? quality}) => switch (this) {
         none => const [''],
         tag => [
             for (final t in item.tags)
               if (Pool.qualityOf(t) == null) t,
           ].let((tags) => tags.isEmpty ? const [''] : tags),
-        quality => [
+        GroupBy.quality => [
             for (final t in item.tags)
-              if (Pool.qualityOf(t) != null) t,
+              if (Pool.qualityOf(t) case final q? when quality == null || q == quality) t,
           ].let((tags) => tags.isEmpty ? const [''] : tags),
-        tagAndQuality => item.tags.toList().let((tags) => tags.isEmpty ? const [''] : tags),
+        tagAndQuality => [
+            for (final t in item.tags)
+              if (Pool.qualityOf(t) case final q when q == null || quality == null || q == quality) t,
+          ].let((tags) => tags.isEmpty ? const [''] : tags),
         _ => [stackLabel(sort!, item, language)],
       };
+
+  /// Whether this grouping asks which quality, in a pool with several.
+  bool get asksQuality => this == quality || this == tagAndQuality;
 
   /// Whether this groups by tags (so headers are tag labels).
   bool get byTags => this == tag || this == quality || this == tagAndQuality;
