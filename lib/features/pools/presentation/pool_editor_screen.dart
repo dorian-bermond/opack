@@ -615,7 +615,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         _withBaskets(play, CustomScrollView(
         slivers: [
           SliverList.list(children: header),
-          if (view == PoolView.stacks)
+          if (view == PoolView.stacks && (_groupBy == GroupBy.none || _groupBy2 == GroupBy.none))
             PoolStacksSliver(
               items: items,
               actions: actions,
@@ -626,6 +626,25 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   ? valueLabel(l10n, label)
                   : groupHeader(l10n, _groupBy, label),
             )
+          else if (view == PoolView.stacks)
+            // Grouped twice: a foldable row of stacks per primary group,
+            // its stacks split by the secondary grouping.
+            for (final (label, group) in _grouped(items, language, _groupBy, _groupQuality)) ...[
+              _groupHeader(
+                key: label!,
+                title: '${groupHeader(l10n, _groupBy, label)} · ${group.length}',
+                theme: theme,
+                level: 0,
+              ),
+              if (!_collapsed.contains(label))
+                PoolStacksSliver(
+                  key: ValueKey('stacks-$label'),
+                  items: group,
+                  actions: actions,
+                  labelOf: (item) => _groupBy2.labelsOf(item, language, quality: _groupQuality2),
+                  header: (sub) => groupHeader(l10n, _groupBy2, sub),
+                ),
+            ]
           else
             for (final (label, group) in _grouped(items, language, _groupBy, _groupQuality)) ...[
               if (label != null)

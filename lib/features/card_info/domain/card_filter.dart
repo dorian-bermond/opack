@@ -27,15 +27,16 @@ enum Facet {
   linkRating(numeric: true),
   atk(numeric: true),
   def(numeric: true),
-  tag;
+  tag,
+  quality;
 
   const Facet({this.numeric = false});
 
   final bool numeric;
 
   static List<Facet> forGame(Game game) => switch (game) {
-        Game.mtg => const [tag, rarity, color, colorIdentity, type, subtype, keyword, manaValue, set],
-        Game.ygo => const [tag, rarity, kind, category, attribute, race, property, archetype, level, linkRating, atk, def, set],
+        Game.mtg => const [tag, quality, rarity, color, colorIdentity, type, subtype, keyword, manaValue, set],
+        Game.ygo => const [tag, quality, rarity, kind, category, attribute, race, property, archetype, level, linkRating, atk, def, set],
       };
 
   /// The values a card has for this facet. Colors use `C` for colorless.
@@ -73,7 +74,11 @@ enum Facet {
       case Facet.archetype:
         return ygo == null ? const [] : [ygo.archetype ?? ''];
       case Facet.tag:
-        return item.tags;
+        return [for (final t in item.tags) if (!t.contains(':')) t];
+      case Facet.quality:
+        // Values of every quality; ø when the card holds none.
+        final values = [for (final t in item.tags) if (t.contains(':')) t];
+        return values.isEmpty ? const ['ø'] : values;
       case Facet.manaValue:
       case Facet.level:
       case Facet.linkRating:

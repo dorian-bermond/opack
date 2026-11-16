@@ -628,8 +628,22 @@ void main() {
     expect(find.text('Group by which quality?'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('groupQuality-power')));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Without quality value · '), findsOneWidget, reason: 'nothing holds a Power value');
+    expect(find.textContaining('ø · '), findsOneWidget, reason: 'nothing holds a Power value');
     expect(find.textContaining('Rarity: '), findsNothing, reason: 'rarity left out');
+    // Stacks grouped twice: one row of stacks per primary group.
+    await tester.tap(find.byTooltip('Then by'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Rarity').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Stacks'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PoolStacksSliver), findsOneWidget, reason: 'one primary group, one row');
+    expect(find.textContaining('Secret rare · '), findsOneWidget, reason: 'a stack per rarity inside it');
+    expect(find.textContaining('ø · '), findsOneWidget);
+    expect(find.byKey(const ValueKey('stack-common-0')), findsOneWidget);
+    expect(find.byKey(const ValueKey('stack-common-8')), findsOneWidget, reason: 'a tall column is cut into stacks');
+    await tester.tap(find.text('List'));
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Group by'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('No grouping'));

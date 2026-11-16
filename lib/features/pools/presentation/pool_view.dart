@@ -143,11 +143,8 @@ enum GroupBy {
   /// By plain tag (yes/no traits), quality values left aside.
   tag,
 
-  /// By quality value, across every quality.
+  /// By quality value, across every quality or one of them.
   quality,
-
-  /// By plain tag and by quality value alike.
-  tagAndQuality,
   rarity,
   manaValue,
   color,
@@ -161,13 +158,13 @@ enum GroupBy {
   archetype;
 
   static List<GroupBy> forGame(Game game) => switch (game) {
-        Game.mtg => const [none, tag, quality, tagAndQuality, rarity, manaValue, color, type, collector],
-        Game.ygo => const [none, tag, quality, tagAndQuality, rarity, level, atk, def, attribute, race, archetype, collector],
+        Game.mtg => const [none, tag, quality, rarity, manaValue, color, type, collector],
+        Game.ygo => const [none, tag, quality, rarity, level, atk, def, attribute, race, archetype, collector],
       };
 
   /// The sort key this grouping follows, `null` for the tag groupings.
   CardSort? get sort => switch (this) {
-        none || tag || quality || tagAndQuality => null,
+        none || tag || quality => null,
         rarity => CardSort.rarity,
         manaValue => CardSort.manaValue,
         color => CardSort.color,
@@ -192,19 +189,18 @@ enum GroupBy {
         GroupBy.quality => [
             for (final t in item.tags)
               if (Pool.qualityOf(t) case final q? when quality == null || q == quality) t,
-          ].let((tags) => tags.isEmpty ? const [''] : tags),
-        tagAndQuality => [
-            for (final t in item.tags)
-              if (Pool.qualityOf(t) case final q when q == null || quality == null || q == quality) t,
-          ].let((tags) => tags.isEmpty ? const [''] : tags),
+          ].let((tags) => tags.isEmpty ? const [noValue] : tags),
         _ => [stackLabel(sort!, item, language)],
       };
 
   /// Whether this grouping asks which quality, in a pool with several.
-  bool get asksQuality => this == quality || this == tagAndQuality;
+  bool get asksQuality => this == quality;
+
+  /// The group of cards holding no value of the quality.
+  static const noValue = 'ø';
 
   /// Whether this groups by tags (so headers are tag labels).
-  bool get byTags => this == tag || this == quality || this == tagAndQuality;
+  bool get byTags => this == tag || this == quality;
 }
 
 extension<T> on T {
@@ -215,15 +211,13 @@ String groupLabel(AppLocalizations l10n, GroupBy group) => switch (group) {
       GroupBy.none => l10n.groupNone,
       GroupBy.tag => l10n.facetTag,
       GroupBy.quality => l10n.tierlistQuality,
-      GroupBy.tagAndQuality => '${l10n.facetTag} + ${l10n.tierlistQuality}',
       _ => sortLabel(l10n, group.sort!),
     };
 
 /// A raw group label as the user reads it.
 String groupHeader(AppLocalizations l10n, GroupBy group, String label) => switch (group) {
       GroupBy.tag => label.isEmpty ? l10n.noTagGroup : tagLabel(l10n, label),
-      GroupBy.quality => label.isEmpty ? l10n.noQualityGroup : tagLabel(l10n, label),
-      GroupBy.tagAndQuality => label.isEmpty ? l10n.noTagGroup : tagLabel(l10n, label),
+      GroupBy.quality => label == GroupBy.noValue ? GroupBy.noValue : tagLabel(l10n, label),
       _ => valueLabel(l10n, label),
     };
 
@@ -445,6 +439,10 @@ class PoolStacksSliver extends StatelessWidget {
   static const cardHeight = cardWidth * 88 / 63;
   static const step = 28.0;
 
+  /// A column is cut into stacks of at most this many cards, laid side by
+  /// side and wrapping, so the width serves rather than the height.
+  static const maxPerStack = 8;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -454,36 +452,35 @@ class PoolStacksSliver extends StatelessWidget {
         (columns[label] ??= []).add(item);
       }
     }
-    final tallest = columns.values.fold(0, (m, c) => c.length > m ? c.length : m);
-    // Cards, the label above them and the list's own padding.
-    final height = tallest == 0 ? 0.0 : cardHeight + step * (tallest - 1) + 56;
-
     return SliverToBoxAdapter(
-      child: SizedBox(
-        height: height,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.all(12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          crossAxisAlignment: WrapCrossAlignment.start,
           children: [
             for (final MapEntry(key: label, value: cards) in columns.entries)
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: SizedBox(
+              for (var start = 0; start < cards.length; start += maxPerStack)
+                SizedBox(
+                  key: ValueKey('stack-$label-$start'),
                   width: cardWidth,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${header(label)} · ${cards.length}',
-                        style: theme.textTheme.labelLarge,
+                        start == 0
+                            ? '${header(label)} · ${cards.length}'
+                            : '${header(label)} · ${start + 1}–${(start + maxPerStack).clamp(0, cards.length)}',
+                        style: start == 0 ? theme.textTheme.labelLarge : theme.textTheme.labelMedium,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       SizedBox(
-                        height: cardHeight + step * (cards.length - 1),
+                        height: cardHeight + step * ((cards.length - start).clamp(1, maxPerStack) - 1),
                         child: Stack(
                           children: [
-                            for (final (i, item) in cards.indexed)
+                            for (final (i, item) in cards.skip(start).take(maxPerStack).indexed)
                               Positioned(
                                 top: i * step,
                                 width: cardWidth,
@@ -496,7 +493,6 @@ class PoolStacksSliver extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
           ],
         ),
       ),

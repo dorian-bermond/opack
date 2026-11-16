@@ -42,6 +42,7 @@ String facetLabel(AppLocalizations l10n, Facet facet) => switch (facet) {
       Facet.atk => l10n.facetAtk,
       Facet.def => l10n.facetDef,
       Facet.tag => l10n.facetTag,
+      Facet.quality => l10n.tierlistQuality,
     };
 
 String metricLabel(AppLocalizations l10n, Metric metric) => switch (metric) {
@@ -110,6 +111,7 @@ String? cardInfoLine(CardInfo? info) => switch (info) {
 /// name…) as the user reads it; most values are shown as they are.
 String valueLabel(AppLocalizations l10n, String value) {
   if (value.isEmpty) return l10n.noArchetype;
+  if (value == 'ø') return value;
   final rarity = Rarity.values.where((r) => r.name == value).firstOrNull;
   if (rarity != null) return rarity.label(l10n);
   if (value.startsWith('rarity:')) return valueLabel(l10n, value.substring(7));
