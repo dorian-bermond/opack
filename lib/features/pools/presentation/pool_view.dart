@@ -460,39 +460,49 @@ class PoolStacksSliver extends StatelessWidget {
           runSpacing: 12,
           crossAxisAlignment: WrapCrossAlignment.start,
           children: [
+            // One panel per group, its header once, its stacks side by
+            // side inside and wrapping when the group is large.
             for (final MapEntry(key: label, value: cards) in columns.entries)
-              for (var start = 0; start < cards.length; start += maxPerStack)
-                SizedBox(
-                  key: ValueKey('stack-$label-$start'),
-                  width: cardWidth,
+              Card(
+                key: ValueKey('stackGroup-$label'),
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        start == 0
-                            ? '${header(label)} · ${cards.length}'
-                            : '${header(label)} · ${start + 1}–${(start + maxPerStack).clamp(0, cards.length)}',
-                        style: start == 0 ? theme.textTheme.labelLarge : theme.textTheme.labelMedium,
-                        overflow: TextOverflow.ellipsis,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
+                        child: Text('${header(label)} · ${cards.length}', style: theme.textTheme.titleSmall),
                       ),
-                      const SizedBox(height: 4),
-                      SizedBox(
-                        height: cardHeight + step * ((cards.length - start).clamp(1, maxPerStack) - 1),
-                        child: Stack(
-                          children: [
-                            for (final (i, item) in cards.skip(start).take(maxPerStack).indexed)
-                              Positioned(
-                                top: i * step,
-                                width: cardWidth,
-                                height: cardHeight,
-                                child: _PictureCard(card: item.card, actions: actions),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (var start = 0; start < cards.length; start += maxPerStack)
+                            SizedBox(
+                              key: ValueKey('stack-$label-$start'),
+                              width: cardWidth,
+                              height: cardHeight + step * ((cards.length - start).clamp(1, maxPerStack) - 1),
+                              child: Stack(
+                                children: [
+                                  for (final (i, item) in cards.skip(start).take(maxPerStack).indexed)
+                                    Positioned(
+                                      top: i * step,
+                                      width: cardWidth,
+                                      height: cardHeight,
+                                      child: _PictureCard(card: item.card, actions: actions),
+                                    ),
+                                ],
                               ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
                 ),
+              ),
           ],
         ),
       ),

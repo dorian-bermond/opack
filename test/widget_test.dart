@@ -642,6 +642,8 @@ void main() {
     expect(find.textContaining('ø · '), findsOneWidget);
     expect(find.byKey(const ValueKey('stack-common-0')), findsOneWidget);
     expect(find.byKey(const ValueKey('stack-common-8')), findsOneWidget, reason: 'a tall column is cut into stacks');
+    expect(find.byKey(const ValueKey('stackGroup-common')), findsOneWidget, reason: 'all in one panel');
+    expect(find.descendant(of: find.byKey(const ValueKey('stackGroup-common')), matching: find.textContaining('Common · ')), findsOneWidget, reason: 'one header');
     await tester.tap(find.text('List'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Group by'));
