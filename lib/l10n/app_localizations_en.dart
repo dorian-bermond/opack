@@ -719,6 +719,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get noQualityGroup => 'Without quality value';
+
+  @override
   String get valueCopies => 'Copies of each card holding this value';
 
   @override

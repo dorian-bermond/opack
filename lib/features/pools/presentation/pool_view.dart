@@ -9,6 +9,7 @@ import '../../card_info/presentation/labels.dart';
 import '../../card_text/data/card_text_repository.dart';
 import '../../card_text/presentation/card_details_sheet.dart';
 import '../../catalog/domain/models.dart';
+import '../domain/pool.dart';
 import 'pool_loader.dart';
 import 'pool_widgets.dart';
 
@@ -138,7 +139,15 @@ String stackLabel(CardSort sort, CardWithInfo item, String language) {
 /// tag (a card shows under each of its tags).
 enum GroupBy {
   none,
+
+  /// By plain tag (yes/no traits), quality values left aside.
   tag,
+
+  /// By quality value, across every quality.
+  quality,
+
+  /// By plain tag and by quality value alike.
+  tagAndQuality,
   rarity,
   manaValue,
   color,
@@ -152,13 +161,13 @@ enum GroupBy {
   archetype;
 
   static List<GroupBy> forGame(Game game) => switch (game) {
-        Game.mtg => const [none, tag, rarity, manaValue, color, type, collector],
-        Game.ygo => const [none, tag, rarity, level, atk, def, attribute, race, archetype, collector],
+        Game.mtg => const [none, tag, quality, tagAndQuality, rarity, manaValue, color, type, collector],
+        Game.ygo => const [none, tag, quality, tagAndQuality, rarity, level, atk, def, attribute, race, archetype, collector],
       };
 
-  /// The sort key this grouping follows, `null` for none and tag.
+  /// The sort key this grouping follows, `null` for the tag groupings.
   CardSort? get sort => switch (this) {
-        none || tag => null,
+        none || tag || quality || tagAndQuality => null,
         rarity => CardSort.rarity,
         manaValue => CardSort.manaValue,
         color => CardSort.color,
@@ -177,10 +186,18 @@ enum GroupBy {
         none => const [''],
         tag => [
             for (final t in item.tags)
-              if (!t.startsWith('rarity:')) t,
+              if (Pool.qualityOf(t) == null) t,
           ].let((tags) => tags.isEmpty ? const [''] : tags),
+        quality => [
+            for (final t in item.tags)
+              if (Pool.qualityOf(t) != null) t,
+          ].let((tags) => tags.isEmpty ? const [''] : tags),
+        tagAndQuality => item.tags.toList().let((tags) => tags.isEmpty ? const [''] : tags),
         _ => [stackLabel(sort!, item, language)],
       };
+
+  /// Whether this groups by tags (so headers are tag labels).
+  bool get byTags => this == tag || this == quality || this == tagAndQuality;
 }
 
 extension<T> on T {
@@ -190,12 +207,16 @@ extension<T> on T {
 String groupLabel(AppLocalizations l10n, GroupBy group) => switch (group) {
       GroupBy.none => l10n.groupNone,
       GroupBy.tag => l10n.facetTag,
+      GroupBy.quality => l10n.tierlistQuality,
+      GroupBy.tagAndQuality => '${l10n.facetTag} + ${l10n.tierlistQuality}',
       _ => sortLabel(l10n, group.sort!),
     };
 
 /// A raw group label as the user reads it.
 String groupHeader(AppLocalizations l10n, GroupBy group, String label) => switch (group) {
       GroupBy.tag => label.isEmpty ? l10n.noTagGroup : tagLabel(l10n, label),
+      GroupBy.quality => label.isEmpty ? l10n.noQualityGroup : tagLabel(l10n, label),
+      GroupBy.tagAndQuality => label.isEmpty ? l10n.noTagGroup : tagLabel(l10n, label),
       _ => valueLabel(l10n, label),
     };
 

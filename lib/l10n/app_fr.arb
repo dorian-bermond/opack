@@ -256,6 +256,7 @@
   },
   "addSelected": "Ajouter au pool",
   "searchFailed": "Recherche impossible : {error}",
+  "noQualityGroup": "Sans valeur de qualité",
   "valueCopies": "Exemplaires de chaque carte portant cette valeur",
   "valueCopiesHint": "× fixe le nombre d'exemplaires de chaque carte portant cette valeur (— : le nombre du pool, ∞ : illimité). Le nombre propre à une carte l'emporte.",
   "batchImport": "Import en lot",

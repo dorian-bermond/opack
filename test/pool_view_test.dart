@@ -8,6 +8,18 @@ import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  test('grouping by tag leaves qualities aside, by quality takes only them, both take all', () {
+    const card = CardData(id: 'X-1', names: {'en': 'X'}, rarity: Rarity.rare);
+    final item = (card: card, info: null, tags: {'mine', 'rarity:rare', 'tier:S'});
+    expect(GroupBy.tag.labelsOf(item, 'en'), ['mine']);
+    expect(GroupBy.quality.labelsOf(item, 'en'), ['rarity:rare', 'tier:S']);
+    expect(GroupBy.tagAndQuality.labelsOf(item, 'en'), unorderedEquals(['mine', 'rarity:rare', 'tier:S']));
+    final bare = (card: card, info: null, tags: <String>{'rarity:rare'});
+    expect(GroupBy.tag.labelsOf(bare, 'en'), [''], reason: 'a quality value is not a tag');
+    expect(GroupBy.quality.labelsOf((card: card, info: null, tags: <String>{'mine'}), 'en'), ['']);
+    expect(GroupBy.forGame(Game.mtg).take(4), [GroupBy.none, GroupBy.tag, GroupBy.quality, GroupBy.tagAndQuality]);
+  });
+
   test('stacks group cards by the sort key, unknown values apart', () {
     const card = CardData(id: 'DMU-1', names: {'en': 'Karn'}, rarity: Rarity.mythic);
     const creature = MtgCardInfo(
