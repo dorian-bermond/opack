@@ -34,8 +34,9 @@ class GameIcon extends StatelessWidget {
 }
 
 /// An emblem's shape, built once from its SVG shapes: solids (`+`) added
-/// and holes (`-`) cut, in the file's order, so overlaps and windings do
-/// not matter; then put under the file's group transform.
+/// and holes (`-`) cut, in the file's order (an `e` marks an even-odd
+/// path), so overlaps and windings do not matter; then put under the
+/// file's group transform.
 class _Emblem {
   _Emblem(this.viewBox, (double, double, double, double) transform, List<(String, String)> shapes)
       : path = _build(shapes).transform(
@@ -53,7 +54,8 @@ class _Emblem {
     var path = Path();
     for (final (kind, data) in shapes) {
       final shape = parseSvgPathData(data);
-      path = Path.combine(kind == '-' ? PathOperation.difference : PathOperation.union, path, shape);
+      if (kind.endsWith('e')) shape.fillType = PathFillType.evenOdd;
+      path = Path.combine(kind.startsWith('-') ? PathOperation.difference : PathOperation.union, path, shape);
     }
     return path;
   }
