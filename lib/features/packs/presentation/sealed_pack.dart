@@ -187,22 +187,23 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
     return [Offset(-1, points.first.dy), ...points, Offset(widget.width + 1, points.last.dy)];
   }
 
-  /// Up to eight card backs, fanned, rising from inside the pack: drawn
-  /// under the pack's body, they show as they clear its torn edge.
-  List<Widget> _risingCards(BuildContext context, double rise) {
+  /// Up to eight card backs, fanned, lying still inside the pack: drawn
+  /// under the pack's pieces, they show as the pieces move away. [shift]
+  /// nudges them along with the bigger piece.
+  List<Widget> _cards(BuildContext context, Offset shift) {
     final theme = Theme.of(context);
     final shown = widget.cardCount.clamp(0, 8);
-    final cardWidth = widget.width * 0.62;
+    final cardWidth = widget.width * 0.68;
     final cardHeight = cardWidth * 88 / 63;
     return [
       for (var i = 0; i < shown; i++)
         Positioned(
-          left: (widget.width - cardWidth) / 2 + (i - (shown - 1) / 2) * 6 * rise,
-          top: widget.height * 0.5 - rise * (widget.height * 0.95 + i * 10),
+          left: (widget.width - cardWidth) / 2 + (i - (shown - 1) / 2) * 2.5 + shift.dx,
+          top: (widget.height - cardHeight) / 2 + (i - (shown - 1) / 2) * 2.5 + shift.dy,
           width: cardWidth,
           height: cardHeight,
           child: Transform.rotate(
-            angle: (i - (shown - 1) / 2) * 0.05 * rise,
+            angle: (i - (shown - 1) / 2) * 0.02,
             child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.primaryContainer,
@@ -216,6 +217,19 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
         ),
     ];
   }
+
+  /// Whether the first piece (above a sideways cut, left of a vertical
+  /// one) is the bigger of the two, judged by where the cut runs.
+  bool _firstIsBigger(List<Offset> cut, bool vertical) {
+    final inside = [for (final p in cut) if (vertical ? p.dy >= 0 && p.dy <= widget.height : p.dx >= 0 && p.dx <= widget.width) p];
+    final points = inside.isEmpty ? cut : inside;
+    final mean = points.fold(0.0, (sum, p) => sum + (vertical ? p.dx : p.dy)) / points.length;
+    return vertical ? mean > widget.width / 2 : mean > widget.height / 2;
+  }
+
+  /// The way a piece leaves: away from the cut, as a unit-ish offset.
+  Offset _away({required bool first, required bool vertical}) =>
+      vertical ? Offset(first ? -1 : 1, 0.15) : Offset(0.2, first ? -1 : 1);
 
   @override
   Widget build(BuildContext context) {
@@ -237,48 +251,45 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
           child: AnimatedBuilder(
             animation: _tear,
             builder: (context, _) {
-              // The tear first, then the cards rise and the pack fades.
-              final t = Curves.easeIn.transform((_tear.value / _tearShare).clamp(0.0, 1.0));
-              final rise = widget.cardCount == 0
+              // The smaller piece tears off first; then the bigger one slides
+              // away, taking the cards along for a moment before they settle.
+              final tA = Curves.easeIn.transform((_tear.value / _tearShare).clamp(0.0, 1.0));
+              final tB = widget.cardCount == 0
                   ? 0.0
-                  : Curves.easeOutCubic.transform(((_tear.value - _tearShare) / (1 - _tearShare)).clamp(0.0, 1.0));
-              final packFade = widget.cardCount == 0 ? 1.0 : 1 - Curves.easeIn.transform((rise - 0.6).clamp(0.0, 0.4) / 0.4);
-              // The piece that stays, and the one torn off: the top one for
-              // a sideways cut, the left one for a vertical cut.
-              final torn = vertical
-                  ? Transform.translate(
-                      offset: Offset(-t * widget.width * 0.6, t * widget.height * 0.2),
-                      child: Transform.rotate(
-                        angle: t * 0.4,
-                        alignment: Alignment.topCenter,
-                        child: Opacity(
-                          opacity: 1 - t,
-                          child: ClipPath(clipper: _Side(cut: cut, vertical: true, first: true), child: widget.child),
-                        ),
-                      ),
-                    )
-                  : Transform.translate(
-                      offset: Offset(t * widget.width * 0.3, -t * widget.height * 0.6),
-                      child: Transform.rotate(
-                        angle: -t * 0.5,
-                        alignment: Alignment.centerLeft,
-                        child: Opacity(
-                          opacity: 1 - t,
-                          child: ClipPath(clipper: _Side(cut: cut, vertical: false, first: true), child: widget.child),
-                        ),
-                      ),
-                    );
+                  : Curves.easeInOut.transform(((_tear.value - _tearShare) / (1 - _tearShare)).clamp(0.0, 1.0));
+              final firstBigger = _firstIsBigger(cut, vertical);
+              final size = Offset(widget.width, widget.height);
+              Offset scaled(Offset direction, double by) => Offset(direction.dx * size.dx * by, direction.dy * size.dy * by);
+
+              Widget piece({required bool first}) =>
+                  ClipPath(clipper: _Side(cut: cut, vertical: vertical, first: first), child: widget.child);
+              final smallDirection = _away(first: !firstBigger, vertical: vertical);
+              final bigDirection = _away(first: firstBigger, vertical: vertical);
+              final smaller = Transform.translate(
+                offset: scaled(smallDirection, tA * 0.6),
+                child: Transform.rotate(
+                  angle: (vertical ? 0.4 : -0.5) * tA * (firstBigger ? -1 : 1),
+                  alignment: vertical ? Alignment.topCenter : Alignment.centerLeft,
+                  child: Opacity(opacity: 1 - tA, child: piece(first: !firstBigger)),
+                ),
+              );
+              final bigger = Transform.translate(
+                offset: scaled(bigDirection, tB * 1.1),
+                child: Opacity(
+                  opacity: 1 - Curves.easeIn.transform(((tB - 0.4) / 0.6).clamp(0.0, 1.0)),
+                  child: piece(first: firstBigger),
+                ),
+              );
+              // The cards follow the bigger piece a little, then come back.
+              final bump = tB == 0 ? 0.0 : 1 - (2 * tB - 1) * (2 * tB - 1);
+              final shift = scaled(bigDirection, 0.18 * bump);
+
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  if (_torn) ..._risingCards(context, rise),
-                  Positioned.fill(
-                    child: Opacity(
-                      opacity: packFade,
-                      child: ClipPath(clipper: _Side(cut: cut, vertical: vertical, first: false), child: widget.child),
-                    ),
-                  ),
-                  Positioned.fill(child: torn),
+                  if (_torn) ..._cards(context, shift),
+                  Positioned.fill(child: bigger),
+                  Positioned.fill(child: smaller),
                   // The cut, drawn only where it crosses the pack.
                   if (_trail.isNotEmpty && !_torn)
                     Positioned.fill(
