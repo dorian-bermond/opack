@@ -10,6 +10,7 @@ import '../features/pools/presentation/pool_editor_screen.dart';
 import '../features/pools/presentation/pool_formats_screen.dart';
 import '../features/pools/presentation/pools_screen.dart';
 import '../features/pools/presentation/tierlist_screen.dart';
+import '../shared/widgets/settings_screen.dart';
 import '../features/sealed/presentation/sealed_screen.dart';
 
 /// `/`: every pool of every game, the app's main screen.
@@ -17,6 +18,9 @@ const poolsPath = '/';
 
 /// `/cubes`: the imported cubes of every game, to manage them.
 const cubesPath = '/cubes';
+
+/// `/settings`: the settings page.
+const settingsPath = '/settings';
 
 /// `/game/<game>/pool/<id>/<mode>`, mode being `open`, `sealed`, `draft`,
 /// `edit` or `details`. The game segment keeps pool ids unique per game.
@@ -32,6 +36,10 @@ final router = GoRouter(
         GoRoute(
           path: 'cubes',
           builder: (context, state) => const CubesScreen(),
+        ),
+        GoRoute(
+          path: 'settings',
+          builder: (context, state) => const SettingsScreen(),
         ),
         GoRoute(
           path: 'game/:game',

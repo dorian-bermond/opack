@@ -14,7 +14,42 @@ import '../../features/pools/presentation/pool_loader.dart';
 import '../../l10n/app_localizations.dart';
 import '../images/card_image_cache.dart';
 
+/// The colors chosen for rarities, over the defaults; saved across
+/// launches. [RarityPresentation.color] reads them.
+final rarityColorsProvider = NotifierProvider<RarityColorsSetting, Map<Rarity, Color>>(RarityColorsSetting.new);
+
+class RarityColorsSetting extends Notifier<Map<Rarity, Color>> {
+  static String _key(Rarity rarity) => 'rarityColor:${rarity.name}';
+
+  @override
+  Map<Rarity, Color> build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final colors = {
+      for (final rarity in Rarity.values)
+        if (prefs.getInt(_key(rarity)) case final argb?) rarity: Color(argb),
+    };
+    RarityPresentation._chosen = colors;
+    return colors;
+  }
+
+  /// Colors [rarity], or restores its default with `null`.
+  void set(Rarity rarity, Color? color) {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (color == null) {
+      prefs.remove(_key(rarity));
+    } else {
+      prefs.setInt(_key(rarity), color.toARGB32());
+    }
+    final colors = {for (final MapEntry(:key, :value) in state.entries) if (key != rarity) key: value, rarity: ?color};
+    RarityPresentation._chosen = colors;
+    state = colors;
+  }
+}
+
 extension RarityPresentation on Rarity {
+  /// The chosen colors, kept here so [color] stays a plain getter.
+  static Map<Rarity, Color> _chosen = const {};
+
   String label(AppLocalizations l10n) => switch (this) {
         Rarity.common => l10n.rarityCommon,
         Rarity.uncommon => l10n.rarityUncommon,
@@ -27,7 +62,9 @@ extension RarityPresentation on Rarity {
         Rarity.leader => l10n.rarityLeader,
       };
 
-  Color get color => switch (this) {
+  Color get color => _chosen[this] ?? defaultColor;
+
+  Color get defaultColor => switch (this) {
         Rarity.common => Colors.blueGrey,
         Rarity.uncommon => Colors.teal,
         Rarity.rare => Colors.amber.shade700,
@@ -105,6 +142,7 @@ class CardTile extends ConsumerWidget {
 
     final preview = revealed && image != null && ref.watch(cardHoverPreviewProvider);
     final marker = hideRarity ? null : ref.watch(rarityMarkerProvider);
+    ref.watch(rarityColorsProvider); // rebuilds when a rarity color changes
     final dot = revealed && marker == RarityMarker.dot;
 
     return AspectRatio(

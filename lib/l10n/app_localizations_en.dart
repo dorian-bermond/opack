@@ -719,6 +719,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get rarityColorsSetting => 'Rarity colors';
+
+  @override
+  String get rarityColorsHint =>
+      'The color of each rarity\'s marker and tier. Tap one to change it.';
+
+  @override
+  String get colorDefault => 'Default';
+
+  @override
+  String get colorReset => 'Back to the default color';
+
+  @override
   String get gameOpc => 'One Piece Card Game';
 
   @override

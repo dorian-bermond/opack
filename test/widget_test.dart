@@ -699,6 +699,35 @@ void main() {
     expect(find.text('Circuit Break (CIBR)'), findsOneWidget);
   });
 
+  testWidgets('settings live on their own page, rarity colors included', (tester) async {
+    final container = await startApp(tester, locale: const Locale('en'));
+    await tester.tap(find.byKey(const Key('settingsButton')));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Rarity colors'), findsOneWidget);
+
+    // A switch flips its setting.
+    expect(container.read(cardHoverPreviewProvider), isTrue);
+    await tester.scrollUntilVisible(find.byKey(const Key('settingHoverPreview')), 300);
+    await tester.tap(find.byKey(const Key('settingHoverPreview')));
+    await tester.pumpAndSettle();
+    expect(container.read(cardHoverPreviewProvider), isFalse);
+
+    // A rarity color is picked from the palette, then reset.
+    final before = Rarity.rare.color;
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('rarityColor-rare')), 300);
+    await tester.tap(find.byKey(const ValueKey('rarityColor-rare')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(ValueKey('swatch-${const Color(0xFF1E88E5).toARGB32()}')));
+    await tester.pumpAndSettle();
+    expect(Rarity.rare.color, const Color(0xFF1E88E5));
+    expect(container.read(rarityColorsProvider)[Rarity.rare], const Color(0xFF1E88E5));
+    await tester.tap(find.byKey(const ValueKey('rarityColorReset-rare')));
+    await tester.pumpAndSettle();
+    expect(Rarity.rare.color, before);
+    expect(find.byKey(const ValueKey('rarityColorReset-rare')), findsNothing);
+  });
+
   testWidgets('follows the device language when none is chosen', (tester) async {
     tester.platformDispatcher.localesTestValue = const [Locale('fr', 'FR')];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);

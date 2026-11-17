@@ -1238,6 +1238,30 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @rarityColorsSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Rarity colors'**
+  String get rarityColorsSetting;
+
+  /// No description provided for @rarityColorsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The color of each rarity\'s marker and tier. Tap one to change it.'**
+  String get rarityColorsHint;
+
+  /// No description provided for @colorDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get colorDefault;
+
+  /// No description provided for @colorReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the default color'**
+  String get colorReset;
+
   /// No description provided for @gameOpc.
   ///
   /// In en, this message translates to:
