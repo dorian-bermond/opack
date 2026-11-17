@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/settings/card_languages.dart';
 import '../../features/catalog/domain/models.dart';
 import '../images/card_image_cache.dart';
+import 'trimmed_image.dart';
 
 /// A sealed booster: the pack picture of [set] once downloaded (or, for MtG
 /// sets without one, card art under the set name), else a plain pack
@@ -78,14 +79,12 @@ class BoosterCover extends ConsumerWidget {
           ),
         ],
       );
-    } else if (set!.game == Game.opc && !image.path.endsWith('-card.webp')) {
-      // The official product picture is a near-square with wide margins
-      // around the pack: zoomed so the pack fills the cover.
-      front = ClipRect(
-        child: Transform.scale(
-          scale: 1.6,
-          child: Image.file(image, fit: BoxFit.contain),
-        ),
+    } else if (set.game == Game.opc && !image.path.endsWith('-card.webp')) {
+      // The official product picture comes with wide blank margins around
+      // the pack: they are cropped away so the pack fills the cover.
+      front = Padding(
+        padding: const EdgeInsets.all(8),
+        child: TrimmedImage(image),
       );
     } else {
       front = Padding(
