@@ -35,9 +35,15 @@ class GameIcon extends StatelessWidget {
 
 /// An emblem's shape, built once from its SVG shapes: solids (`+`) added
 /// and holes (`-`) cut, in the file's order, so overlaps and windings do
-/// not matter.
+/// not matter; then put under the file's group transform.
 class _Emblem {
-  _Emblem(this.viewBox, List<(String, String)> shapes) : path = _build(shapes);
+  _Emblem(this.viewBox, (double, double, double, double) transform, List<(String, String)> shapes)
+      : path = _build(shapes).transform(
+          (Matrix4.identity()
+                ..translateByDouble(transform.$1, transform.$2, 0, 1)
+                ..scaleByDouble(transform.$3, transform.$4, 1, 1))
+              .storage,
+        );
 
   /// The SVG view box: origin, then width and height.
   final (double, double, double, double) viewBox;
@@ -52,9 +58,9 @@ class _Emblem {
     return path;
   }
 
-  static final mtg = _Emblem(mtgIconViewBox, mtgIconShapes);
-  static final ygo = _Emblem(ygoIconViewBox, ygoIconShapes);
-  static final opc = _Emblem(opcIconViewBox, opcIconShapes);
+  static final mtg = _Emblem(mtgIconViewBox, mtgIconTransform, mtgIconShapes);
+  static final ygo = _Emblem(ygoIconViewBox, ygoIconTransform, ygoIconShapes);
+  static final opc = _Emblem(opcIconViewBox, opcIconTransform, opcIconShapes);
 }
 
 /// Paints an emblem fitted and centered in the icon's square.

@@ -3,6 +3,9 @@
 /// The SVG view box: origin, then width and height.
 const ygoIconViewBox = (0.0, 0.0, 100.0, 100.0);
 
+/// The transform the shapes are drawn under: translate x, y, then scale x, y.
+const ygoIconTransform = (0.000, 0.000, 1.000, 1.000);
+
 /// The emblem's shapes in order: solids ('+') and holes ('-'), as SVG path data.
 const ygoIconShapes = <(String, String)>[
   ('+',
