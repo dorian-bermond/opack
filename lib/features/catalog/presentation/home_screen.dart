@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/game_icon.dart';
 import '../domain/models.dart';
 
 extension GamePresentation on Game {
@@ -30,7 +31,7 @@ Future<Game?> pickGame(BuildContext context) {
           ListTile(title: Text(l10n.chooseGame, style: Theme.of(context).textTheme.titleMedium)),
           for (final game in Game.values)
             ListTile(
-              leading: const Icon(Icons.style),
+              leading: GameIcon(game, size: 28),
               title: Text(game.label(l10n)),
               onTap: () => Navigator.pop(context, game),
             ),

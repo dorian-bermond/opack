@@ -7,6 +7,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../../catalog/presentation/home_screen.dart';
+import '../../../shared/widgets/game_icon.dart';
 import '../../cube/data/cube_repository.dart';
 import '../data/pool_repository.dart';
 import '../domain/pool.dart';
@@ -174,6 +175,7 @@ class _PoolTile extends ConsumerWidget {
                 Tooltip(
                   message: pool.game.label(l10n),
                   child: Chip(
+                    avatar: GameIcon(pool.game, size: 18),
                     label: Text(pool.game.shortLabel),
                     visualDensity: VisualDensity.compact,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

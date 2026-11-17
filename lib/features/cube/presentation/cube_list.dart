@@ -10,6 +10,7 @@ import '../../../shared/widgets/settings_menu.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../../catalog/presentation/home_screen.dart';
+import '../../../shared/widgets/game_icon.dart';
 import '../../pools/domain/pool.dart';
 import '../../pools/presentation/pool_list.dart';
 import '../data/cube_repository.dart';
@@ -30,7 +31,7 @@ class CubesScreen extends StatelessWidget {
           title: Text(l10n.tabCubes),
           actions: const [SettingsMenu()],
           bottom: TabBar(
-            tabs: [for (final game in Game.values) Tab(text: game.label(l10n))],
+            tabs: [for (final game in Game.values) Tab(icon: GameIcon(game, size: 22), text: game.label(l10n))],
           ),
         ),
         body: TabBarView(
