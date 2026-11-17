@@ -62,6 +62,7 @@ class _CubeListState extends ConsumerState<CubeList> {
       final result = switch (widget.game) {
         Game.mtg => await _importFromCubeCobra(),
         Game.ygo => await _importFromFile(),
+        Game.opc => await _importOpcFile(),
       };
       if (result == null) return;
       await ref.read(cubesProvider.notifier).add(result.cube);
@@ -104,6 +105,18 @@ class _CubeListState extends ConsumerState<CubeList> {
     );
   }
 
+  Future<({Cube cube, List<String> unresolved})?> _importOpcFile() async {
+    final file = await FilePicker.pickFile(type: FileType.custom, allowedExtensions: const ['txt']);
+    if (file == null) return null;
+    final bytes = await file.readAsBytes();
+    return importOpcList(
+      name: file.name.replaceFirst(RegExp(r'\.txt$', caseSensitive: false), ''),
+      fileName: file.name,
+      text: utf8.decode(bytes, allowMalformed: true),
+      catalog: ref.read(catalogRepositoryProvider),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -127,7 +140,11 @@ class _CubeListState extends ConsumerState<CubeList> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  widget.game == Game.mtg ? l10n.noCubesMtg : l10n.noCubesYgo,
+                  switch (widget.game) {
+                    Game.mtg => l10n.noCubesMtg,
+                    Game.ygo => l10n.noCubesYgo,
+                    Game.opc => l10n.noCubesOpc,
+                  },
                   textAlign: TextAlign.center,
                 ),
               ),

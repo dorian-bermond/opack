@@ -8,6 +8,7 @@ import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../../cube/data/cube_repository.dart';
 import '../data/card_search.dart';
+import '../domain/card_info.dart';
 import 'labels.dart';
 
 /// `null` disables online search (tests).
@@ -177,6 +178,7 @@ class SearchFacets extends StatelessWidget {
       children: switch (game) {
         Game.mtg => _mtgFacets(l10n, theme),
         Game.ygo => _ygoFacets(l10n, theme),
+        Game.opc => _opcFacets(l10n, theme),
       },
     );
   }
@@ -249,6 +251,30 @@ class SearchFacets extends StatelessWidget {
           theme,
           TextField(
             decoration: const InputDecoration(hintText: 'DMU', isDense: true),
+            onChanged: (text) => _update(_query.copyWith(setCode: text)),
+          ),
+        ),
+      ];
+
+  List<Widget> _opcFacets(AppLocalizations l10n, ThemeData theme) => [
+        _section(
+            l10n.facetRarity,
+            theme,
+            _chips(
+                const [Rarity.common, Rarity.uncommon, Rarity.rare, Rarity.superRare, Rarity.leader, Rarity.secretRare],
+                _query.rarities,
+                (r) => r.label(l10n),
+                (v) => _update(_query.copyWith(rarities: v)))),
+        _section(l10n.facetColor, theme,
+            _chips(opcColors, _query.colors, (c) => c, (v) => _update(_query.copyWith(colors: v)))),
+        _section(l10n.facetType, theme,
+            _chips(opcTypes, _query.types, (t) => t, (v) => _update(_query.copyWith(types: v)))),
+        _range(l10n.facetCost, theme, _query.manaValue, 0, 10, 1, (r) => _update(_query.copyWith(manaValue: () => r))),
+        _section(
+          l10n.facetSet,
+          theme,
+          TextField(
+            decoration: const InputDecoration(hintText: 'OP01', isDense: true),
             onChanged: (text) => _update(_query.copyWith(setCode: text)),
           ),
         ),

@@ -24,6 +24,7 @@ extension RarityPresentation on Rarity {
         Rarity.ultraRare => l10n.rarityUltraRare,
         Rarity.special => l10n.raritySpecial,
         Rarity.secretRare => l10n.raritySecretRare,
+        Rarity.leader => l10n.rarityLeader,
       };
 
   Color get color => switch (this) {
@@ -35,6 +36,7 @@ extension RarityPresentation on Rarity {
         Rarity.mythic => Colors.deepOrange,
         Rarity.special => Colors.indigo,
         Rarity.secretRare => Colors.pink,
+        Rarity.leader => Colors.cyan.shade700,
       };
 }
 

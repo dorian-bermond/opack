@@ -719,6 +719,34 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get gameOpc => 'One Piece Card Game';
+
+  @override
+  String get rarityLeader => 'Leader';
+
+  @override
+  String get noCubesOpc =>
+      'No cube yet. Import a text file with one card per line, by name or by code (e.g. \"OP01-001\").';
+
+  @override
+  String get facetCost => 'Cost';
+
+  @override
+  String get facetCounter => 'Counter';
+
+  @override
+  String get metricCostCurve => 'Cost curve';
+
+  @override
+  String get metricPower => 'Power';
+
+  @override
+  String get metricCounters => 'Counters';
+
+  @override
+  String get metricLife => 'Leader life';
+
+  @override
   String get groupWhichQuality => 'Group by which quality?';
 
   @override

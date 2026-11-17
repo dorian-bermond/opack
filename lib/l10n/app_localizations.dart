@@ -1238,6 +1238,60 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @gameOpc.
+  ///
+  /// In en, this message translates to:
+  /// **'One Piece Card Game'**
+  String get gameOpc;
+
+  /// No description provided for @rarityLeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Leader'**
+  String get rarityLeader;
+
+  /// No description provided for @noCubesOpc.
+  ///
+  /// In en, this message translates to:
+  /// **'No cube yet. Import a text file with one card per line, by name or by code (e.g. \"OP01-001\").'**
+  String get noCubesOpc;
+
+  /// No description provided for @facetCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get facetCost;
+
+  /// No description provided for @facetCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter'**
+  String get facetCounter;
+
+  /// No description provided for @metricCostCurve.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost curve'**
+  String get metricCostCurve;
+
+  /// No description provided for @metricPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Power'**
+  String get metricPower;
+
+  /// No description provided for @metricCounters.
+  ///
+  /// In en, this message translates to:
+  /// **'Counters'**
+  String get metricCounters;
+
+  /// No description provided for @metricLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Leader life'**
+  String get metricLife;
+
   /// No description provided for @groupWhichQuality.
   ///
   /// In en, this message translates to:

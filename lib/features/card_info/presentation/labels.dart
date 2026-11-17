@@ -20,6 +20,8 @@ String sortLabel(AppLocalizations l10n, CardSort sort) => switch (sort) {
       CardSort.attribute => l10n.sortAttribute,
       CardSort.race => l10n.sortRace,
       CardSort.archetype => l10n.sortArchetype,
+      CardSort.cost => l10n.facetCost,
+      CardSort.counter => l10n.facetCounter,
     };
 
 String facetLabel(AppLocalizations l10n, Facet facet) => switch (facet) {
@@ -43,6 +45,9 @@ String facetLabel(AppLocalizations l10n, Facet facet) => switch (facet) {
       Facet.def => l10n.facetDef,
       Facet.tag => l10n.facetTag,
       Facet.quality => l10n.tierlistQuality,
+      Facet.cost => l10n.facetCost,
+      Facet.power => l10n.sortPower,
+      Facet.counter => l10n.facetCounter,
     };
 
 String metricLabel(AppLocalizations l10n, Metric metric) => switch (metric) {
@@ -70,6 +75,10 @@ String metricLabel(AppLocalizations l10n, Metric metric) => switch (metric) {
       Metric.archetypes => l10n.metricArchetypes,
       Metric.properties => l10n.metricProperties,
       Metric.tags => l10n.metricTags,
+      Metric.costCurve => l10n.metricCostCurve,
+      Metric.power => l10n.metricPower,
+      Metric.counters => l10n.metricCounters,
+      Metric.life => l10n.metricLife,
     };
 
 /// A tag as the user reads it: rarity tags and the random slot localized,
@@ -95,6 +104,14 @@ String qualityLabel(AppLocalizations l10n, String quality) => switch (quality) {
 /// One line of details under a card: cost and type line, or attribute,
 /// monster type, level and ATK/DEF; `null` without details.
 String? cardInfoLine(CardInfo? info) => switch (info) {
+      OpcCardInfo(:final type, :final colors, :final cost, :final power, :final counter, :final life, :final attribute) => [
+          [type, if (colors.isNotEmpty) colors.join('/')].join(' · '),
+          if (cost != null) 'Cost $cost',
+          if (life != null) 'Life $life',
+          if (power != null) 'Power $power',
+          if (counter != null && counter > 0) 'Counter +$counter',
+          ?attribute,
+        ].join(' · '),
       MtgCardInfo(:final manaCost, :final typeLine) => [?manaCost, typeLine].join(' · '),
       YgoCardInfo(kind: YgoKind.monster, :final attribute, :final race, :final level, :final linkRating, :final atk, :final def) =>
         [

@@ -115,6 +115,56 @@ Future<Map<String, String>> mtgFrenchNames(CatalogRepository catalog) async {
   return _frenchCache = names;
 }
 
+/// Builds a One Piece cube from a card-name list (`1 Name` or `Name`
+/// per line), resolved against the bundled sets by English name or code.
+Future<({Cube cube, List<String> unresolved})> importOpcList({
+  required String name,
+  required String fileName,
+  required String text,
+  required CatalogRepository catalog,
+}) async {
+  final byName = <String, CardData>{};
+  final byId = <String, CardData>{};
+  for (final summary in catalog.setsFor(Game.opc)) {
+    final set = await catalog.loadSet(Game.opc, summary.code);
+    for (final card in set.cards) {
+      byId[card.id.toUpperCase()] = card;
+      byName.putIfAbsent(card.nameFor('en').toLowerCase(), () => card);
+    }
+  }
+  final cards = <CardData>[];
+  final unresolved = <String>[];
+  for (final raw in text.split('\n')) {
+    var line = raw.trim();
+    if (line.isEmpty || RegExp(r'^\d+$').hasMatch(line)) continue;
+    var count = 1;
+    if (RegExp(r'^(\d+)\s*[xX]?\s+(.+)$').firstMatch(line) case final m?) {
+      count = int.parse(m.group(1)!);
+      line = m.group(2)!.trim();
+    }
+    final card = byId[line.toUpperCase()] ?? byName[line.toLowerCase()];
+    if (card == null) {
+      unresolved.add(line);
+      continue;
+    }
+    for (var i = 0; i < count.clamp(1, 99); i++) {
+      cards.add(card);
+    }
+  }
+  if (cards.isEmpty) throw CubeImportException('No known card in "$fileName"');
+  return (
+    cube: Cube(
+      id: 'opc-${DateTime.now().microsecondsSinceEpoch}',
+      game: Game.opc,
+      name: name,
+      source: fileName,
+      importedAt: DateTime.now(),
+      cards: cards,
+    ),
+    unresolved: unresolved,
+  );
+}
+
 YgoCardDatabase? _ygoDatabase;
 
 Future<YgoCardDatabase> ygoCardDatabase(AssetBundle bundle) async =>

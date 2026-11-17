@@ -7,12 +7,14 @@ extension GamePresentation on Game {
   String label(AppLocalizations l10n) => switch (this) {
         Game.mtg => l10n.gameMtg,
         Game.ygo => l10n.gameYgo,
+        Game.opc => l10n.gameOpc,
       };
 
   /// A short tag for lists mixing both games.
   String get shortLabel => switch (this) {
         Game.mtg => 'MTG',
         Game.ygo => 'YGO',
+        Game.opc => 'OP',
       };
 }
 

@@ -63,7 +63,36 @@ class CardInfoFetcher {
       switch (game) {
         Game.mtg => _fetchMtg(cards),
         Game.ygo => _fetchYgo(cards, language),
+        Game.opc => _fetchOpc(cards),
       };
+
+  /// optcgapi's set id for a card code: `OP01-077` lives in `OP-01`.
+  static String? opcSetOf(String cardId) {
+    final m = RegExp(r'^([A-Z]+)(\d+)-').firstMatch(cardId);
+    return m == null ? null : '${m.group(1)}-${m.group(2)}';
+  }
+
+  /// One call per set the cards come from.
+  Future<Map<String, CardInfo>> _fetchOpc(List<CardData> cards) async {
+    final bySet = <String, List<CardData>>{};
+    for (final card in cards) {
+      if (opcSetOf(card.id) case final set?) (bySet[set] ??= []).add(card);
+    }
+    final result = <String, CardInfo>{};
+    for (final MapEntry(key: set, value: owners) in bySet.entries) {
+      final response = await _client.get(Uri.https('optcgapi.com', '/api/sets/$set/'), headers: _headers);
+      if (response.statusCode == 404) continue;
+      if (response.statusCode != 200) throw HttpException('optcgapi ${response.statusCode}');
+      final body = jsonDecode(utf8.decode(response.bodyBytes));
+      if (body is! List) continue;
+      final byId = {for (final c in body.cast<Map<String, dynamic>>()) '${c['card_set_id']}': c};
+      for (final owner in owners) {
+        if (byId[owner.id] case final json?) result[owner.id] = OpcCardInfo.fromOptcg(json);
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    return result;
+  }
 
   Future<Map<String, CardInfo>> _fetchMtg(List<CardData> cards) async {
     final byScryfallId = <String, List<CardData>>{};

@@ -96,6 +96,7 @@ String stackLabel(CardSort sort, CardWithInfo item, String language) {
   final info = item.info;
   final mtg = info is MtgCardInfo ? info : null;
   final ygo = info is YgoCardInfo ? info : null;
+  final opc = info is OpcCardInfo ? info : null;
   String bucket(int? value) => switch (value) {
         null => '?',
         < 1000 => '0-999',
@@ -112,14 +113,14 @@ String stackLabel(CardSort sort, CardWithInfo item, String language) {
         >= 7 => '7+',
         final mv => '${mv.toInt()}',
       },
-    CardSort.color => switch (mtg?.colors) {
+    CardSort.color => switch (mtg?.colors ?? opc?.colors) {
         null => '?',
         [] => 'C',
         [final one] => one,
         _ => 'multi',
       },
-    CardSort.type => mtg?.types.firstOrNull ?? '?',
-    CardSort.power => mtg?.power ?? '?',
+    CardSort.type => mtg?.types.firstOrNull ?? opc?.type ?? '?',
+    CardSort.power => mtg?.power ?? (opc?.power == null ? '?' : '${opc!.power}'),
     CardSort.toughness => mtg?.toughness ?? '?',
     CardSort.collector => item.card.id.split('-').first,
     CardSort.level => ygo?.linkRating != null
@@ -129,9 +130,11 @@ String stackLabel(CardSort sort, CardWithInfo item, String language) {
             : '${ygo!.level}',
     CardSort.atk => bucket(ygo?.atk),
     CardSort.def => bucket(ygo?.def),
-    CardSort.attribute => ygo?.attribute ?? '?',
+    CardSort.attribute => ygo?.attribute ?? opc?.attribute ?? '?',
     CardSort.race => ygo?.race ?? '?',
     CardSort.archetype => ygo?.archetype ?? '',
+    CardSort.cost => opc?.cost == null ? '?' : '${opc!.cost}',
+    CardSort.counter => opc?.counter == null ? '?' : '${opc!.counter}',
   };
 }
 
@@ -155,11 +158,13 @@ enum GroupBy {
   def,
   attribute,
   race,
-  archetype;
+  archetype,
+  cost;
 
   static List<GroupBy> forGame(Game game) => switch (game) {
         Game.mtg => const [none, tag, quality, rarity, manaValue, color, type, collector],
         Game.ygo => const [none, tag, quality, rarity, level, atk, def, attribute, race, archetype, collector],
+        Game.opc => const [none, tag, quality, rarity, cost, color, type, attribute, collector],
       };
 
   /// The sort key this grouping follows, `null` for the tag groupings.
@@ -176,6 +181,7 @@ enum GroupBy {
         attribute => CardSort.attribute,
         race => CardSort.race,
         archetype => CardSort.archetype,
+        cost => CardSort.cost,
       };
 
   /// The groups a card belongs to (raw labels; `''` for cards without

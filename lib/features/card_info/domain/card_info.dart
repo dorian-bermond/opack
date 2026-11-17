@@ -7,6 +7,7 @@ sealed class CardInfo {
   factory CardInfo.fromJson(Map<String, dynamic> json) => switch (json['game']) {
         'mtg' => MtgCardInfo.fromJson(json),
         'ygo' => YgoCardInfo.fromJson(json),
+        'opc' => OpcCardInfo.fromJson(json),
         final game => throw FormatException('Unknown card info game $game'),
       };
 
@@ -14,6 +15,139 @@ sealed class CardInfo {
 
   /// The card name in the data's language.
   String get name;
+}
+
+/// One Piece colors, in the game's order.
+const opcColors = ['Red', 'Green', 'Blue', 'Purple', 'Black', 'Yellow'];
+
+/// One Piece card types.
+const opcTypes = ['Leader', 'Character', 'Event', 'Stage'];
+
+/// Details of a One Piece card, from optcgapi.com.
+class OpcCardInfo extends CardInfo {
+  const OpcCardInfo({
+    required this.name,
+    required this.type,
+    this.colors = const [],
+    this.cost,
+    this.power,
+    this.counter,
+    this.life,
+    this.attribute,
+    this.subtypes = const [],
+    this.text,
+    this.setCode,
+    this.setName,
+  });
+
+  factory OpcCardInfo.fromJson(Map<String, dynamic> json) => OpcCardInfo(
+        name: json['name'] as String,
+        type: json['type'] as String,
+        colors: (json['colors'] as List? ?? const []).cast<String>(),
+        cost: json['cost'] as int?,
+        power: json['power'] as int?,
+        counter: json['counter'] as int?,
+        life: json['life'] as int?,
+        attribute: json['attribute'] as String?,
+        subtypes: (json['subtypes'] as List? ?? const []).cast<String>(),
+        text: json['text'] as String?,
+        setCode: json['setCode'] as String?,
+        setName: json['setName'] as String?,
+      );
+
+  /// Reads an optcgapi card object.
+  factory OpcCardInfo.fromOptcg(Map<String, dynamic> json) {
+    int? number(Object? value) => switch (value) {
+          final int n => n,
+          final num n => n.toInt(),
+          final String s => int.tryParse(s.trim()),
+          _ => null,
+        };
+    final color = (json['card_color'] as String? ?? '').trim();
+    final subtypes = (json['sub_types'] as String? ?? '').trim();
+    return OpcCardInfo(
+      name: (json['card_name'] as String? ?? '').trim(),
+      type: (json['card_type'] as String? ?? '').trim(),
+      colors: [for (final c in color.split('/')) if (c.trim().isNotEmpty) c.trim()],
+      cost: number(json['card_cost']),
+      power: number(json['card_power']),
+      counter: number(json['counter_amount']),
+      life: number(json['life']),
+      attribute: (json['attribute'] as String?)?.trim(),
+      // Subtypes come space-separated, multi-word ones too ("Straw Hat Crew").
+      subtypes: subtypes.isEmpty ? const [] : _splitSubtypes(subtypes),
+      text: json['card_text'] as String?,
+      setCode: (json['card_set_id'] as String?)?.split('-').firstOrNull,
+      setName: json['set_name'] as String?,
+    );
+  }
+
+  /// Known multi-word One Piece types, so "Animal Straw Hat Crew" splits
+  /// into "Animal" and "Straw Hat Crew".
+  static const _multiWord = [
+    'Straw Hat Crew', 'Heart Pirates', 'Kid Pirates', 'Whitebeard Pirates', 'Big Mom Pirates',
+    'Animal Kingdom Pirates', 'Beast Pirates', 'Red Hair Pirates', 'Blackbeard Pirates', 'Donquixote Pirates',
+    'Thriller Bark Pirates', 'Baroque Works', 'Impel Down', 'Revolutionary Army', 'Land of Wano',
+    'Fish-Man', 'Alabasta', 'Navy', 'Seven Warlords of the Sea', 'The Four Emperors', 'Drum Kingdom',
+    'Water Seven', 'Sky Island', 'Arlong Pirates', 'Buggy Pirates', 'Kuja Pirates', 'Foxy Pirates',
+    'Sun Pirates', 'Cross Guild', 'Egghead', 'Minister', 'Punk Hazard', 'Dressrosa', 'Film',
+    'Germa 66', 'Vinsmoke Family', 'The Tontattas', 'Mountain Bandits', 'Krieg Pirates', 'Black Cat Pirates',
+    'Jaya', 'Scientist', 'Music', 'Giant', 'Mink Tribe', 'Lunarian', 'Smile', 'Homies', 'Flying Pirates',
+    'Neo Navy', 'Gyro Pirates', 'Goa Kingdom', 'The House of Lambs', 'Alvida Pirates', 'Rumbar Pirates',
+    'Bellamy Pirates', 'Barto Club', 'New Giant Pirates', 'Caribou Pirates', 'Fallen Monk Pirates',
+    'Happo Navy', 'Ideo Pirates', 'Beautiful Pirates', 'Tonta Corps', 'Yonta Maria Grand Fleet',
+    'Golden Lion Pirates', 'Mary Geoise', 'Celestial Dragons', 'Former Rocks Pirates', 'Roger Pirates',
+    'Former Roger Pirates', 'Whitebeard Pirates Allies', 'Former Whitebeard Pirates', 'Former Navy',
+    'Former Baroque Works', 'The Vinsmoke Family', 'Kozuki Clan', 'Kurozumi Clan', 'The Akazaya Nine',
+    'Amazon Lily', 'Botanist', 'Shandian Warrior', 'Long Ring Long Land', 'Mugiwara Chase',
+    'Eldoraggo Crew', 'Frost Moon Village', 'CP0', 'CP9', 'SWORD', 'Marine', 'Cipher Pol',
+  ];
+
+  static List<String> _splitSubtypes(String text) {
+    final found = <String>[];
+    var rest = text;
+    for (final multi in _multiWord) {
+      if (rest.contains(multi)) {
+        found.add(multi);
+        rest = rest.replaceAll(multi, ' ');
+      }
+    }
+    found.addAll([for (final w in rest.split(RegExp(r'\s+'))) if (w.isNotEmpty) w]);
+    return found;
+  }
+
+  @override
+  Map<String, Object?> toJson() => {
+        'game': 'opc',
+        'name': name,
+        'type': type,
+        'colors': colors,
+        'cost': ?cost,
+        'power': ?power,
+        'counter': ?counter,
+        'life': ?life,
+        'attribute': ?attribute,
+        'subtypes': subtypes,
+        'text': ?text,
+        'setCode': ?setCode,
+        'setName': ?setName,
+      };
+
+  @override
+  final String name;
+
+  /// Leader, Character, Event or Stage.
+  final String type;
+  final List<String> colors;
+  final int? cost;
+  final int? power;
+  final int? counter;
+  final int? life;
+  final String? attribute;
+  final List<String> subtypes;
+  final String? text;
+  final String? setCode;
+  final String? setName;
 }
 
 /// Supertypes Scryfall puts before the card types on a type line.

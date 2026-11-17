@@ -172,6 +172,68 @@ class CardSearch {
       switch (game) {
         Game.mtg => _scryfall(query, frenchNames),
         Game.ygo => _ygoprodeck(query, language),
+        Game.opc => _opc(query),
+      };
+
+  /// Every One Piece card, loaded once from optcgapi (a call per set).
+  List<FoundCard>? _opcAll;
+
+  Future<({List<FoundCard> cards, bool hasMore})> _opc(SearchQuery query) async {
+    final all = _opcAll ??= await _loadOpc();
+    final text = query.text.trim().toLowerCase();
+    final found = [
+      for (final f in all)
+        if (f.info case final OpcCardInfo info)
+          if ((text.isEmpty || info.name.toLowerCase().contains(text) || (info.text ?? '').toLowerCase().contains(text)) &&
+              (query.rarities.isEmpty || query.rarities.contains(f.card.rarity)) &&
+              (query.colors.isEmpty || info.colors.any(query.colors.contains)) &&
+              (query.types.isEmpty || query.types.contains(info.type)) &&
+              (query.setCode.trim().isEmpty || f.card.id.toLowerCase().startsWith(query.setCode.trim().toLowerCase())) &&
+              (query.manaValue == null || (info.cost != null && info.cost! >= query.manaValue!.$1 && info.cost! <= query.manaValue!.$2)))
+            f,
+    ];
+    return (cards: found.take(pageSize * 3).toList(), hasMore: found.length > pageSize * 3);
+  }
+
+  Future<List<FoundCard>> _loadOpc() async {
+    final listing = await _client.get(Uri.https('optcgapi.com', '/api/allSets/'), headers: _headers);
+    if (listing.statusCode != 200) throw HttpException('optcgapi ${listing.statusCode}');
+    final sets = (jsonDecode(utf8.decode(listing.bodyBytes)) as List).cast<Map<String, dynamic>>();
+    final found = <FoundCard>[];
+    final seen = <String>{};
+    for (final set in sets) {
+      final id = set['set_id'] as String? ?? '';
+      final response = await _client.get(Uri.https('optcgapi.com', '/api/sets/$id/'), headers: _headers);
+      if (response.statusCode != 200) continue;
+      final body = jsonDecode(utf8.decode(response.bodyBytes));
+      if (body is! List) continue;
+      for (final json in body.cast<Map<String, dynamic>>()) {
+        if (opcFound(json) case final f? when seen.add(f.card.id)) found.add(f);
+      }
+    }
+    return found;
+  }
+
+  /// An optcgapi card as a pool card: its code, English name and rarity.
+  static FoundCard? opcFound(Map<String, dynamic> json) {
+    final id = (json['card_set_id'] as String? ?? '').trim();
+    if (id.isEmpty) return null;
+    final info = OpcCardInfo.fromOptcg(json);
+    return (
+      card: CardData(id: id, names: {'en': info.name}, rarity: opcRarity(json['rarity'] as String?)),
+      info: info,
+    );
+  }
+
+  /// The app's rarity for an optcgapi rarity code.
+  static Rarity opcRarity(String? code) => switch ((code ?? '').trim().toUpperCase()) {
+        'C' => Rarity.common,
+        'UC' => Rarity.uncommon,
+        'R' => Rarity.rare,
+        'SR' => Rarity.superRare,
+        'L' => Rarity.leader,
+        'SEC' || 'TR' => Rarity.secretRare,
+        _ => Rarity.special,
       };
 
   Future<({List<FoundCard> cards, bool hasMore})> _scryfall(

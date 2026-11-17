@@ -2481,6 +2481,300 @@
   "path": "assets/sets/mtg/ZNR.json"
  },
  {
+  "code": "EB01",
+  "prefix": "EB01",
+  "game": "opc",
+  "names": {
+   "en": "Extra Booster: Memorial Collection"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 61,
+  "path": "assets/sets/opc/EB01.json"
+ },
+ {
+  "code": "EB02",
+  "prefix": "EB02",
+  "game": "opc",
+  "names": {
+   "en": "Extra Booster: Anime 25th Collection"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 87,
+  "path": "assets/sets/opc/EB02.json"
+ },
+ {
+  "code": "EB03",
+  "prefix": "EB03",
+  "game": "opc",
+  "names": {
+   "en": "Extra Booster: One Piece Heroines Edition"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 66,
+  "path": "assets/sets/opc/EB03.json"
+ },
+ {
+  "code": "EB05",
+  "prefix": "EB05",
+  "game": "opc",
+  "names": {
+   "en": "Extra Booster: One Piece Heroines Edition Vol. 2"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 72,
+  "path": "assets/sets/opc/EB05.json"
+ },
+ {
+  "code": "OP01",
+  "prefix": "OP01",
+  "game": "opc",
+  "names": {
+   "en": "Romance Dawn"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 121,
+  "path": "assets/sets/opc/OP01.json"
+ },
+ {
+  "code": "OP02",
+  "prefix": "OP02",
+  "game": "opc",
+  "names": {
+   "en": "Paramount War"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 121,
+  "path": "assets/sets/opc/OP02.json"
+ },
+ {
+  "code": "OP03",
+  "prefix": "OP03",
+  "game": "opc",
+  "names": {
+   "en": "Pillars of Strength"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 127,
+  "path": "assets/sets/opc/OP03.json"
+ },
+ {
+  "code": "OP04",
+  "prefix": "OP04",
+  "game": "opc",
+  "names": {
+   "en": "Kingdoms of Intrigue"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 130,
+  "path": "assets/sets/opc/OP04.json"
+ },
+ {
+  "code": "OP05",
+  "prefix": "OP05",
+  "game": "opc",
+  "names": {
+   "en": "Awakening of the New Era"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 125,
+  "path": "assets/sets/opc/OP05.json"
+ },
+ {
+  "code": "OP06",
+  "prefix": "OP06",
+  "game": "opc",
+  "names": {
+   "en": "Wings of the Captain"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 126,
+  "path": "assets/sets/opc/OP06.json"
+ },
+ {
+  "code": "OP07",
+  "prefix": "OP07",
+  "game": "opc",
+  "names": {
+   "en": "500 Years in the Future"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 126,
+  "path": "assets/sets/opc/OP07.json"
+ },
+ {
+  "code": "OP08",
+  "prefix": "OP08",
+  "game": "opc",
+  "names": {
+   "en": "Two Legends"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 126,
+  "path": "assets/sets/opc/OP08.json"
+ },
+ {
+  "code": "OP09",
+  "prefix": "OP09",
+  "game": "opc",
+  "names": {
+   "en": "Emperors in the New World"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 127,
+  "path": "assets/sets/opc/OP09.json"
+ },
+ {
+  "code": "OP10",
+  "prefix": "OP10",
+  "game": "opc",
+  "names": {
+   "en": "Royal Blood"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 126,
+  "path": "assets/sets/opc/OP10.json"
+ },
+ {
+  "code": "OP11",
+  "prefix": "OP11",
+  "game": "opc",
+  "names": {
+   "en": "A Fist of Divine Speed"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 127,
+  "path": "assets/sets/opc/OP11.json"
+ },
+ {
+  "code": "OP12",
+  "prefix": "OP12",
+  "game": "opc",
+  "names": {
+   "en": "Legacy of the Master"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 127,
+  "path": "assets/sets/opc/OP12.json"
+ },
+ {
+  "code": "OP13",
+  "prefix": "OP13",
+  "game": "opc",
+  "names": {
+   "en": "Carrying On His Will"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 129,
+  "path": "assets/sets/opc/OP13.json"
+ },
+ {
+  "code": "OP16",
+  "prefix": "OP16",
+  "game": "opc",
+  "names": {
+   "en": "The Time of Battle"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 125,
+  "path": "assets/sets/opc/OP16.json"
+ },
+ {
+  "code": "OP17",
+  "prefix": "OP17",
+  "game": "opc",
+  "names": {
+   "en": "The World's Strongest Warriors"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 130,
+  "path": "assets/sets/opc/OP17.json"
+ },
+ {
+  "code": "PRB01",
+  "prefix": "PRB01",
+  "game": "opc",
+  "names": {
+   "en": "Premium Booster - The Best"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 110,
+  "path": "assets/sets/opc/PRB01.json"
+ },
+ {
+  "code": "PRB02",
+  "prefix": "PRB02",
+  "game": "opc",
+  "names": {
+   "en": "Premium Booster - The Best - Vol. 2"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 173,
+  "path": "assets/sets/opc/PRB02.json"
+ },
+ {
   "code": "25TH",
   "prefix": "25TH",
   "game": "ygo",

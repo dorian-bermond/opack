@@ -29,6 +29,10 @@ enum Metric {
   archetypes,
   properties,
   tags,
+  costCurve,
+  power,
+  counters,
+  life,
 }
 
 class MetricSection {
@@ -55,6 +59,7 @@ List<MetricSection> poolMetrics(Game game, List<CardWithInfo> cards) {
   final sections = switch (game) {
     Game.mtg => _mtg(cards),
     Game.ygo => _ygo(cards),
+    Game.opc => _opc(cards),
   };
   return [for (final section in sections) if (!section.isEmpty) section];
 }
@@ -165,6 +170,50 @@ List<MetricSection> _ygo(List<CardWithInfo> cards) {
     MetricSection(
       Metric.sets,
       _counted([for (final c in cards) (c.info as YgoCardInfo?)?.setName ?? c.card.id.split('-').first]),
+    ),
+  ];
+}
+
+List<MetricSection> _opc(List<CardWithInfo> cards) {
+  final infos = [for (final c in cards) if (c.info case final OpcCardInfo info) info];
+  final withCost = infos.where((i) => i.cost != null && i.type != 'Leader').toList();
+  final withPower = infos.where((i) => i.power != null).toList();
+  final withCounter = infos.where((i) => i.counter != null && i.counter! > 0).toList();
+  final leaders = infos.where((i) => i.type == 'Leader' && i.life != null).toList();
+  return [
+    MetricSection(
+      Metric.costCurve,
+      _ordered([for (final i in withCost) i.cost! >= 8 ? '8+' : '${i.cost}'],
+          order: ['0', '1', '2', '3', '4', '5', '6', '7', '8+']),
+      average: _mean([for (final i in withCost) i.cost!.toDouble()]),
+      known: withCost.length,
+    ),
+    MetricSection(Metric.colors, _ordered([for (final i in infos) ...i.colors], order: opcColors)),
+    MetricSection(
+      Metric.colorCount,
+      _ordered([for (final i in infos) i.colors.length > 1 ? 'multi' : 'mono'], order: const ['mono', 'multi']),
+    ),
+    MetricSection(Metric.types, _ordered([for (final i in infos) i.type], order: opcTypes)),
+    MetricSection(Metric.subtypes, _counted([for (final i in infos) ...i.subtypes], top: 15)),
+    MetricSection(Metric.attributes, _counted([for (final i in infos) ?i.attribute])),
+    MetricSection(
+      Metric.power,
+      _ordered([for (final i in withPower) '${i.power}'],
+          order: [for (var p = 0; p <= 13000; p += 1000) '$p']),
+      average: _mean([for (final i in withPower) i.power!.toDouble()]),
+      max: withPower.isEmpty ? null : withPower.map((i) => i.power!).reduce((a, b) => a > b ? a : b),
+      known: withPower.length,
+    ),
+    MetricSection(
+      Metric.counters,
+      _ordered([for (final i in withCounter) '${i.counter}'], order: const ['1000', '2000']),
+      known: withCounter.length,
+    ),
+    MetricSection(Metric.life, _counted([for (final i in leaders) '${i.life}'])),
+    ..._common(cards),
+    MetricSection(
+      Metric.sets,
+      _counted([for (final c in cards) (c.info as OpcCardInfo?)?.setName ?? c.card.id.split('-').first]),
     ),
   ];
 }

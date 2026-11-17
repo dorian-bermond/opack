@@ -48,6 +48,9 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
       fallback: ImageSource('scryfall-$id', english),
     );
   }
+  if (isOnePieceId(card.id)) {
+    return ImageSource('opc-${card.id}', opcCardImage(card.id));
+  }
   if (card.passcode case final passcode?) {
     // The importer stores the English name as passcode for cards without one;
     // YGOPRODeck can still find those by name.
@@ -63,6 +66,12 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
   }
   return null;
 }
+
+/// Whether a card code is a One Piece one (`OP01-077`, `EB01-001`, `ST01-001`).
+bool isOnePieceId(String id) => RegExp(r'^(OP|EB|ST|PRB|P)\d*-\d+').hasMatch(id);
+
+/// optcgapi's picture of a One Piece card.
+Uri opcCardImage(String id) => Uri.https('optcgapi.com', '/media/static/Card_Images/$id.jpg');
 
 /// The picture of [artwork] for [card] (see [CardData.artwork]): a wiki scan
 /// when it is a URL, else Scryfall's normal picture of that print for MtG,
@@ -126,6 +135,11 @@ ImageSource? boosterImageSource(CardSet set, {String language = 'en', BoosterTyp
             pickMtgBooster(listing, type, setName: set.nameFor('en'), setCode: set.displayCode),
         fallback: art,
       );
+    case Game.opc:
+      // No pack scans online: the set's leader, or its best card, stands in.
+      final cover = set.cards.where((c) => c.rarity == Rarity.leader).firstOrNull ??
+          set.cards.fold<CardData?>(null, (best, c) => best == null || c.rarity.index > best.rarity.index ? c : best);
+      return cover == null ? null : ImageSource('booster-opc-${set.code}', opcCardImage(cover.id));
     case Game.ygo:
       final code = set.displayCode;
       Uri wiki(String region) => Uri.https('yugioh.fandom.com', '/api.php', {

@@ -1,6 +1,9 @@
 enum Game {
   mtg(sealedPackCount: 6, draftRounds: 3),
-  ygo(sealedPackCount: 5, draftRounds: 3);
+  ygo(sealedPackCount: 5, draftRounds: 3),
+
+  /// One Piece Card Game.
+  opc(sealedPackCount: 6, draftRounds: 3);
 
   const Game({required this.sealedPackCount, required this.draftRounds});
 
@@ -14,6 +17,9 @@ enum Rarity {
   uncommon,
   rare,
   superRare,
+
+  /// A One Piece leader card.
+  leader,
   ultraRare,
   mythic,
   special,
