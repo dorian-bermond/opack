@@ -78,6 +78,15 @@ class BoosterCover extends ConsumerWidget {
           ),
         ],
       );
+    } else if (set!.game == Game.opc && !image.path.endsWith('-card.webp')) {
+      // The official product picture is a near-square with wide margins
+      // around the pack: zoomed so the pack fills the cover.
+      front = ClipRect(
+        child: Transform.scale(
+          scale: 1.6,
+          child: Image.file(image, fit: BoxFit.contain),
+        ),
+      );
     } else {
       front = Padding(
         padding: const EdgeInsets.all(8),
