@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
 
+/// Relays a slash started anywhere on the screen to the sealed pack: the
+/// pointer's positions, in global coordinates.
+class SlashController extends ChangeNotifier {
+  final List<Offset> _points = [];
+  bool _ended = false;
+
+  List<Offset> get points => List.unmodifiable(_points);
+  bool get ended => _ended;
+
+  void start(Offset global) {
+    _points
+      ..clear()
+      ..add(global);
+    _ended = false;
+    notifyListeners();
+  }
+
+  void move(Offset global) {
+    _points.add(global);
+    notifyListeners();
+  }
+
+  void end() {
+    _ended = true;
+    notifyListeners();
+  }
+}
+
 /// A sealed pack that opens on a tap, or by slashing across it: a drag
-/// draws the cut along the pointer's path and, once it spans enough of
-/// the pack sideways or up and down, tears the pack in two along that
-/// line before [onOpen] fires.
+/// draws the cut along the pointer's path where it crosses the pack and,
+/// once it spans enough of the pack sideways or up and down, tears the
+/// pack in two along that line before [onOpen] fires. With a
+/// [controller], the slash may start anywhere on the screen.
 class SealedPack extends StatefulWidget {
   const SealedPack({
     super.key,
@@ -12,6 +41,7 @@ class SealedPack extends StatefulWidget {
     required this.height,
     required this.onOpen,
     this.enabled = true,
+    this.controller,
   });
 
   final Widget child;
@@ -19,6 +49,7 @@ class SealedPack extends StatefulWidget {
   final double height;
   final VoidCallback onOpen;
   final bool enabled;
+  final SlashController? controller;
 
   /// Where a tap's cut runs, as a share of the pack's height from the top.
   static const cutAt = 0.14;
@@ -41,16 +72,50 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
       if (status == AnimationStatus.completed) widget.onOpen();
     });
 
-  /// The slash's extent sideways and up and down, as shares of the pack.
+  @override
+  void initState() {
+    super.initState();
+    widget.controller?.addListener(_relayed);
+  }
+
+  @override
+  void didUpdateWidget(SealedPack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_relayed);
+      widget.controller?.addListener(_relayed);
+    }
+  }
+
+  /// A slash relayed from outside: its points brought into the pack's
+  /// coordinates, then handled like the pack's own.
+  void _relayed() {
+    final controller = widget.controller!;
+    if (_torn || !widget.enabled) return;
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return;
+    if (controller.ended) {
+      _release(DragEndDetails());
+      return;
+    }
+    setState(() => _trail
+      ..clear()
+      ..addAll(controller.points.map(box.globalToLocal)));
+  }
+
+  /// The slash's extent sideways and up and down, as shares of the pack,
+  /// counting only where it crosses the pack.
   (double, double) get _extent {
     if (_trail.length < 2) return (0, 0);
     var left = double.infinity, right = double.negativeInfinity;
     var top = double.infinity, bottom = double.negativeInfinity;
     for (final p in _trail) {
-      if (p.dx < left) left = p.dx;
-      if (p.dx > right) right = p.dx;
-      if (p.dy < top) top = p.dy;
-      if (p.dy > bottom) bottom = p.dy;
+      final x = p.dx.clamp(0.0, widget.width);
+      final y = p.dy.clamp(0.0, widget.height);
+      if (x < left) left = x;
+      if (x > right) right = x;
+      if (y < top) top = y;
+      if (y > bottom) bottom = y;
     }
     return ((right - left) / widget.width, (bottom - top) / widget.height);
   }
@@ -69,6 +134,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    widget.controller?.removeListener(_relayed);
     _tear.dispose();
     super.dispose();
   }
@@ -120,9 +186,10 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
       key: const Key('sealedPack'),
       behavior: HitTestBehavior.opaque,
       onTap: widget.enabled && !_torn ? widget.onOpen : null,
-      onPanStart: _start,
-      onPanUpdate: _slash,
-      onPanEnd: _release,
+      // With a controller the screen relays the slash; else the pack takes it.
+      onPanStart: widget.controller == null ? _start : null,
+      onPanUpdate: widget.controller == null ? _slash : null,
+      onPanEnd: widget.controller == null ? _release : null,
       child: MouseRegion(
         cursor: widget.enabled ? SystemMouseCursors.click : MouseCursor.defer,
         child: SizedBox(
@@ -164,11 +231,14 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
                     child: ClipPath(clipper: _Side(cut: cut, vertical: vertical, first: false), child: widget.child),
                   ),
                   Positioned.fill(child: torn),
+                  // The cut, drawn only where it crosses the pack.
                   if (_trail.isNotEmpty && !_torn)
                     Positioned.fill(
                       child: IgnorePointer(
-                        child: CustomPaint(
-                          painter: _CutPainter(trail: _trail, color: Theme.of(context).colorScheme.primary),
+                        child: ClipRect(
+                          child: CustomPaint(
+                            painter: _CutPainter(trail: _trail, color: Theme.of(context).colorScheme.primary),
+                          ),
                         ),
                       ),
                     ),

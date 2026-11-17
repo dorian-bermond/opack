@@ -46,6 +46,9 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
   BoosterPlay get _play => widget.pool.boosterPlay(_kind)!;
   PackSource get _source => _sources[_kind] ??= _play.newSource();
 
+  /// Relays a slash started anywhere on the screen to the pack.
+  final _slash = SlashController();
+
   List<CardData>? _pack;
   final _opened = <String, int>{};
   final Set<int> _revealed = {};
@@ -80,7 +83,14 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
               // The pack takes the height left by the texts around it.
               final packHeight = (constraints.maxHeight - 190).clamp(200.0, 720.0);
               final packWidth = (packHeight * 180 / 280).clamp(120.0, constraints.maxWidth - 32);
-              return Center(
+              // A slash may start anywhere: the whole screen relays it.
+              return GestureDetector(
+              key: const Key('slashArea'),
+              behavior: HitTestBehavior.opaque,
+              onPanStart: (d) => _slash.start(d.globalPosition),
+              onPanUpdate: (d) => _slash.move(d.globalPosition),
+              onPanEnd: (_) => _slash.end(),
+              child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -102,6 +112,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                     height: packWidth * 280 / 180,
                     enabled: !_exhausted,
                     onOpen: _open,
+                    controller: _slash,
                     child: BoosterCover(
                       set: pool.layoutSet,
                       label: pool.name,
@@ -122,6 +133,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                     Text(attribution, style: theme.textTheme.bodySmall),
                   ],
                 ],
+              ),
               ),
             );
             })

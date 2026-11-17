@@ -685,8 +685,10 @@ void main() {
     expect(find.byKey(const Key('sealedPack')), findsOneWidget);
     expect(find.byType(CardTile), findsNothing);
 
-    // A slash across most of it tears the pack, and the cards come out.
-    await tester.timedDrag(pack, Offset(width * 0.8, 0), const Duration(milliseconds: 200));
+    // A slash across most of it tears the pack, and the cards come out;
+    // it may start beside the pack, on the screen.
+    final start = tester.getTopLeft(pack) + Offset(-60, tester.getSize(pack).height * 0.3);
+    await tester.timedDragFrom(start, Offset(width * 0.8 + 60, 0), const Duration(milliseconds: 200));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('sealedPack')), findsNothing);
     expect(find.byType(CardTile), findsWidgets);
