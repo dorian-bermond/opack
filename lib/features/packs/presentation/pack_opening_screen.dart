@@ -11,6 +11,7 @@ import '../../pools/presentation/pool_loader.dart';
 import '../domain/pack_source.dart';
 import 'opening_mode.dart';
 import 'pack_stack.dart';
+import 'sealed_pack.dart';
 
 /// Opens loose packs dealt from a pool, one at a time.
 class PackOpeningScreen extends StatelessWidget {
@@ -75,7 +76,11 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
     return Scaffold(
       appBar: AppBar(title: Text(pool.name)),
       body: pack == null
-          ? Center(
+          ? LayoutBuilder(builder: (context, constraints) {
+              // The pack takes the height left by the texts around it.
+              final packHeight = (constraints.maxHeight - 190).clamp(200.0, 720.0);
+              final packWidth = (packHeight * 180 / 280).clamp(120.0, constraints.maxWidth - 32);
+              return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -91,11 +96,20 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                         ],
                       ),
                     ),
-                  InkWell(
-                    key: const Key('sealedPack'),
-                    onTap: _exhausted ? null : _open,
-                    borderRadius: BorderRadius.circular(16),
-                    child: BoosterCover(set: pool.layoutSet, label: pool.name, booster: booster, custom: pool.pool.cover),
+                  SealedPack(
+                    key: ValueKey('sealed-${_opened[_kind] ?? 0}'),
+                    width: packWidth,
+                    height: packWidth * 280 / 180,
+                    enabled: !_exhausted,
+                    onOpen: _open,
+                    child: BoosterCover(
+                      set: pool.layoutSet,
+                      label: pool.name,
+                      booster: booster,
+                      custom: pool.pool.cover,
+                      width: packWidth,
+                      height: packWidth * 280 / 180,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(l10n.tapToOpen),
@@ -109,7 +123,8 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                   ],
                 ],
               ),
-            )
+            );
+            })
           : swipe
               ? PackStack(key: ValueKey(pack), cards: pack)
               : CardGrid(

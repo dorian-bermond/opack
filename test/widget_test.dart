@@ -667,6 +667,31 @@ void main() {
     expect(container.read(poolsProvider).value!.single.tags['rarity:bonus']!.color, 0xFF1E88E5);
   });
 
+  testWidgets('slashing across the pack tears it open; a short slash does not', (tester) async {
+    await startApp(tester, locale: const Locale('en'));
+    await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open a pack'));
+    await settleLoading(tester);
+    final pack = find.byKey(const Key('sealedPack'));
+    expect(pack, findsOneWidget);
+    final width = tester.getSize(pack).width;
+    expect(width, greaterThan(120), reason: 'sized to the window');
+
+    // Too short a slash: still sealed.
+    await tester.timedDrag(pack, Offset(width * 0.3, 0), const Duration(milliseconds: 200));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('sealedPack')), findsOneWidget);
+    expect(find.byType(CardTile), findsNothing);
+
+    // A slash across most of it tears the pack, and the cards come out.
+    await tester.timedDrag(pack, Offset(width * 0.8, 0), const Duration(milliseconds: 200));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('sealedPack')), findsNothing);
+    expect(find.byType(CardTile), findsWidgets);
+  });
+
   testWidgets('an empty pool cannot be played until it has a source', (tester) async {
     await startApp(tester, locale: const Locale('en'));
 

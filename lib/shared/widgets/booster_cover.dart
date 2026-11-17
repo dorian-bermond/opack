@@ -41,12 +41,12 @@ class BoosterCover extends ConsumerWidget {
 
     final custom = this.custom == null ? null : File(this.custom!);
     final Widget front;
+    // A picture of the pack stands alone; the plain pack and MtG's art get a backdrop.
+    var backdrop = false;
     if (custom != null && custom.existsSync()) {
-      front = Padding(
-        padding: const EdgeInsets.all(8),
-        child: Image.file(custom, key: const Key('customCover'), fit: BoxFit.contain),
-      );
+      front = Image.file(custom, key: const Key('customCover'), fit: BoxFit.contain);
     } else if (image == null) {
+      backdrop = true;
       front = Center(
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -58,6 +58,7 @@ class BoosterCover extends ConsumerWidget {
         ),
       );
     } else if (set!.game == Game.mtg && image.path.endsWith('-art.jpg')) {
+      backdrop = true;
       front = Stack(
         fit: StackFit.expand,
         children: [
@@ -82,23 +83,18 @@ class BoosterCover extends ConsumerWidget {
     } else if (set.game == Game.opc && !image.path.endsWith('-card.webp')) {
       // The official product picture comes with wide blank margins around
       // the pack: they are cropped away so the pack fills the cover.
-      front = Padding(
-        padding: const EdgeInsets.all(8),
-        child: TrimmedImage(image),
-      );
+      front = TrimmedImage(image);
     } else {
-      front = Padding(
-        padding: const EdgeInsets.all(8),
-        child: Image.file(image, fit: BoxFit.contain),
-      );
+      front = Image.file(image, fit: BoxFit.contain);
     }
 
+    if (!backdrop) return SizedBox(width: width, height: height, child: front);
     return Ink(
       width: width,
       height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: image == null && custom == null ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
+        color: image == null ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
       ),
       child: ClipRRect(borderRadius: BorderRadius.circular(16), child: front),
     );

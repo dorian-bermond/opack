@@ -185,7 +185,7 @@ abstract class AppLocalizations {
   /// No description provided for @tapToOpen.
   ///
   /// In en, this message translates to:
-  /// **'Tap the pack to open it'**
+  /// **'Tap the pack, or slash across its top, to open it'**
   String get tapToOpen;
 
   /// No description provided for @revealAll.

@@ -14,7 +14,7 @@
   "modeOpen": "Open a pack",
   "modeSealed": "Sealed",
   "modeDraft": "Draft",
-  "tapToOpen": "Tap the pack to open it",
+  "tapToOpen": "Tap the pack, or slash across its top, to open it",
   "revealAll": "Reveal all",
   "openAnother": "Open another",
   "openingModeSetting": "Pack opening",
