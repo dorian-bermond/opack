@@ -52,7 +52,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modeDraft => 'Draft';
 
   @override
-  String get tapToOpen => 'Tap the pack, or slash across its top, to open it';
+  String get tapToOpen => 'Tap the pack, or slash across it, to open it';
 
   @override
   String get revealAll => 'Reveal all';

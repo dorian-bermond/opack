@@ -53,7 +53,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tapToOpen =>
-      'Touchez le booster, ou déchirez-le d\'un trait en haut, pour l\'ouvrir';
+      'Touchez le booster, ou déchirez-le d\'un trait, pour l\'ouvrir';
 
   @override
   String get revealAll => 'Tout révéler';
