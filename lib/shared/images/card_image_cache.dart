@@ -14,12 +14,15 @@ import '../../features/catalog/domain/models.dart';
 /// picture to download from it (`null` when it lists none). Equal sources
 /// share a [key].
 class ImageSource {
-  const ImageSource(this.key, this.url, {this.fallback, this.pick});
+  const ImageSource(this.key, this.url, {this.fallback, this.pick, this.extension = 'jpg'});
 
   final String key;
   final Uri url;
   final ImageSource? fallback;
   final String? Function(Map<String, dynamic> listing)? pick;
+
+  /// The cached file's extension (the picture's format).
+  final String extension;
 
   @override
   bool operator ==(Object other) => other is ImageSource && other.key == key;
@@ -49,7 +52,7 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
     );
   }
   if (isOnePieceId(card.id)) {
-    return ImageSource('opc-${card.id}', opcCardImage(card.id));
+    return ImageSource('opc-${card.id}', opcCardImage(card.id), extension: 'webp');
   }
   if (card.passcode case final passcode?) {
     // The importer stores the English name as passcode for cards without one;
@@ -70,14 +73,16 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
 /// Whether a card code is a One Piece one (`OP01-077`, `EB01-001`, `ST01-001`).
 bool isOnePieceId(String id) => RegExp(r'^(OP|EB|ST|PRB|P)\d*-\d+').hasMatch(id);
 
-/// optcgapi's picture of a One Piece card.
-Uri opcCardImage(String id) => Uri.https('optcgapi.com', '/media/static/Card_Images/$id.jpg');
+/// onepiece.gg's picture of a One Piece print, base (`OP01-001`) or
+/// alternate art (`OP01-001_p1`).
+Uri opcCardImage(String id) => Uri.https('static.dotgg.gg', '/onepiece/card/$id.webp');
 
 /// The picture of [artwork] for [card] (see [CardData.artwork]): a wiki scan
 /// when it is a URL, else Scryfall's normal picture of that print for MtG,
 /// YGOPRODeck's image for Yu-Gi-Oh!. With [small], the thumbnail instead
 /// (for choosing among scans).
 ImageSource artworkImageSource(CardData card, String artwork, {bool small = false}) {
+  if (isOnePieceId(artwork)) return ImageSource('opc-$artwork', opcCardImage(artwork), extension: 'webp');
   if (artwork.startsWith('http')) {
     final url = Uri.parse(artwork);
     // Fandom files: `…/File.png/revision/latest?cb=…`; a width-limited
@@ -493,5 +498,5 @@ class CardHoverPreviewSetting extends Notifier<bool> {
 final cardImageProvider = FutureProvider.family<File?, ImageSource>((ref, source) async {
   final cache = ref.watch(cardImageCacheProvider);
   if (cache == null || !ref.watch(cardImagesEnabledProvider)) return null;
-  return cache.fetch(source.key, source.url, fallback: source.fallback, pick: source.pick);
+  return cache.fetch(source.key, source.url, fallback: source.fallback, pick: source.pick, extension: source.extension);
 });

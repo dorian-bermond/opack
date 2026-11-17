@@ -1,105 +1,96 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:opack/features/card_info/data/card_info_repository.dart';
 import 'package:opack/features/card_info/data/card_search.dart';
+import 'package:opack/features/card_info/data/dotgg_one_piece.dart';
 import 'package:opack/features/card_info/domain/card_filter.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_info/domain/pool_metrics.dart';
 import 'package:opack/features/catalog/domain/models.dart';
 import 'package:opack/features/pools/presentation/pool_view.dart';
+import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 
 import '../tool/src/opc.dart';
 
-const _perona = {
-  'card_name': 'Perona',
-  'set_name': 'Romance Dawn',
-  'card_text': '[On Play] Look at 5 cards from the top of your deck.',
-  'set_id': 'OP-01',
-  'rarity': 'UC',
-  'card_set_id': 'OP01-077',
-  'card_color': 'Blue',
-  'card_type': 'Character',
-  'life': null,
-  'card_cost': '1',
-  'card_power': '2000',
-  'sub_types': 'Thriller Bark Pirates',
-  'counter_amount': 1000,
-  'attribute': 'Special',
-  'card_image': 'https://optcgapi.com/media/static/Card_Images/OP01-077.jpg',
-};
+/// A onepiece.gg indexed answer: Perona, Chopper, the Luffy leader with an
+/// alternate art, a Japanese row and a DON card.
+const _names = [
+  'id', 'id_normal', 'rarity', 'cardType', 'name', 'Cost', 'Attribute', 'Power', 'Counter', 'Color', 'Type', //
+  'Effect', 'CardSets', 'Life', 'set', 'language',
+];
+const _data = [
+  ['OP01-077', 'OP01-077', 'UC', 'CHARACTER', 'Perona', '1', 'Special', '2000', '1000', 'Blue', 'Thriller Bark Pirates', '[On Play] Look at 5 cards.', '-ROMANCE DAWN- [OP01]', null, 'OP01', 'en'],
+  ['OP01-015', 'OP01-015', 'UC', 'CHARACTER', 'Tony Tony.Chopper', 3, 'Wisdom', 4000, 1000, 'Red', 'Animal/Straw Hat Crew', '', '-ROMANCE DAWN- [OP01]', null, 'OP01', 'en'],
+  ['OP01-003', 'OP01-003', 'L', 'LEADER', 'Monkey.D.Luffy', null, 'Strike', '5000', null, 'Red/Green', 'Supernovas/Straw Hat Crew', 'x', '-ROMANCE DAWN- [OP01]', 4, 'OP01', 'en'],
+  ['OP01-003_p1', 'OP01-003', 'L', 'LEADER', 'Monkey.D.Luffy', null, 'Strike', '5000', null, 'Red/Green', 'Supernovas/Straw Hat Crew', 'x', '-ROMANCE DAWN- [OP01]', 4, 'OP01', 'en'],
+  ['OP01-003_p2', 'OP01-003', 'L', 'LEADER', 'モンキー・D・ルフィ', null, '打', '5000', null, 'Red/Green', '', 'x', '', 4, 'OP01', 'jp'],
+  ['OP18-001', 'OP18-001', 'L', 'LEADER', 'Karoo', null, 'Strike', '5000', null, 'Red/Blue', 'Animal/Alabasta', 'y', 'BOOSTER PACK -THE DOMINANCE OF GOD- [OP-18]', 4, 'OP18', 'en'],
+  ['DON-001', 'DON-001', 'C', 'DON', 'DON!! card', null, null, null, null, null, '', '', '', null, 'OP01', 'en'],
+  ['ST01-001', 'ST01-001', 'L', 'LEADER', 'Luffy (ST)', null, 'Strike', '5000', null, 'Red', 'Straw Hat Crew', '', 'STARTER DECK -Straw Hat Crew- [ST-01]', 5, 'ST01', 'en'],
+];
+final _json = {'names': _names, 'data': _data};
 
-const _chopper = {
-  'card_name': 'Tony Tony.Chopper',
-  'set_name': 'Romance Dawn',
-  'set_id': 'OP-01',
-  'rarity': 'UC',
-  'card_set_id': 'OP01-015',
-  'card_color': 'Red',
-  'card_type': 'Character',
-  'card_cost': '3',
-  'card_power': '4000',
-  'sub_types': 'Animal Straw Hat Crew',
-  'counter_amount': 1000,
-  'attribute': 'Wisdom',
-};
+Map<String, Object?> _row(String id) => DotggOnePiece.parse(_json).firstWhere((r) => r['id'] == id);
 
-const _luffy = {
-  'card_name': 'Monkey.D.Luffy',
-  'set_name': 'Romance Dawn',
-  'set_id': 'OP-01',
-  'rarity': 'L',
-  'card_set_id': 'OP01-003',
-  'card_color': 'Red/Green',
-  'card_type': 'Leader',
-  'life': 5,
-  'card_cost': null,
-  'card_power': '5000',
-  'sub_types': 'Supernovas Straw Hat Crew',
-  'counter_amount': null,
-  'attribute': 'Strike',
-};
+http.Client _client() => MockClient((request) async {
+      expect(request.url.host, 'api.dotgg.gg');
+      return http.Response.bytes(utf8.encode(jsonEncode(_json)), 200);
+    });
 
 void main() {
-  test('an optcgapi card becomes a One Piece card info, and survives saving', () {
-    final info = OpcCardInfo.fromOptcg(_chopper);
+  setUp(DotggOnePiece.reset);
+
+  test('a onepiece.gg row becomes a One Piece card info, and survives saving', () {
+    final info = OpcCardInfo.fromDotgg(_row('OP01-015'));
     expect(info.name, 'Tony Tony.Chopper');
     expect(info.type, 'Character');
     expect(info.colors, ['Red']);
     expect(info.cost, 3);
     expect(info.power, 4000);
     expect(info.counter, 1000);
-    expect(info.subtypes, ['Straw Hat Crew', 'Animal'], reason: 'multi-word types kept whole');
+    expect(info.subtypes, ['Animal', 'Straw Hat Crew']);
     expect(info.attribute, 'Wisdom');
     expect(info.setCode, 'OP01');
-    final leader = OpcCardInfo.fromOptcg(_luffy);
+    expect(info.text, isNull, reason: 'an empty effect is none');
+    final leader = OpcCardInfo.fromDotgg(_row('OP01-003'));
     expect(leader.colors, ['Red', 'Green']);
-    expect(leader.life, 5);
+    expect(leader.life, 4);
     expect(leader.cost, isNull);
+    expect(leader.type, 'Leader');
     final reloaded = CardInfo.fromJson(jsonDecode(jsonEncode(leader.toJson())) as Map<String, dynamic>);
     expect(reloaded, isA<OpcCardInfo>());
-    expect((reloaded as OpcCardInfo).subtypes, ['Straw Hat Crew', 'Supernovas']);
-    expect(reloaded.life, 5);
+    expect((reloaded as OpcCardInfo).subtypes, ['Supernovas', 'Straw Hat Crew']);
+    expect(reloaded.life, 4);
+    expect(DotggOnePiece.parse(_json).map((r) => r['id']), isNot(contains('OP01-003_p2')), reason: 'English only');
+    expect(DotggOnePiece.setName('BOOSTER PACK -THE DOMINANCE OF GOD- [OP-18]'), 'The Dominance of God');
+    expect(DotggOnePiece.setName('-ROMANCE DAWN- [OP01]'), 'Romance Dawn');
   });
 
-  test('rarities, set codes and the booster formula of an imported set', () {
+  test('rarities, booster sets and the formula of an imported set', () {
     expect(opcRarity('C'), 'common');
     expect(opcRarity('SR'), 'superRare');
     expect(opcRarity('L'), 'leader');
     expect(opcRarity('SEC'), 'secretRare');
     expect(opcRarity('SP CARD'), 'special');
     expect(opcSetCode('OP-01'), 'OP01');
-    expect(opcIsBooster('OP-01'), isTrue);
+    expect(opcIsBooster('OP18'), isTrue);
     expect(opcIsBooster('EB-02'), isTrue);
-    expect(opcIsBooster('ST-01'), isFalse);
-    expect(CardInfoFetcher.opcSetOf('OP01-077'), 'OP-01');
-    expect(CardInfoFetcher.opcSetOf('PRB01-010'), 'PRB-01');
-    expect(CardInfoFetcher.opcSetOf('DMU-1'), isNull);
+    expect(opcIsBooster('PRB01'), isTrue);
+    expect(opcIsBooster('ST01'), isFalse);
+    expect(opcIsBooster('P'), isFalse);
 
-    final set = buildOpcSet('OP-01', 'Romance Dawn', [_perona, _chopper, _luffy, _perona]);
+    final bySet = opcCardsBySet(_json);
+    expect(bySet.keys, unorderedEquals(['OP01', 'OP18']), reason: 'booster sets only');
+    expect(bySet['OP01']!.map((c) => c.id), ['OP01-077', 'OP01-015', 'OP01-003'],
+        reason: 'base prints, English, no DON');
+
+    final set = buildOpcSet('OP01', 'Romance Dawn', [...bySet['OP01']!, ...bySet['OP01']!]);
     expect(set['code'], 'OP01');
-    expect((set['cards'] as List).length, 3, reason: 'a repeated printing counts once');
+    expect((set['cards'] as List).length, 3, reason: 'a repeated card counts once');
     expect(((set['cards'] as List).first as Map)['id'], 'OP01-003', reason: 'sorted by code');
     final booster = (set['boosters'] as Map)['standard'] as Map;
     expect(booster['approximate'], isTrue);
@@ -113,25 +104,56 @@ void main() {
     expect(parsed.cards.first.rarity, Rarity.leader);
   });
 
-  test('One Piece cards take their picture from optcgapi, by code', () {
+  test('One Piece pictures come from onepiece.gg by print id, alternate arts too', () {
     const card = CardData(id: 'OP01-077', names: {'en': 'Perona'}, rarity: Rarity.uncommon);
     expect(isOnePieceId('OP01-077'), isTrue);
-    expect(isOnePieceId('EB01-001'), isTrue);
+    expect(isOnePieceId('OP01-003_p1'), isTrue);
     expect(isOnePieceId('CIBR-FR077'), isFalse);
-    expect(isOnePieceId('DMU-1'), isFalse);
     final source = cardImageSource(card, language: 'fr')!;
     expect(source.key, 'opc-OP01-077');
-    expect(source.url.toString(), 'https://optcgapi.com/media/static/Card_Images/OP01-077.jpg');
+    expect(source.url.toString(), 'https://static.dotgg.gg/onepiece/card/OP01-077.webp');
+    expect(source.extension, 'webp');
     expect(source.fallback, isNull);
+    final alt = artworkImageSource(card, 'OP01-077_p1');
+    expect(alt.url.path, '/onepiece/card/OP01-077_p1.webp');
+    expect(alt.key, 'opc-OP01-077_p1');
+  });
+
+  test('details, search and alternate arts all read the one list', () async {
+    final fetcher = CardInfoFetcher(client: _client());
+    final infos = await fetcher.fetch(Game.opc, const [
+      CardData(id: 'OP01-003', names: {}, rarity: Rarity.leader),
+      CardData(id: 'OP18-001', names: {}, rarity: Rarity.leader),
+      CardData(id: 'OP99-001', names: {}, rarity: Rarity.common),
+    ]);
+    expect(infos.keys, unorderedEquals(['OP01-003', 'OP18-001']));
+    expect((infos['OP18-001'] as OpcCardInfo).colors, ['Red', 'Blue']);
+
+    final search = CardSearch(client: _client());
+    final found = await search.search(Game.opc, const SearchQuery(text: 'luffy'));
+    expect(found.cards.map((f) => f.card.id), ['OP01-003', 'ST01-001'], reason: 'base prints, no DON, no alt');
+    expect(found.cards.first.card.rarity, Rarity.leader);
+    final red = await search.search(Game.opc, const SearchQuery(colors: {'Green'}));
+    expect(red.cards.map((f) => f.card.id), ['OP01-003']);
+    final cheap = await search.search(Game.opc, const SearchQuery(manaValue: (0, 2)));
+    expect(cheap.cards.map((f) => f.card.id), ['OP01-077']);
+    final set18 = await search.search(Game.opc, const SearchQuery(setCode: 'op18'));
+    expect(set18.cards.map((f) => f.card.id), ['OP18-001']);
+
+    final arts = await ArtworkSearch(client: _client()).alternatives(
+        const CardData(id: 'OP01-003', names: {'en': 'Luffy'}, rarity: Rarity.leader));
+    expect(arts.map((a) => a.key), ['OP01-003', 'OP01-003_p1'], reason: 'own first, English prints only');
+    expect(arts.first.own, isTrue);
+    expect(arts.last.label, 'Alt 1');
   });
 
   test('filters, sorts, groupings and metrics know One Piece cards', () {
     final chopper = (card: const CardData(id: 'OP01-015', names: {'en': 'Chopper'}, rarity: Rarity.uncommon),
-        info: OpcCardInfo.fromOptcg(_chopper), tags: <String>{});
+        info: OpcCardInfo.fromDotgg(_row('OP01-015')), tags: <String>{});
     final luffy = (card: const CardData(id: 'OP01-003', names: {'en': 'Luffy'}, rarity: Rarity.leader),
-        info: OpcCardInfo.fromOptcg(_luffy), tags: <String>{});
+        info: OpcCardInfo.fromDotgg(_row('OP01-003')), tags: <String>{});
     final perona = (card: const CardData(id: 'OP01-077', names: {'en': 'Perona'}, rarity: Rarity.uncommon),
-        info: OpcCardInfo.fromOptcg(_perona), tags: <String>{});
+        info: OpcCardInfo.fromDotgg(_row('OP01-077')), tags: <String>{});
 
     expect(Facet.forGame(Game.opc), contains(Facet.cost));
     expect(Facet.color.valuesOf(luffy), ['Red', 'Green']);
@@ -166,17 +188,8 @@ void main() {
     final colors = metrics.firstWhere((m) => m.metric == Metric.colors);
     expect(colors.rows, [('Red', 2), ('Green', 1), ('Blue', 1)]);
     final life = metrics.firstWhere((m) => m.metric == Metric.life);
-    expect(life.rows, [('5', 1)]);
+    expect(life.rows, [('4', 1)]);
     expect(metrics.firstWhere((m) => m.metric == Metric.types).rows.first, ('Leader', 1));
-  });
-
-  test('a search answer becomes a pool card with its rarity', () {
-    final found = CardSearch.opcFound(_luffy)!;
-    expect(found.card.id, 'OP01-003');
-    expect(found.card.rarity, Rarity.leader);
-    expect(found.card.names['en'], 'Monkey.D.Luffy');
-    expect(CardSearch.opcRarity('SEC'), Rarity.secretRare);
-    expect(CardSearch.opcFound(const {'card_name': 'x'}), isNull);
   });
 
   test('the leader rarity sits between super rare and ultra rare', () {

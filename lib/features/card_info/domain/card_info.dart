@@ -23,7 +23,7 @@ const opcColors = ['Red', 'Green', 'Blue', 'Purple', 'Black', 'Yellow'];
 /// One Piece card types.
 const opcTypes = ['Leader', 'Character', 'Event', 'Stage'];
 
-/// Details of a One Piece card, from optcgapi.com.
+/// Details of a One Piece card, from onepiece.gg.
 class OpcCardInfo extends CardInfo {
   const OpcCardInfo({
     required this.name,
@@ -55,65 +55,33 @@ class OpcCardInfo extends CardInfo {
         setName: json['setName'] as String?,
       );
 
-  /// Reads an optcgapi card object.
-  factory OpcCardInfo.fromOptcg(Map<String, dynamic> json) {
+  /// Reads a onepiece.gg row (see `DotggOnePiece`): columns `name`,
+  /// `cardType`, `Color`, `Type`, `Cost`, `Power`, `Counter`, `Life`,
+  /// `Attribute`, `Effect`, `set`, `CardSets`.
+  factory OpcCardInfo.fromDotgg(Map<String, Object?> row) {
     int? number(Object? value) => switch (value) {
           final int n => n,
           final num n => n.toInt(),
           final String s => int.tryParse(s.trim()),
           _ => null,
         };
-    final color = (json['card_color'] as String? ?? '').trim();
-    final subtypes = (json['sub_types'] as String? ?? '').trim();
+    List<String> parts(Object? value) =>
+        [for (final p in '${value ?? ''}'.split('/')) if (p.trim().isNotEmpty) p.trim()];
+    final type = '${row['cardType'] ?? ''}'.trim();
     return OpcCardInfo(
-      name: (json['card_name'] as String? ?? '').trim(),
-      type: (json['card_type'] as String? ?? '').trim(),
-      colors: [for (final c in color.split('/')) if (c.trim().isNotEmpty) c.trim()],
-      cost: number(json['card_cost']),
-      power: number(json['card_power']),
-      counter: number(json['counter_amount']),
-      life: number(json['life']),
-      attribute: (json['attribute'] as String?)?.trim(),
-      // Subtypes come space-separated, multi-word ones too ("Straw Hat Crew").
-      subtypes: subtypes.isEmpty ? const [] : _splitSubtypes(subtypes),
-      text: json['card_text'] as String?,
-      setCode: (json['card_set_id'] as String?)?.split('-').firstOrNull,
-      setName: json['set_name'] as String?,
+      name: '${row['name'] ?? ''}'.trim(),
+      type: type.isEmpty ? type : type[0] + type.substring(1).toLowerCase(),
+      colors: parts(row['Color']),
+      cost: number(row['Cost']),
+      power: number(row['Power']),
+      counter: number(row['Counter']),
+      life: number(row['Life']),
+      attribute: switch ('${row['Attribute'] ?? ''}'.trim()) { '' || 'null' => null, final a => a },
+      subtypes: parts(row['Type']),
+      text: switch (row['Effect']) { final String t when t.isNotEmpty => t, _ => null },
+      setCode: switch ('${row['set'] ?? ''}'.trim()) { '' => null, final s => s.replaceAll('-', '').toUpperCase() },
+      setName: switch (row['CardSets']) { final String s when s.isNotEmpty => s, _ => null },
     );
-  }
-
-  /// Known multi-word One Piece types, so "Animal Straw Hat Crew" splits
-  /// into "Animal" and "Straw Hat Crew".
-  static const _multiWord = [
-    'Straw Hat Crew', 'Heart Pirates', 'Kid Pirates', 'Whitebeard Pirates', 'Big Mom Pirates',
-    'Animal Kingdom Pirates', 'Beast Pirates', 'Red Hair Pirates', 'Blackbeard Pirates', 'Donquixote Pirates',
-    'Thriller Bark Pirates', 'Baroque Works', 'Impel Down', 'Revolutionary Army', 'Land of Wano',
-    'Fish-Man', 'Alabasta', 'Navy', 'Seven Warlords of the Sea', 'The Four Emperors', 'Drum Kingdom',
-    'Water Seven', 'Sky Island', 'Arlong Pirates', 'Buggy Pirates', 'Kuja Pirates', 'Foxy Pirates',
-    'Sun Pirates', 'Cross Guild', 'Egghead', 'Minister', 'Punk Hazard', 'Dressrosa', 'Film',
-    'Germa 66', 'Vinsmoke Family', 'The Tontattas', 'Mountain Bandits', 'Krieg Pirates', 'Black Cat Pirates',
-    'Jaya', 'Scientist', 'Music', 'Giant', 'Mink Tribe', 'Lunarian', 'Smile', 'Homies', 'Flying Pirates',
-    'Neo Navy', 'Gyro Pirates', 'Goa Kingdom', 'The House of Lambs', 'Alvida Pirates', 'Rumbar Pirates',
-    'Bellamy Pirates', 'Barto Club', 'New Giant Pirates', 'Caribou Pirates', 'Fallen Monk Pirates',
-    'Happo Navy', 'Ideo Pirates', 'Beautiful Pirates', 'Tonta Corps', 'Yonta Maria Grand Fleet',
-    'Golden Lion Pirates', 'Mary Geoise', 'Celestial Dragons', 'Former Rocks Pirates', 'Roger Pirates',
-    'Former Roger Pirates', 'Whitebeard Pirates Allies', 'Former Whitebeard Pirates', 'Former Navy',
-    'Former Baroque Works', 'The Vinsmoke Family', 'Kozuki Clan', 'Kurozumi Clan', 'The Akazaya Nine',
-    'Amazon Lily', 'Botanist', 'Shandian Warrior', 'Long Ring Long Land', 'Mugiwara Chase',
-    'Eldoraggo Crew', 'Frost Moon Village', 'CP0', 'CP9', 'SWORD', 'Marine', 'Cipher Pol',
-  ];
-
-  static List<String> _splitSubtypes(String text) {
-    final found = <String>[];
-    var rest = text;
-    for (final multi in _multiWord) {
-      if (rest.contains(multi)) {
-        found.add(multi);
-        rest = rest.replaceAll(multi, ' ');
-      }
-    }
-    found.addAll([for (final w in rest.split(RegExp(r'\s+'))) if (w.isNotEmpty) w]);
-    return found;
   }
 
   @override

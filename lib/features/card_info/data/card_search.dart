@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../../catalog/domain/models.dart';
 import '../domain/card_info.dart';
+import 'dotgg_one_piece.dart';
 
 /// A card found online, ready to join a pool with its details.
 typedef FoundCard = ({CardData card, CardInfo info});
@@ -175,7 +176,7 @@ class CardSearch {
         Game.opc => _opc(query),
       };
 
-  /// Every One Piece card, loaded once from optcgapi (a call per set).
+  /// Every One Piece card, from onepiece.gg's list, loaded once.
   List<FoundCard>? _opcAll;
 
   Future<({List<FoundCard> cards, bool hasMore})> _opc(SearchQuery query) async {
@@ -196,36 +197,27 @@ class CardSearch {
   }
 
   Future<List<FoundCard>> _loadOpc() async {
-    final listing = await _client.get(Uri.https('optcgapi.com', '/api/allSets/'), headers: _headers);
-    if (listing.statusCode != 200) throw HttpException('optcgapi ${listing.statusCode}');
-    final sets = (jsonDecode(utf8.decode(listing.bodyBytes)) as List).cast<Map<String, dynamic>>();
     final found = <FoundCard>[];
-    final seen = <String>{};
-    for (final set in sets) {
-      final id = set['set_id'] as String? ?? '';
-      final response = await _client.get(Uri.https('optcgapi.com', '/api/sets/$id/'), headers: _headers);
-      if (response.statusCode != 200) continue;
-      final body = jsonDecode(utf8.decode(response.bodyBytes));
-      if (body is! List) continue;
-      for (final json in body.cast<Map<String, dynamic>>()) {
-        if (opcFound(json) case final f? when seen.add(f.card.id)) found.add(f);
+    for (final row in await DotggOnePiece.rows(_client)) {
+      if (DotggOnePiece.isBase(row) && row['cardType'] != 'DON') {
+        if (opcFound(row) case final f?) found.add(f);
       }
     }
     return found;
   }
 
-  /// An optcgapi card as a pool card: its code, English name and rarity.
-  static FoundCard? opcFound(Map<String, dynamic> json) {
-    final id = (json['card_set_id'] as String? ?? '').trim();
-    if (id.isEmpty) return null;
-    final info = OpcCardInfo.fromOptcg(json);
+  /// A onepiece.gg row as a pool card: its code, English name and rarity.
+  static FoundCard? opcFound(Map<String, Object?> row) {
+    final id = DotggOnePiece.baseId(row).trim();
+    if (id.isEmpty || id == 'null') return null;
+    final info = OpcCardInfo.fromDotgg(row);
     return (
-      card: CardData(id: id, names: {'en': info.name}, rarity: opcRarity(json['rarity'] as String?)),
+      card: CardData(id: id, names: {'en': info.name}, rarity: opcRarity('${row['rarity'] ?? ''}')),
       info: info,
     );
   }
 
-  /// The app's rarity for an optcgapi rarity code.
+  /// The app's rarity for a One Piece rarity code.
   static Rarity opcRarity(String? code) => switch ((code ?? '').trim().toUpperCase()) {
         'C' => Rarity.common,
         'UC' => Rarity.uncommon,

@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../../features/card_info/data/dotgg_one_piece.dart';
 import '../../features/catalog/domain/models.dart';
+import 'card_image_cache.dart';
 
 /// One picture a card can be shown with: its [key] (see
 /// [CardData.artwork]), a [label] naming the scan, and whether it is the
@@ -28,6 +30,7 @@ class ArtworkSearch {
   /// The scans of [card], its own first; empty when the card has no online
   /// key.
   Future<List<Artwork>> alternatives(CardData card) async {
+    if (isOnePieceId(card.id)) return _onePiece(card.id);
     if (card.scryfallId case final id?) return _scryfall(id);
     if (card.passcode case final passcode?) {
       return _ownFirst([
@@ -138,6 +141,21 @@ class ArtworkSearch {
         if (image['id'] case final id?)
           (key: '$id', label: 'YGOPRODeck #${i + 1}', own: false),
     ];
+  }
+
+  /// Every print of a One Piece card on onepiece.gg: the base one and its
+  /// alternate arts (`_p1`, `_p2`...).
+  Future<List<Artwork>> _onePiece(String id) async {
+    final rows = await DotggOnePiece.rows(_client);
+    return _ownFirst([
+      for (final row in rows)
+        if (DotggOnePiece.baseId(row) == id)
+          (
+            key: '${row['id']}',
+            label: DotggOnePiece.isBase(row) ? id : 'Alt ${'${row['id']}'.split('_p').last}',
+            own: DotggOnePiece.isBase(row),
+          ),
+    ]);
   }
 
   static List<Artwork> _ownFirst(List<Artwork> found) =>

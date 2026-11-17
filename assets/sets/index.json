@@ -2485,7 +2485,7 @@
   "prefix": "EB01",
   "game": "opc",
   "names": {
-   "en": "Extra Booster: Memorial Collection"
+   "en": "Memorial Collection"
   },
   "releaseDate": null,
   "boosterTypes": [
@@ -2499,13 +2499,13 @@
   "prefix": "EB02",
   "game": "opc",
   "names": {
-   "en": "Extra Booster: Anime 25th Collection"
+   "en": "Anime 25th Collection"
   },
   "releaseDate": null,
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 87,
+  "cardCount": 61,
   "path": "assets/sets/opc/EB02.json"
  },
  {
@@ -2513,27 +2513,41 @@
   "prefix": "EB03",
   "game": "opc",
   "names": {
-   "en": "Extra Booster: One Piece Heroines Edition"
+   "en": "One Piece Heroines Edition"
   },
   "releaseDate": null,
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 66,
+  "cardCount": 62,
   "path": "assets/sets/opc/EB03.json"
+ },
+ {
+  "code": "EB04",
+  "prefix": "EB04",
+  "game": "opc",
+  "names": {
+   "en": "Adventure on Kami's Island"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 61,
+  "path": "assets/sets/opc/EB04.json"
  },
  {
   "code": "EB05",
   "prefix": "EB05",
   "game": "opc",
   "names": {
-   "en": "Extra Booster: One Piece Heroines Edition Vol. 2"
+   "en": "One Piece Heroines Edition Vol.2"
   },
   "releaseDate": null,
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 72,
+  "cardCount": 61,
   "path": "assets/sets/opc/EB05.json"
  },
  {
@@ -2575,7 +2589,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 127,
+  "cardCount": 123,
   "path": "assets/sets/opc/OP03.json"
  },
  {
@@ -2589,7 +2603,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 130,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP04.json"
  },
  {
@@ -2603,7 +2617,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 125,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP05.json"
  },
  {
@@ -2611,13 +2625,13 @@
   "prefix": "OP06",
   "game": "opc",
   "names": {
-   "en": "Wings of the Captain"
+   "en": "Wings of Captain"
   },
   "releaseDate": null,
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 126,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP06.json"
  },
  {
@@ -2631,7 +2645,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 126,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP07.json"
  },
  {
@@ -2645,7 +2659,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 126,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP08.json"
  },
  {
@@ -2659,7 +2673,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 127,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP09.json"
  },
  {
@@ -2673,7 +2687,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 126,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP10.json"
  },
  {
@@ -2687,7 +2701,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 127,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP11.json"
  },
  {
@@ -2701,7 +2715,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 127,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP12.json"
  },
  {
@@ -2709,14 +2723,42 @@
   "prefix": "OP13",
   "game": "opc",
   "names": {
-   "en": "Carrying On His Will"
+   "en": "Carrying on His Will"
   },
   "releaseDate": null,
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 129,
+  "cardCount": 120,
   "path": "assets/sets/opc/OP13.json"
+ },
+ {
+  "code": "OP14",
+  "prefix": "OP14",
+  "game": "opc",
+  "names": {
+   "en": "The Azure Sea’s Seven"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 120,
+  "path": "assets/sets/opc/OP14.json"
+ },
+ {
+  "code": "OP15",
+  "prefix": "OP15",
+  "game": "opc",
+  "names": {
+   "en": "Adventure on Kami's Island"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 119,
+  "path": "assets/sets/opc/OP15.json"
  },
  {
   "code": "OP16",
@@ -2729,7 +2771,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 125,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP16.json"
  },
  {
@@ -2737,42 +2779,28 @@
   "prefix": "OP17",
   "game": "opc",
   "names": {
-   "en": "The World's Strongest Warriors"
+   "en": "The World’s Strongest Warriors"
   },
   "releaseDate": null,
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 130,
+  "cardCount": 119,
   "path": "assets/sets/opc/OP17.json"
  },
  {
-  "code": "PRB01",
-  "prefix": "PRB01",
+  "code": "OP18",
+  "prefix": "OP18",
   "game": "opc",
   "names": {
-   "en": "Premium Booster - The Best"
+   "en": "The Dominance of God"
   },
   "releaseDate": null,
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 110,
-  "path": "assets/sets/opc/PRB01.json"
- },
- {
-  "code": "PRB02",
-  "prefix": "PRB02",
-  "game": "opc",
-  "names": {
-   "en": "Premium Booster - The Best - Vol. 2"
-  },
-  "releaseDate": null,
-  "boosterTypes": [
-   "standard"
-  ],
-  "cardCount": 173,
-  "path": "assets/sets/opc/PRB02.json"
+  "cardCount": 119,
+  "path": "assets/sets/opc/OP18.json"
  },
  {
   "code": "25TH",

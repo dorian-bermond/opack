@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../catalog/domain/models.dart';
 import '../domain/card_info.dart';
+import 'dotgg_one_piece.dart';
 
 /// Card details per pool, one JSON file each (a card in two pools is saved
 /// twice, so a pool is self-contained).
@@ -66,32 +67,14 @@ class CardInfoFetcher {
         Game.opc => _fetchOpc(cards),
       };
 
-  /// optcgapi's set id for a card code: `OP01-077` lives in `OP-01`.
-  static String? opcSetOf(String cardId) {
-    final m = RegExp(r'^([A-Z]+)(\d+)-').firstMatch(cardId);
-    return m == null ? null : '${m.group(1)}-${m.group(2)}';
-  }
-
-  /// One call per set the cards come from.
+  /// One Piece details come from onepiece.gg's full list, loaded once.
   Future<Map<String, CardInfo>> _fetchOpc(List<CardData> cards) async {
-    final bySet = <String, List<CardData>>{};
-    for (final card in cards) {
-      if (opcSetOf(card.id) case final set?) (bySet[set] ??= []).add(card);
-    }
-    final result = <String, CardInfo>{};
-    for (final MapEntry(key: set, value: owners) in bySet.entries) {
-      final response = await _client.get(Uri.https('optcgapi.com', '/api/sets/$set/'), headers: _headers);
-      if (response.statusCode == 404) continue;
-      if (response.statusCode != 200) throw HttpException('optcgapi ${response.statusCode}');
-      final body = jsonDecode(utf8.decode(response.bodyBytes));
-      if (body is! List) continue;
-      final byId = {for (final c in body.cast<Map<String, dynamic>>()) '${c['card_set_id']}': c};
-      for (final owner in owners) {
-        if (byId[owner.id] case final json?) result[owner.id] = OpcCardInfo.fromOptcg(json);
-      }
-      await Future<void>.delayed(const Duration(milliseconds: 100));
-    }
-    return result;
+    final rows = await DotggOnePiece.rows(_client);
+    final byId = {for (final row in rows) if (DotggOnePiece.isBase(row)) DotggOnePiece.baseId(row): row};
+    return {
+      for (final card in cards)
+        if (byId[card.id] case final row?) card.id: OpcCardInfo.fromDotgg(row),
+    };
   }
 
   Future<Map<String, CardInfo>> _fetchMtg(List<CardData> cards) async {
