@@ -86,9 +86,24 @@ class _SealedPackState extends State<SealedPack> with TickerProviderStateMixin {
     }
   }
 
+  /// The cut as a line from the pack's left edge to its right: the slash's
+  /// own path, extended straight to both edges; a straight line at the
+  /// guide's height when the pack was tapped open.
+  List<Offset> _cutLine(double cutY) {
+    if (_trail.length < 2) return [Offset(-1, cutY), Offset(widget.width + 1, cutY)];
+    final points = [..._trail];
+    if (points.first.dx > points.last.dx) points.setAll(0, points.reversed.toList());
+    return [
+      Offset(-1, points.first.dy),
+      ...points,
+      Offset(widget.width + 1, points.last.dy),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final cutY = widget.height * SealedPack.cutAt;
+    final cut = _cutLine(cutY);
     return GestureDetector(
       key: const Key('sealedPack'),
       behavior: HitTestBehavior.opaque,
@@ -114,8 +129,8 @@ class _SealedPackState extends State<SealedPack> with TickerProviderStateMixin {
               children: [
                 // The body, below the cut.
                 Positioned.fill(
-                  child: ClipRect(
-                    clipper: _Band(top: cutY, bottom: widget.height),
+                  child: ClipPath(
+                    clipper: _Side(cut: cut, above: false),
                     child: widget.child,
                   ),
                 ),
@@ -128,8 +143,8 @@ class _SealedPackState extends State<SealedPack> with TickerProviderStateMixin {
                       alignment: Alignment.centerLeft,
                       child: Opacity(
                         opacity: 1 - t,
-                        child: ClipRect(
-                          clipper: _Band(top: 0, bottom: cutY),
+                        child: ClipPath(
+                          clipper: _Side(cut: cut, above: true),
                           child: widget.child,
                         ),
                       ),
@@ -207,18 +222,30 @@ class _GuidePainter extends CustomPainter {
   bool shouldRepaint(_GuidePainter old) => old.y != y || old.glow != glow;
 }
 
-/// A horizontal band of the pack, from [top] to [bottom].
-class _Band extends CustomClipper<Rect> {
-  const _Band({required this.top, required this.bottom});
+/// The part of the pack on one side of the [cut] line: [above] it, or
+/// below it.
+class _Side extends CustomClipper<Path> {
+  const _Side({required this.cut, required this.above});
 
-  final double top;
-  final double bottom;
-
-  @override
-  Rect getClip(Size size) => Rect.fromLTRB(-size.width, top, size.width * 2, bottom);
+  final List<Offset> cut;
+  final bool above;
 
   @override
-  bool shouldReclip(_Band old) => old.top != top || old.bottom != bottom;
+  Path getClip(Size size) {
+    final far = above ? -size.height : size.height * 2;
+    final path = Path()..moveTo(cut.first.dx, cut.first.dy);
+    for (final p in cut.skip(1)) {
+      path.lineTo(p.dx, p.dy);
+    }
+    path
+      ..lineTo(cut.last.dx, far)
+      ..lineTo(cut.first.dx, far)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(_Side old) => old.above != above || old.cut.length != cut.length || old.cut != cut;
 }
 
 /// The cut drawn as the slash goes: a bright line along the pointer's
