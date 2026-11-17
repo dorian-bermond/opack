@@ -40,11 +40,11 @@ class _SealedPackState extends State<SealedPack> with TickerProviderStateMixin {
       if (status == AnimationStatus.completed) widget.onOpen();
     });
 
-  /// Breathes the guide while the pack waits.
+  /// Breathes the guide while the pointer hovers the pack.
   late final AnimationController _pulse = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1400),
-  )..repeat(reverse: true);
+  );
 
   /// How far across the pack the slash went, 0 to 1.
   double get _cut {
@@ -98,6 +98,10 @@ class _SealedPackState extends State<SealedPack> with TickerProviderStateMixin {
       onPanEnd: _release,
       child: MouseRegion(
         cursor: widget.enabled ? SystemMouseCursors.click : MouseCursor.defer,
+        onEnter: (_) => _pulse.repeat(reverse: true),
+        onExit: (_) => _pulse
+          ..stop()
+          ..value = 0,
         child: SizedBox(
         width: widget.width,
         height: widget.height,
