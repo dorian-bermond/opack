@@ -205,7 +205,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
   /// pieces, it shows as they move away. [shift] nudges it along with the
   /// bigger piece.
   Widget _insideCard(Offset shift) {
-    final cardWidth = widget.width * 0.72;
+    final cardWidth = widget.width * 0.94;
     final cardHeight = cardWidth * 88 / 63;
     return Positioned(
       left: (widget.width - cardWidth) / 2 + shift.dx,
