@@ -1,12 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:path_drawing/path_drawing.dart';
 
 import '../../features/catalog/domain/models.dart';
+import 'ygo_icon_path.dart';
 
-/// A small drawn emblem per game: a straw hat skull flag for One Piece, a
-/// planeswalker spark for MtG, the Millennium Puzzle for Yu-Gi-Oh!. Drawn
-/// here rather than taken from the games' trademarked logos.
+/// A small emblem per game: a straw hat skull flag for One Piece and a
+/// planeswalker spark for MtG, drawn here; the Millennium Puzzle for
+/// Yu-Gi-Oh!, traced from a drawing (assets/icons/ygo.svg).
 class GameIcon extends StatelessWidget {
   const GameIcon(this.game, {super.key, this.size = 24, this.color});
 
@@ -67,40 +69,22 @@ class _PlaneswalkerPainter extends CustomPainter {
   bool shouldRepaint(_PlaneswalkerPainter old) => old.color != color;
 }
 
-/// An upside-down pyramid bearing the Eye of Wdjat.
+/// The Millennium Puzzle, traced from a drawing into SVG path data (see
+/// `ygo_icon_path.dart`), scaled to the icon's size.
 class _MillenniumPuzzlePainter extends CustomPainter {
-  const _MillenniumPuzzlePainter(this.color);
+  _MillenniumPuzzlePainter(this.color);
 
   final Color color;
 
+  static final Path _path = parseSvgPathData(ygoIconPath);
+
   @override
   void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final fill = Paint()..color = color;
-    final line = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.07
-      ..strokeJoin = StrokeJoin.round;
-    // The ring at the top, then the pyramid hanging from it.
-    canvas.drawCircle(Offset(w / 2, h * 0.1), w * 0.08, line);
-    final pyramid = Path()
-      ..moveTo(w * 0.08, h * 0.26)
-      ..lineTo(w * 0.92, h * 0.26)
-      ..lineTo(w / 2, h * 0.98)
-      ..close();
-    canvas.drawPath(pyramid, line);
-    // The eye: an almond with its pupil, sitting in the upper half.
-    final eye = Path()
-      ..moveTo(w * 0.28, h * 0.46)
-      ..quadraticBezierTo(w / 2, h * 0.28, w * 0.72, h * 0.46)
-      ..quadraticBezierTo(w / 2, h * 0.64, w * 0.28, h * 0.46)
-      ..close();
-    canvas.drawPath(eye, line..strokeWidth = w * 0.05);
-    canvas.drawCircle(Offset(w / 2, h * 0.46), w * 0.07, fill);
-    // The tear line under the eye.
-    canvas.drawLine(Offset(w * 0.5, h * 0.6), Offset(w * 0.44, h * 0.76), line);
+    final scale = size.width / ygoIconViewBox;
+    canvas.save();
+    canvas.scale(scale, scale);
+    canvas.drawPath(_path, Paint()..color = color);
+    canvas.restore();
   }
 
   @override
