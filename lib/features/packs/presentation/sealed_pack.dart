@@ -42,6 +42,7 @@ class SealedPack extends StatefulWidget {
     required this.onOpen,
     this.enabled = true,
     this.controller,
+    this.cardCount = 0,
   });
 
   final Widget child;
@@ -50,6 +51,10 @@ class SealedPack extends StatefulWidget {
   final VoidCallback onOpen;
   final bool enabled;
   final SlashController? controller;
+
+  /// How many cards rise out of the torn pack before [onOpen] (none: the
+  /// pack just tears).
+  final int cardCount;
 
   /// Where a tap's cut runs, as a share of the pack's height from the top.
   static const cutAt = 0.14;
@@ -65,12 +70,16 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
   /// Where the pointer went while slashing, in the pack's coordinates.
   final List<Offset> _trail = [];
   bool _torn = false;
+  /// The tear, then the cards rising out of the pack.
   late final AnimationController _tear = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 380),
+    duration: Duration(milliseconds: widget.cardCount > 0 ? 1100 : 380),
   )..addStatusListener((status) {
       if (status == AnimationStatus.completed) widget.onOpen();
     });
+
+  /// The tear's own share of the animation.
+  double get _tearShare => widget.cardCount > 0 ? 0.35 : 1;
 
   @override
   void initState() {
@@ -178,6 +187,36 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
     return [Offset(-1, points.first.dy), ...points, Offset(widget.width + 1, points.last.dy)];
   }
 
+  /// Up to eight card backs, fanned, rising from inside the pack: drawn
+  /// under the pack's body, they show as they clear its torn edge.
+  List<Widget> _risingCards(BuildContext context, double rise) {
+    final theme = Theme.of(context);
+    final shown = widget.cardCount.clamp(0, 8);
+    final cardWidth = widget.width * 0.62;
+    final cardHeight = cardWidth * 88 / 63;
+    return [
+      for (var i = 0; i < shown; i++)
+        Positioned(
+          left: (widget.width - cardWidth) / 2 + (i - (shown - 1) / 2) * 6 * rise,
+          top: widget.height * 0.5 - rise * (widget.height * 0.95 + i * 10),
+          width: cardWidth,
+          height: cardHeight,
+          child: Transform.rotate(
+            angle: (i - (shown - 1) / 2) * 0.05 * rise,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: theme.colorScheme.outline, width: 2),
+                boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 6, offset: Offset(0, 3))],
+              ),
+              child: Icon(Icons.style, size: cardWidth * 0.3, color: theme.colorScheme.onPrimaryContainer),
+            ),
+          ),
+        ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final cut = _cutLine();
@@ -198,7 +237,12 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
           child: AnimatedBuilder(
             animation: _tear,
             builder: (context, _) {
-              final t = Curves.easeIn.transform(_tear.value);
+              // The tear first, then the cards rise and the pack fades.
+              final t = Curves.easeIn.transform((_tear.value / _tearShare).clamp(0.0, 1.0));
+              final rise = widget.cardCount == 0
+                  ? 0.0
+                  : Curves.easeOutCubic.transform(((_tear.value - _tearShare) / (1 - _tearShare)).clamp(0.0, 1.0));
+              final packFade = widget.cardCount == 0 ? 1.0 : 1 - Curves.easeIn.transform((rise - 0.6).clamp(0.0, 0.4) / 0.4);
               // The piece that stays, and the one torn off: the top one for
               // a sideways cut, the left one for a vertical cut.
               final torn = vertical
@@ -227,8 +271,12 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
+                  if (_torn) ..._risingCards(context, rise),
                   Positioned.fill(
-                    child: ClipPath(clipper: _Side(cut: cut, vertical: vertical, first: false), child: widget.child),
+                    child: Opacity(
+                      opacity: packFade,
+                      child: ClipPath(clipper: _Side(cut: cut, vertical: vertical, first: false), child: widget.child),
+                    ),
                   ),
                   Positioned.fill(child: torn),
                   // The cut, drawn only where it crosses the pack.

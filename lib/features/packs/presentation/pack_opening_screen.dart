@@ -113,6 +113,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                     enabled: !_exhausted,
                     onOpen: _open,
                     controller: _slash,
+                    cardCount: _play.packSize,
                     child: BoosterCover(
                       set: pool.layoutSet,
                       label: pool.name,
@@ -137,16 +138,21 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
               ),
             );
             })
-          : swipe
-              ? PackStack(key: ValueKey(pack), cards: pack)
-              : CardGrid(
-                  itemCount: pack.length,
-                  itemBuilder: (context, i) => CardTile(
-                    card: pack[i],
-                    revealed: _revealed.contains(i),
-                    onTap: () => setState(() => _revealed.add(i)),
-                  ),
-                ),
+          : AnimatedSwitcher(
+              // The cards settle in from the rising pack.
+              duration: const Duration(milliseconds: 350),
+              child: swipe
+                  ? PackStack(key: ValueKey(pack), cards: pack)
+                  : CardGrid(
+                      key: ValueKey(pack),
+                      itemCount: pack.length,
+                      itemBuilder: (context, i) => CardTile(
+                        card: pack[i],
+                        revealed: _revealed.contains(i),
+                        onTap: () => setState(() => _revealed.add(i)),
+                      ),
+                    ),
+            ),
       bottomNavigationBar: pack == null
           ? null
           : SafeArea(
