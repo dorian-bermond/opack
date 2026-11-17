@@ -1,15 +1,14 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:path_drawing/path_drawing.dart';
 
 import '../../features/catalog/domain/models.dart';
+import 'mtg_icon_path.dart';
 import 'opc_icon_path.dart';
 import 'ygo_icon_path.dart';
 
-/// A small emblem per game: a planeswalker spark for MtG, drawn here; the
-/// Millennium Puzzle for Yu-Gi-Oh! and the Straw Hat jolly roger for One
-/// Piece, from traced SVGs (assets/icons).
+/// A small emblem per game, each from an SVG under assets/icons: the
+/// planeswalker symbol for MtG, the Millennium Puzzle for Yu-Gi-Oh!, the
+/// Straw Hat jolly roger for One Piece.
 class GameIcon extends StatelessWidget {
   const GameIcon(this.game, {super.key, this.size = 24, this.color});
 
@@ -34,36 +33,25 @@ class GameIcon extends StatelessWidget {
   }
 }
 
-/// A five-pointed spark: the planeswalker symbol's silhouette.
+/// The planeswalker symbol, from SVG path data (assets/icons/mtg.svg, see
+/// `mtg_icon_path.dart`), fitted and centered in the icon's square.
 class _PlaneswalkerPainter extends CustomPainter {
-  const _PlaneswalkerPainter(this.color);
+  _PlaneswalkerPainter(this.color);
 
   final Color color;
 
+  static final Path _path = parseSvgPathData(mtgIconPath);
+
   @override
   void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2;
-    final path = Path();
-    // Five long points with deep concave sides, like a flame.
-    for (var i = 0; i < 5; i++) {
-      final a = -math.pi / 2 + i * 2 * math.pi / 5;
-      final tip = c + Offset(math.cos(a), math.sin(a)) * r;
-      final inA = a + math.pi / 5;
-      final inner = c + Offset(math.cos(inA), math.sin(inA)) * r * 0.36;
-      if (i == 0) {
-        path.moveTo(tip.dx, tip.dy);
-      } else {
-        path.lineTo(tip.dx, tip.dy);
-      }
-      // Curved sides bow inwards toward the center.
-      final nextA = -math.pi / 2 + (i + 1) * 2 * math.pi / 5;
-      final nextTip = c + Offset(math.cos(nextA), math.sin(nextA)) * r;
-      path.quadraticBezierTo(inner.dx, inner.dy, nextTip.dx, nextTip.dy);
-    }
-    path.close();
-    canvas.drawPath(path, Paint()..color = color);
-    canvas.drawCircle(c, r * 0.12, Paint()..color = color.withValues(alpha: 0.35));
+    final (x, y, w, h) = mtgIconViewBox;
+    final scale = size.width / (w > h ? w : h);
+    canvas.save();
+    canvas.translate((size.width - w * scale) / 2, (size.height - h * scale) / 2);
+    canvas.scale(scale, scale);
+    canvas.translate(-x, -y);
+    canvas.drawPath(_path, Paint()..color = color);
+    canvas.restore();
   }
 
   @override
