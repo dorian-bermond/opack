@@ -1238,6 +1238,30 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @boosterPicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Booster picture'**
+  String get boosterPicture;
+
+  /// No description provided for @boosterPictureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The pack shown when opening: the set\'s own picture, or one of yours.'**
+  String get boosterPictureHint;
+
+  /// No description provided for @choosePicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a picture'**
+  String get choosePicture;
+
+  /// No description provided for @removePicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the set\'s picture'**
+  String get removePicture;
+
   /// No description provided for @rarityColorsSetting.
   ///
   /// In en, this message translates to:

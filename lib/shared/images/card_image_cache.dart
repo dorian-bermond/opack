@@ -70,6 +70,18 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
   return null;
 }
 
+/// The product picture (the booster pack) on an official One Piece product
+/// page (given as `{'html': page}`): the page's `img_item01` picture, made
+/// absolute on [site]'s host; `null` when the page has none.
+String? pickOnePieceProduct(Map<String, dynamic> listing, {required String site}) {
+  final html = listing['html'];
+  if (html is! String) return null;
+  final match = RegExp(r'src="([^"]*img_item0\d\.(?:webp|png|jpe?g))"').firstMatch(html);
+  if (match == null) return null;
+  final path = match.group(1)!;
+  return path.startsWith('http') ? path : 'https://$site.onepiece-cardgame.com$path';
+}
+
 /// Whether a card code is a One Piece one (`OP01-077`, `EB01-001`, `ST01-001`).
 bool isOnePieceId(String id) => RegExp(r'^(OP|EB|ST|PRB|P)\d*-\d+').hasMatch(id);
 
@@ -141,10 +153,21 @@ ImageSource? boosterImageSource(CardSet set, {String language = 'en', BoosterTyp
         fallback: art,
       );
     case Game.opc:
-      // No pack scans online: the set's leader, or its best card, stands in.
+      // The pack picture of the official product page, in the picture
+      // language's edition when the site has it (fr, else en); without
+      // one, the set's leader, or its best card, stands in.
       final cover = set.cards.where((c) => c.rarity == Rarity.leader).firstOrNull ??
           set.cards.fold<CardData?>(null, (best, c) => best == null || c.rarity.index > best.rarity.index ? c : best);
-      return cover == null ? null : ImageSource('booster-opc-${set.code}', opcCardImage(cover.id));
+      final card = cover == null ? null : ImageSource('booster-opc-${set.code}-card', opcCardImage(cover.id), extension: 'webp');
+      ImageSource page(String site, {ImageSource? fallback}) => ImageSource(
+            'booster-opc-${set.code}-$site',
+            Uri.https('$site.onepiece-cardgame.com', '/products/${set.code.toLowerCase()}.html'),
+            pick: (listing) => pickOnePieceProduct(listing, site: site),
+            extension: 'webp',
+            fallback: fallback,
+          );
+      final english = page('en', fallback: card);
+      return language == 'fr' ? page('fr', fallback: english) : english;
     case Game.ygo:
       final code = set.displayCode;
       Uri wiki(String region) => Uri.https('yugioh.fandom.com', '/api.php', {
@@ -340,7 +363,14 @@ class CardImageCache {
       if (lookup == null) return await _getWithRetry(url);
       final listing = await _getWithRetry(url);
       if (listing.statusCode != 200) return listing;
-      var picture = lookup(jsonDecode(listing.body) as Map<String, dynamic>);
+      // A JSON listing, or a web page handed over as `{'html': page}`.
+      Map<String, dynamic> parsed;
+      try {
+        parsed = jsonDecode(utf8.decode(listing.bodyBytes, allowMalformed: true)) as Map<String, dynamic>;
+      } on FormatException {
+        parsed = {'html': utf8.decode(listing.bodyBytes, allowMalformed: true)};
+      }
+      var picture = lookup(parsed);
       if (picture == null) return http.Response('', 404);
       if (Uri.parse(picture).queryParameters['prop'] == 'imageinfo') {
         // A second hop: the picked file's thumbnail (see [wikiThumbnail]),
@@ -434,8 +464,8 @@ class CardImageCache {
   Future<http.Response> _get(Uri url) async {
     await _throttle(url);
     return _client.get(url, headers: const {
-      'User-Agent': 'Opack/1.0',
-      'Accept': 'image/*',
+      'User-Agent': 'Mozilla/5.0 (compatible; Opack/1.0)',
+      'Accept': 'image/*, text/html, application/json;q=0.9, */*;q=0.5',
     });
   }
 

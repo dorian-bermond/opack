@@ -95,7 +95,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                     key: const Key('sealedPack'),
                     onTap: _exhausted ? null : _open,
                     borderRadius: BorderRadius.circular(16),
-                    child: BoosterCover(set: pool.layoutSet, label: pool.name, booster: booster),
+                    child: BoosterCover(set: pool.layoutSet, label: pool.name, booster: booster, custom: pool.pool.cover),
                   ),
                   const SizedBox(height: 16),
                   Text(l10n.tapToOpen),

@@ -501,6 +501,7 @@ class Pool {
     this.artworks = const {},
     this.descending = const {},
     this.tierlistQuality,
+    this.cover,
   });
 
   factory Pool.fromJson(Map<String, dynamic> json) => Pool(
@@ -538,6 +539,7 @@ class Pool {
         artworks: (json['artworks'] as Map<String, dynamic>? ?? const {}).cast<String, String>(),
         descending: (json['descending'] as Map<String, dynamic>? ?? const {}).cast<String, bool>(),
         tierlistQuality: json['tierlistQuality'] as String?,
+        cover: json['cover'] as String?,
       );
 
   /// A set's booster print run: every card unlimited, tags and slots
@@ -600,6 +602,7 @@ class Pool {
         if (artworks.isNotEmpty) 'artworks': artworks,
         if (descending.isNotEmpty) 'descending': descending,
         'tierlistQuality': ?tierlistQuality,
+        'cover': ?cover,
       };
 
   final String id;
@@ -628,6 +631,28 @@ class Pool {
 
   /// The quality the tierlist was last on, to open on it again.
   final String? tierlistQuality;
+
+  /// A picture of the user's own for the booster, as a file path on this
+  /// device; `null` for the set's picture.
+  final String? cover;
+
+  /// With [cover] as the booster picture (`null`: the set's).
+  Pool withCover(String? cover) => Pool(
+        id: id,
+        game: game,
+        name: name,
+        sources: sources,
+        layout: layout,
+        config: config,
+        updatedAt: DateTime.now(),
+        tags: tags,
+        boosters: boosters,
+        formats: formats,
+        artworks: artworks,
+        descending: descending,
+        tierlistQuality: tierlistQuality,
+        cover: cover,
+      );
 
   /// The quality the tierlist opens on: the last one used, while it
   /// exists, else the first.
@@ -919,6 +944,7 @@ class Pool {
       artworks: artworks ?? this.artworks,
       descending: descending ?? this.descending,
       tierlistQuality: tierlistQuality ?? this.tierlistQuality,
+      cover: cover,
     );
   }
 

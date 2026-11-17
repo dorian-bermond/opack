@@ -719,6 +719,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get boosterPicture => 'Booster picture';
+
+  @override
+  String get boosterPictureHint =>
+      'The pack shown when opening: the set\'s own picture, or one of yours.';
+
+  @override
+  String get choosePicture => 'Choose a picture';
+
+  @override
+  String get removePicture => 'Back to the set\'s picture';
+
+  @override
   String get rarityColorsSetting => 'Rarity colors';
 
   @override

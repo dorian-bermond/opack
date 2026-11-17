@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -214,6 +216,47 @@ class _PoolDetails extends ConsumerWidget {
                     label: Text(l10n.newQualityTitle),
                     onPressed: () => newPoolQuality(context, ref, saved),
                   ),
+                ),
+              ],
+            ),
+          ),
+          PoolSection(
+            title: l10n.boosterPicture,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.boosterPictureHint, style: theme.textTheme.bodySmall),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (saved.cover case final path? when File(path).existsSync())
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(File(path), key: const Key('coverThumbnail'), width: 64, height: 96, fit: BoxFit.cover),
+                        ),
+                      ),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        FilledButton.tonalIcon(
+                          key: const Key('chooseCover'),
+                          icon: const Icon(Icons.image_outlined),
+                          label: Text(l10n.choosePicture),
+                          onPressed: () => pickPoolCover(context, ref, saved),
+                        ),
+                        if (saved.cover != null)
+                          OutlinedButton.icon(
+                            key: const Key('clearCover'),
+                            icon: const Icon(Icons.restart_alt),
+                            label: Text(l10n.removePicture),
+                            onPressed: () => clearPoolCover(ref, saved),
+                          ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),

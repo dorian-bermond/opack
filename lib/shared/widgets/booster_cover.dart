@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,11 +16,15 @@ class BoosterCover extends ConsumerWidget {
     required this.set,
     required this.label,
     this.booster,
+    this.custom,
     this.width = 180,
     this.height = 280,
   });
 
   final CardSet? set;
+
+  /// A picture of the user's own, as a file path, shown instead of the set's.
+  final String? custom;
   final String label;
   final BoosterType? booster;
   final double width;
@@ -32,8 +38,14 @@ class BoosterCover extends ConsumerWidget {
     final source = set == null ? null : boosterImageSource(set, language: language, booster: booster);
     final image = source == null ? null : ref.watch(cardImageProvider(source)).value;
 
+    final custom = this.custom == null ? null : File(this.custom!);
     final Widget front;
-    if (image == null) {
+    if (custom != null && custom.existsSync()) {
+      front = Padding(
+        padding: const EdgeInsets.all(8),
+        child: Image.file(custom, key: const Key('customCover'), fit: BoxFit.contain),
+      );
+    } else if (image == null) {
       front = Center(
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -78,7 +90,7 @@ class BoosterCover extends ConsumerWidget {
       height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: image == null ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
+        color: image == null && custom == null ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
       ),
       child: ClipRRect(borderRadius: BorderRadius.circular(16), child: front),
     );

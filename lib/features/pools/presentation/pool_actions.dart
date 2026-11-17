@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -29,6 +33,37 @@ Future<String?> askName(BuildContext context, String title, {String initial = ''
 Future<void> renamePool(BuildContext context, WidgetRef ref, Pool pool) async {
   final name = await askName(context, AppLocalizations.of(context).renamePool, initial: pool.name);
   if (name != null) savePool(ref, pool.copyWith(name: name));
+}
+
+/// Where the pools' own booster pictures are kept on this device.
+Future<Directory> poolCoversDirectory() async =>
+    Directory('${(await getApplicationSupportDirectory()).path}/pools/covers');
+
+/// Lets the user pick a picture file for the pool's booster, copied next
+/// to the app's data so the original may go.
+Future<void> pickPoolCover(BuildContext context, WidgetRef ref, Pool pool) async {
+  final file = await FilePicker.pickFile(type: FileType.image);
+  if (file == null) return;
+  final bytes = await file.readAsBytes();
+  final extension = file.name.contains('.') ? file.name.split('.').last.toLowerCase() : 'png';
+  final dir = await poolCoversDirectory();
+  await dir.create(recursive: true);
+  final target = File('${dir.path}/${pool.id}.$extension');
+  await target.writeAsBytes(bytes, flush: true);
+  if (pool.cover case final old? when old != target.path) {
+    final previous = File(old);
+    if (await previous.exists()) await previous.delete();
+  }
+  savePool(ref, pool.withCover(target.path));
+}
+
+/// Drops the pool's own booster picture, back to the set's.
+Future<void> clearPoolCover(WidgetRef ref, Pool pool) async {
+  if (pool.cover case final path?) {
+    final file = File(path);
+    if (await file.exists()) await file.delete();
+  }
+  savePool(ref, pool.withCover(null));
 }
 
 /// Adds a set or a cube; its cards join the tags the pool already has

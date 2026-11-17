@@ -721,6 +721,19 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get boosterPicture => 'Image du booster';
+
+  @override
+  String get boosterPictureHint =>
+      'Le paquet montré à l\'ouverture : l\'image de l\'extension, ou une des vôtres.';
+
+  @override
+  String get choosePicture => 'Choisir une image';
+
+  @override
+  String get removePicture => 'Revenir à l\'image de l\'extension';
+
+  @override
   String get rarityColorsSetting => 'Couleurs des raretés';
 
   @override

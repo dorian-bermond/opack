@@ -192,6 +192,25 @@ void main() {
     expect(metrics.firstWhere((m) => m.metric == Metric.types).rows.first, ('Leader', 1));
   });
 
+  test('a One Piece booster shows the official product page picture, the leader failing that', () {
+    final set = CardSet.fromJson(jsonDecode(jsonEncode(buildOpcSet('OP18', 'The Dominance of God', [
+      (id: 'OP18-001', name: 'Karoo', rarityCode: 'L'),
+      (id: 'OP18-002', name: 'Vivi', rarityCode: 'C'),
+    ]))) as Map<String, dynamic>);
+    final french = boosterImageSource(set, language: 'fr')!;
+    expect(french.key, 'booster-opc-OP18-fr');
+    expect(french.url.toString(), 'https://fr.onepiece-cardgame.com/products/op18.html');
+    expect(french.extension, 'webp');
+    expect(french.fallback!.key, 'booster-opc-OP18-en');
+    expect(french.fallback!.fallback!.url.path, '/onepiece/card/OP18-001.webp', reason: 'the leader');
+    expect(boosterImageSource(set, language: 'en')!.key, 'booster-opc-OP18-en');
+
+    const page = '<img src="/renewal/images/common/logo.png"><img src="/onepiececg/bccard/fr/products/2026/09/18/u9x6/img_item01.webp">';
+    expect(french.pick!({'html': page}), 'https://fr.onepiece-cardgame.com/onepiececg/bccard/fr/products/2026/09/18/u9x6/img_item01.webp');
+    expect(french.pick!({'html': '<p>nothing</p>'}), isNull);
+    expect(pickOnePieceProduct({'html': '<img src="https://cdn/x/img_item02.png">'}, site: 'en'), 'https://cdn/x/img_item02.png');
+  });
+
   test('the leader rarity sits between super rare and ultra rare', () {
     expect(Rarity.leader.index, greaterThan(Rarity.superRare.index));
     expect(Rarity.leader.index, lessThan(Rarity.ultraRare.index));

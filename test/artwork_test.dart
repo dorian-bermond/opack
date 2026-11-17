@@ -62,6 +62,16 @@ void main() {
     expect(play.tagCards[rarityTag(Rarity.rare)]!.single.artwork, 'def');
   });
 
+  test('a pool keeps its own booster picture path', () {
+    final pool = Pool.empty(Game.opc, name: 'p').withCover('C:/covers/x.png');
+    expect(pool.cover, 'C:/covers/x.png');
+    final reloaded = Pool.fromJson(jsonDecode(jsonEncode(pool.toJson())) as Map<String, dynamic>);
+    expect(reloaded.cover, 'C:/covers/x.png');
+    expect(reloaded.copyWith(name: 'q').cover, 'C:/covers/x.png', reason: 'kept by copyWith');
+    expect(reloaded.withCover(null).cover, isNull);
+    expect(reloaded.withCover(null).toJson().containsKey('cover'), isFalse);
+  });
+
   test('lists every Scryfall print of an MtG card in every language, its own first', () async {
     final search = ArtworkSearch(
       client: MockClient((request) async {
