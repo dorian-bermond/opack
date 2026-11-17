@@ -58,10 +58,24 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
         null => false,
       };
 
+  /// The pack dealt as the booster tears, shown once it is open.
+  List<CardData>? _pending;
+
+  /// Deals the pack and answers its first card, face up, for the tear.
+  Widget _deal() {
+    final pack = _source.nextPack();
+    _pending = pack;
+    return CardTile(card: pack.first);
+  }
+
   void _open() => setState(() {
-        _pack = _source.nextPack();
+        _pack = _pending ?? _source.nextPack();
+        _pending = null;
         _opened[_kind] = (_opened[_kind] ?? 0) + 1;
-        _revealed.clear();
+        // The first card was seen face up in the pack.
+        _revealed
+          ..clear()
+          ..add(0);
       });
 
   @override
@@ -113,7 +127,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                     enabled: !_exhausted,
                     onOpen: _open,
                     controller: _slash,
-                    cardCount: _play.packSize,
+                    onTear: _deal,
                     child: BoosterCover(
                       set: pool.layoutSet,
                       label: pool.name,

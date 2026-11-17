@@ -42,19 +42,22 @@ class SealedPack extends StatefulWidget {
     required this.onOpen,
     this.enabled = true,
     this.controller,
-    this.cardCount = 0,
+    this.onTear,
   });
 
   final Widget child;
   final double width;
   final double height;
+
+  /// Fires once the pack is fully open.
   final VoidCallback onOpen;
   final bool enabled;
   final SlashController? controller;
 
-  /// How many cards rise out of the torn pack before [onOpen] (none: the
-  /// pack just tears).
-  final int cardCount;
+  /// Fires as the pack tears, answering what lies inside (the first card,
+  /// face up), shown behind the pieces as they move away; `null` or
+  /// absent, the pack just tears.
+  final Widget? Function()? onTear;
 
   /// Where a tap's cut runs, as a share of the pack's height from the top.
   static const cutAt = 0.14;
@@ -70,16 +73,28 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
   /// Where the pointer went while slashing, in the pack's coordinates.
   final List<Offset> _trail = [];
   bool _torn = false;
-  /// The tear, then the cards rising out of the pack.
+  /// What the pack holds, once torn.
+  Widget? _inside;
+
+  /// The tear, then the bigger piece moving away.
   late final AnimationController _tear = AnimationController(
     vsync: this,
-    duration: Duration(milliseconds: widget.cardCount > 0 ? 1100 : 380),
+    duration: const Duration(milliseconds: 1100),
   )..addStatusListener((status) {
       if (status == AnimationStatus.completed) widget.onOpen();
     });
 
-  /// The tear's own share of the animation.
-  double get _tearShare => widget.cardCount > 0 ? 0.35 : 1;
+  /// The smaller piece's tear, as a share of the animation.
+  static const _tearShare = 0.35;
+
+  /// Tears the pack open, by a slash or a tap.
+  void _tearOpen() {
+    setState(() {
+      _torn = true;
+      _inside = widget.onTear?.call();
+    });
+    _tear.forward();
+  }
 
   @override
   void initState() {
@@ -163,8 +178,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
   void _release(DragEndDetails details) {
     if (_torn || !widget.enabled) return;
     if (_cut >= SealedPack.tearAt) {
-      setState(() => _torn = true);
-      _tear.forward();
+      _tearOpen();
     } else {
       setState(_trail.clear);
     }
@@ -187,35 +201,25 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
     return [Offset(-1, points.first.dy), ...points, Offset(widget.width + 1, points.last.dy)];
   }
 
-  /// Up to eight card backs, fanned, lying still inside the pack: drawn
-  /// under the pack's pieces, they show as the pieces move away. [shift]
-  /// nudges them along with the bigger piece.
-  List<Widget> _cards(BuildContext context, Offset shift) {
-    final theme = Theme.of(context);
-    final shown = widget.cardCount.clamp(0, 8);
-    final cardWidth = widget.width * 0.68;
+  /// What lies inside, lying still at the pack's center: drawn under the
+  /// pieces, it shows as they move away. [shift] nudges it along with the
+  /// bigger piece.
+  Widget _insideCard(Offset shift) {
+    final cardWidth = widget.width * 0.72;
     final cardHeight = cardWidth * 88 / 63;
-    return [
-      for (var i = 0; i < shown; i++)
-        Positioned(
-          left: (widget.width - cardWidth) / 2 + (i - (shown - 1) / 2) * 2.5 + shift.dx,
-          top: (widget.height - cardHeight) / 2 + (i - (shown - 1) / 2) * 2.5 + shift.dy,
-          width: cardWidth,
-          height: cardHeight,
-          child: Transform.rotate(
-            angle: (i - (shown - 1) / 2) * 0.02,
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: theme.colorScheme.outline, width: 2),
-                boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 6, offset: Offset(0, 3))],
-              ),
-              child: Icon(Icons.style, size: cardWidth * 0.3, color: theme.colorScheme.onPrimaryContainer),
-            ),
-          ),
+    return Positioned(
+      left: (widget.width - cardWidth) / 2 + shift.dx,
+      top: (widget.height - cardHeight) / 2 + shift.dy,
+      width: cardWidth,
+      height: cardHeight,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 3))],
         ),
-    ];
+        child: _inside,
+      ),
+    );
   }
 
   /// Whether the first piece (above a sideways cut, left of a vertical
@@ -238,7 +242,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
     return GestureDetector(
       key: const Key('sealedPack'),
       behavior: HitTestBehavior.opaque,
-      onTap: widget.enabled && !_torn ? widget.onOpen : null,
+      onTap: widget.enabled && !_torn ? _tearOpen : null,
       // With a controller the screen relays the slash; else the pack takes it.
       onPanStart: widget.controller == null ? _start : null,
       onPanUpdate: widget.controller == null ? _slash : null,
@@ -254,9 +258,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
               // The smaller piece tears off first; then the bigger one slides
               // away, taking the cards along for a moment before they settle.
               final tA = Curves.easeIn.transform((_tear.value / _tearShare).clamp(0.0, 1.0));
-              final tB = widget.cardCount == 0
-                  ? 0.0
-                  : Curves.easeInOut.transform(((_tear.value - _tearShare) / (1 - _tearShare)).clamp(0.0, 1.0));
+              final tB = Curves.easeInOut.transform(((_tear.value - _tearShare) / (1 - _tearShare)).clamp(0.0, 1.0));
               final firstBigger = _firstIsBigger(cut, vertical);
               final size = Offset(widget.width, widget.height);
               Offset scaled(Offset direction, double by) => Offset(direction.dx * size.dx * by, direction.dy * size.dy * by);
@@ -287,7 +289,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  if (_torn) ..._cards(context, shift),
+                  if (_torn && _inside != null) _insideCard(shift),
                   Positioned.fill(child: bigger),
                   Positioned.fill(child: smaller),
                   // The cut, drawn only where it crosses the pack.
