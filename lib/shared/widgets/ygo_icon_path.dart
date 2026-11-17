@@ -1,5 +1,5 @@
 // Generated from assets/icons/ygo.svg (traced from a Millennium Puzzle drawing)
-// by build/trace/trace.js. Do not edit by hand.
+// by tool/trace_icon.js. Do not edit by hand.
 
 /// The SVG view box the path is drawn in.
 const ygoIconViewBox = 640.0;
