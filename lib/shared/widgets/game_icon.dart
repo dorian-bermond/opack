@@ -24,90 +24,58 @@ class GameIcon extends StatelessWidget {
       height: size,
       child: CustomPaint(
         painter: switch (game) {
-          Game.mtg => _PlaneswalkerPainter(paint),
-          Game.ygo => _MillenniumPuzzlePainter(paint),
-          Game.opc => _StrawHatFlagPainter(paint),
+          Game.mtg => _EmblemPainter(_Emblem.mtg, paint),
+          Game.ygo => _EmblemPainter(_Emblem.ygo, paint),
+          Game.opc => _EmblemPainter(_Emblem.opc, paint),
         },
       ),
     );
   }
 }
 
-/// The planeswalker symbol, from SVG path data (assets/icons/mtg.svg, see
-/// `mtg_icon_path.dart`), fitted and centered in the icon's square.
-class _PlaneswalkerPainter extends CustomPainter {
-  _PlaneswalkerPainter(this.color);
+/// An emblem's shape, built once from its SVG shapes: solids (`+`) added
+/// and holes (`-`) cut, in the file's order, so overlaps and windings do
+/// not matter.
+class _Emblem {
+  _Emblem(this.viewBox, List<(String, String)> shapes) : path = _build(shapes);
 
+  /// The SVG view box: origin, then width and height.
+  final (double, double, double, double) viewBox;
+  final Path path;
+
+  static Path _build(List<(String, String)> shapes) {
+    var path = Path();
+    for (final (kind, data) in shapes) {
+      final shape = parseSvgPathData(data);
+      path = Path.combine(kind == '-' ? PathOperation.difference : PathOperation.union, path, shape);
+    }
+    return path;
+  }
+
+  static final mtg = _Emblem(mtgIconViewBox, mtgIconShapes);
+  static final ygo = _Emblem(ygoIconViewBox, ygoIconShapes);
+  static final opc = _Emblem(opcIconViewBox, opcIconShapes);
+}
+
+/// Paints an emblem fitted and centered in the icon's square.
+class _EmblemPainter extends CustomPainter {
+  const _EmblemPainter(this.emblem, this.color);
+
+  final _Emblem emblem;
   final Color color;
-
-  static final Path _path = parseSvgPathData(mtgIconPath);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final (x, y, w, h) = mtgIconViewBox;
+    final (x, y, w, h) = emblem.viewBox;
     final scale = size.width / (w > h ? w : h);
     canvas.save();
     canvas.translate((size.width - w * scale) / 2, (size.height - h * scale) / 2);
     canvas.scale(scale, scale);
     canvas.translate(-x, -y);
-    canvas.drawPath(_path, Paint()..color = color);
+    canvas.drawPath(emblem.path, Paint()..color = color);
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(_PlaneswalkerPainter old) => old.color != color;
-}
-
-/// The Millennium Puzzle, traced from a drawing into SVG path data (see
-/// `ygo_icon_path.dart`), scaled to the icon's size.
-class _MillenniumPuzzlePainter extends CustomPainter {
-  _MillenniumPuzzlePainter(this.color);
-
-  final Color color;
-
-  // The trace cuts its holes (eye, ring, tear) with the even-odd rule.
-  static final Path _path = parseSvgPathData(ygoIconPath)..fillType = PathFillType.evenOdd;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final scale = size.width / ygoIconViewBox;
-    canvas.save();
-    canvas.scale(scale, scale);
-    canvas.drawPath(_path, Paint()..color = color);
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(_MillenniumPuzzlePainter old) => old.color != color;
-}
-
-/// The Straw Hat jolly roger, from a traced SVG (assets/icons/opc.svg,
-/// see `opc_icon_path.dart`): its paths, drawn under the file's group
-/// transform, fitted and centered in the icon's square.
-class _StrawHatFlagPainter extends CustomPainter {
-  _StrawHatFlagPainter(this.color);
-
-  final Color color;
-
-  static final List<Path> _paths = [for (final d in opcIconPaths) parseSvgPathData(d)];
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final (w, h) = opcIconViewBox;
-    final scale = size.width / (w > h ? w : h);
-    canvas.save();
-    // Centered in the square, since the drawing is not one.
-    canvas.translate((size.width - w * scale) / 2, (size.height - h * scale) / 2);
-    canvas.scale(scale, scale);
-    canvas.translate(opcIconTranslate.$1.toDouble(), opcIconTranslate.$2.toDouble());
-    canvas.scale(opcIconScale.$1, opcIconScale.$2);
-    final paint = Paint()..color = color;
-    for (final path in _paths) {
-      canvas.drawPath(path, paint);
-    }
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(_StrawHatFlagPainter old) => old.color != color;
+  bool shouldRepaint(_EmblemPainter old) => old.color != color || old.emblem != emblem;
 }
