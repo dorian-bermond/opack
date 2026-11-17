@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:path_drawing/path_drawing.dart';
 
 import '../../features/catalog/domain/models.dart';
+import 'opc_icon_path.dart';
 import 'ygo_icon_path.dart';
 
-/// A small emblem per game: a straw hat skull flag for One Piece and a
-/// planeswalker spark for MtG, drawn here; the Millennium Puzzle for
-/// Yu-Gi-Oh!, traced from a drawing (assets/icons/ygo.svg).
+/// A small emblem per game: a planeswalker spark for MtG, drawn here; the
+/// Millennium Puzzle for Yu-Gi-Oh! and the Straw Hat jolly roger for One
+/// Piece, from traced SVGs (assets/icons).
 class GameIcon extends StatelessWidget {
   const GameIcon(this.game, {super.key, this.size = 24, this.color});
 
@@ -92,46 +93,30 @@ class _MillenniumPuzzlePainter extends CustomPainter {
   bool shouldRepaint(_MillenniumPuzzlePainter old) => old.color != color;
 }
 
-/// A skull under a straw hat, over crossed bones: the Straw Hat jolly roger.
+/// The Straw Hat jolly roger, from a traced SVG (assets/icons/opc.svg,
+/// see `opc_icon_path.dart`): its paths, drawn under the file's group
+/// transform, fitted and centered in the icon's square.
 class _StrawHatFlagPainter extends CustomPainter {
-  const _StrawHatFlagPainter(this.color);
+  _StrawHatFlagPainter(this.color);
 
   final Color color;
 
+  static final List<Path> _paths = [for (final d in opcIconPaths) parseSvgPathData(d)];
+
   @override
   void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final fill = Paint()..color = color;
-    final hole = Paint()..color = color.withValues(alpha: 0.0)..blendMode = BlendMode.clear;
-    final line = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.09
-      ..strokeCap = StrokeCap.round;
-    canvas.saveLayer(Offset.zero & size, Paint());
-    // Crossed bones behind.
-    canvas.drawLine(Offset(w * 0.12, h * 0.92), Offset(w * 0.88, h * 0.4), line);
-    canvas.drawLine(Offset(w * 0.88, h * 0.92), Offset(w * 0.12, h * 0.4), line);
-    // The skull: a rounded head with a jaw.
-    final skull = Path()
-      ..addOval(Rect.fromCenter(center: Offset(w / 2, h * 0.52), width: w * 0.5, height: h * 0.48))
-      ..addRect(Rect.fromLTWH(w * 0.36, h * 0.66, w * 0.28, h * 0.14));
-    canvas.drawPath(skull, fill);
-    // Eyes and nose, cut out.
-    canvas.drawCircle(Offset(w * 0.42, h * 0.5), w * 0.06, hole);
-    canvas.drawCircle(Offset(w * 0.58, h * 0.5), w * 0.06, hole);
-    canvas.drawCircle(Offset(w * 0.5, h * 0.62), w * 0.03, hole);
-    // The straw hat: a wide brim and a low crown with its band.
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(w * 0.1, h * 0.26, w * 0.8, h * 0.1), Radius.circular(w * 0.05)),
-      fill,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(w * 0.3, h * 0.1, w * 0.4, h * 0.2), Radius.circular(w * 0.08)),
-      fill,
-    );
-    canvas.drawRect(Rect.fromLTWH(w * 0.3, h * 0.22, w * 0.4, h * 0.05), hole);
+    final (w, h) = opcIconViewBox;
+    final scale = size.width / (w > h ? w : h);
+    canvas.save();
+    // Centered in the square, since the drawing is not one.
+    canvas.translate((size.width - w * scale) / 2, (size.height - h * scale) / 2);
+    canvas.scale(scale, scale);
+    canvas.translate(opcIconTranslate.$1.toDouble(), opcIconTranslate.$2.toDouble());
+    canvas.scale(opcIconScale.$1, opcIconScale.$2);
+    final paint = Paint()..color = color;
+    for (final path in _paths) {
+      canvas.drawPath(path, paint);
+    }
     canvas.restore();
   }
 
