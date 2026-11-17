@@ -76,7 +76,8 @@ class _MillenniumPuzzlePainter extends CustomPainter {
 
   final Color color;
 
-  static final Path _path = parseSvgPathData(ygoIconPath);
+  // The trace cuts its holes (eye, ring, tear) with the even-odd rule.
+  static final Path _path = parseSvgPathData(ygoIconPath)..fillType = PathFillType.evenOdd;
 
   @override
   void paint(Canvas canvas, Size size) {
