@@ -75,7 +75,7 @@ class _Emblem {
 
   static final mtg = _Emblem(mtgIconViewBox, mtgIconTransform, mtgIconShapes);
   static final ygo = _Emblem(ygoIconViewBox, ygoIconTransform, ygoIconShapes, outline: 26);
-  static final opc = _Emblem(opcIconViewBox, opcIconTransform, opcIconShapes, outline: 22);
+  static final opc = _Emblem(opcIconViewBox, opcIconTransform, opcIconShapes, outline: 40);
 }
 
 /// Paints an emblem fitted and centered in the icon's square.
