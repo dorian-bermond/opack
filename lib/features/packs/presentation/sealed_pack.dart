@@ -29,9 +29,9 @@ class SealedPack extends StatefulWidget {
   State<SealedPack> createState() => _SealedPackState();
 }
 
-class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateMixin {
-  /// The cut's progress across the pack while slashing, 0 to 1.
-  double _cut = 0;
+class _SealedPackState extends State<SealedPack> with TickerProviderStateMixin {
+  /// Where the pointer went while slashing, in the pack's coordinates.
+  final List<Offset> _trail = [];
   bool _torn = false;
   late final AnimationController _tear = AnimationController(
     vsync: this,
@@ -40,15 +40,40 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
       if (status == AnimationStatus.completed) widget.onOpen();
     });
 
+  /// Breathes the guide while the pack waits.
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  )..repeat(reverse: true);
+
+  /// How far across the pack the slash went, 0 to 1.
+  double get _cut {
+    if (_trail.length < 2) return 0;
+    var left = double.infinity, right = double.negativeInfinity;
+    for (final p in _trail) {
+      if (p.dx < left) left = p.dx;
+      if (p.dx > right) right = p.dx;
+    }
+    return ((right - left) / widget.width).clamp(0.0, 1.0);
+  }
+
   @override
   void dispose() {
     _tear.dispose();
+    _pulse.dispose();
     super.dispose();
+  }
+
+  void _start(DragStartDetails details) {
+    if (_torn || !widget.enabled) return;
+    setState(() => _trail
+      ..clear()
+      ..add(details.localPosition));
   }
 
   void _slash(DragUpdateDetails details) {
     if (_torn || !widget.enabled) return;
-    setState(() => _cut = (_cut + details.delta.dx.abs() / widget.width).clamp(0.0, 1.0));
+    setState(() => _trail.add(details.localPosition));
   }
 
   void _release(DragEndDetails details) {
@@ -57,7 +82,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
       setState(() => _torn = true);
       _tear.forward();
     } else {
-      setState(() => _cut = 0);
+      setState(_trail.clear);
     }
   }
 
@@ -68,9 +93,12 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
       key: const Key('sealedPack'),
       behavior: HitTestBehavior.opaque,
       onTap: widget.enabled && !_torn ? widget.onOpen : null,
-      onHorizontalDragUpdate: _slash,
-      onHorizontalDragEnd: _release,
-      child: SizedBox(
+      onPanStart: _start,
+      onPanUpdate: _slash,
+      onPanEnd: _release,
+      child: MouseRegion(
+        cursor: widget.enabled ? SystemMouseCursors.click : MouseCursor.defer,
+        child: SizedBox(
         width: widget.width,
         height: widget.height,
         child: AnimatedBuilder(
@@ -104,19 +132,75 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
                     ),
                   ),
                 ),
-                if (_cut > 0 && !_torn)
+                // The guide: where to slash, while nothing is cut yet.
+                if (_trail.isEmpty && !_torn && widget.enabled)
                   Positioned.fill(
                     child: IgnorePointer(
-                      child: CustomPaint(painter: _CutPainter(progress: _cut, y: cutY, color: Theme.of(context).colorScheme.primary)),
+                      child: AnimatedBuilder(
+                        animation: _pulse,
+                        builder: (context, _) => CustomPaint(
+                          painter: _GuidePainter(y: cutY, glow: 0.45 + 0.4 * _pulse.value),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (_trail.isNotEmpty && !_torn)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(
+                        painter: _CutPainter(trail: _trail, color: Theme.of(context).colorScheme.primary),
+                      ),
                     ),
                   ),
               ],
             );
           },
         ),
+        ),
       ),
     );
   }
+}
+
+/// A dashed line along the cut with a scissors mark at its left end, so
+/// the player knows where to slash; it breathes with [glow].
+class _GuidePainter extends CustomPainter {
+  const _GuidePainter({required this.y, required this.glow});
+
+  final double y;
+  final double glow;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: glow)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    final shadow = Paint()
+      ..color = Colors.black.withValues(alpha: glow * 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+    for (var x = 18.0; x < size.width - 4; x += 12) {
+      final end = (x + 6).clamp(0.0, size.width - 4);
+      canvas.drawLine(Offset(x, y), Offset(end, y), shadow);
+      canvas.drawLine(Offset(x, y), Offset(end, y), paint);
+    }
+    // The scissors: two rings and two blades pointing along the line.
+    final c = Offset(10, y);
+    canvas.drawCircle(c + const Offset(-4, -4), 2.6, shadow);
+    canvas.drawCircle(c + const Offset(-4, 4), 2.6, shadow);
+    canvas.drawCircle(c + const Offset(-4, -4), 2.6, paint);
+    canvas.drawCircle(c + const Offset(-4, 4), 2.6, paint);
+    canvas.drawLine(c + const Offset(-2, -2), c + const Offset(7, 2.5), shadow);
+    canvas.drawLine(c + const Offset(-2, 2), c + const Offset(7, -2.5), shadow);
+    canvas.drawLine(c + const Offset(-2, -2), c + const Offset(7, 2.5), paint);
+    canvas.drawLine(c + const Offset(-2, 2), c + const Offset(7, -2.5), paint);
+  }
+
+  @override
+  bool shouldRepaint(_GuidePainter old) => old.y != y || old.glow != glow;
 }
 
 /// A horizontal band of the pack, from [top] to [bottom].
@@ -133,23 +217,21 @@ class _Band extends CustomClipper<Rect> {
   bool shouldReclip(_Band old) => old.top != top || old.bottom != bottom;
 }
 
-/// The cut drawn along the top of the pack as the slash goes: a bright
-/// jagged line from the left edge to [progress] of the width.
+/// The cut drawn as the slash goes: a bright line along the pointer's
+/// [trail].
 class _CutPainter extends CustomPainter {
-  const _CutPainter({required this.progress, required this.y, required this.color});
+  const _CutPainter({required this.trail, required this.color});
 
-  final double progress;
-  final double y;
+  final List<Offset> trail;
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final end = size.width * progress;
-    final path = Path()..moveTo(0, y);
-    for (var x = 0.0; x < end; x += 6) {
-      path.lineTo(x + 3, (x ~/ 6).isEven ? y - 2.5 : y + 2.5);
+    if (trail.isEmpty) return;
+    final path = Path()..moveTo(trail.first.dx, trail.first.dy);
+    for (final p in trail.skip(1)) {
+      path.lineTo(p.dx, p.dy);
     }
-    path.lineTo(end, y);
     canvas.drawPath(
       path,
       Paint()
@@ -170,5 +252,5 @@ class _CutPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_CutPainter old) => old.progress != progress || old.y != y || old.color != color;
+  bool shouldRepaint(_CutPainter old) => old.trail.length != trail.length || old.color != color;
 }
