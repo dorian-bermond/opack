@@ -90,18 +90,18 @@ void main() {
     expect(opcVersion('OP17-001_p1'), 'p1');
     expect(opcVersion('OP12-090_r1'), 'r1');
     expect(opcVersionSheet('OP17-001', 'L'), isNull);
-    expect(opcVersionSheet('OP17-001_p1', 'L'), 'parallel');
-    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17', manga: true), 'manga');
-    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17'), 'special',
+    expect(opcVersionSheet('OP17-001_p1', 'L'), 'version:parallel');
+    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17', manga: true), 'version:manga');
+    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17'), 'version:special',
         reason: 'a second art of the set\'s own card that is no manga art (a gold stamp, a super leader)');
-    expect(opcVersionSheet('OP17-001_p1', 'L', product: 'EB05'), 'special', reason: "another set's card in a new art");
-    expect(opcVersionSheet('OP17-040_p1', 'SP CARD'), 'special');
+    expect(opcVersionSheet('OP17-001_p1', 'L', product: 'EB05'), 'version:special', reason: "another set's card in a new art");
+    expect(opcVersionSheet('OP17-040_p1', 'SP CARD'), 'version:special');
     expect(opcPulledFrom('EXTRA BOOSTER -ONE PIECE HEROINES EDITION vol.2- [EB-05]', 'OP17'), 'EB05',
         reason: 'a special art reprint is pulled from the extra booster');
     expect(opcPulledFrom('-ROMANCE DAWN- [OP01]', 'OP01'), 'OP01');
     expect(opcPulledFrom('STARTER DECK -Straw Hat Crew- [ST-01]', 'OP01'), 'OP01', reason: 'not a booster: its own set');
     expect(opcPulledFrom('', 'EB05'), 'EB05');
-    expect(opcVersionSheet('OP17-119_p1', 'TR'), 'treasure');
+    expect(opcVersionSheet('OP17-119_p1', 'TR'), 'version:treasure');
     expect(opcVersionSheet('OP12-090_r1', 'C'), isNull, reason: 'a reprint, never in a booster');
 
     final bySet = opcCardsBySet(_json);
@@ -117,14 +117,16 @@ void main() {
     final booster = (set['boosters'] as Map)['standard'] as Map;
     expect(booster['approximate'], isTrue);
     final variants = (booster['variants'] as List).cast<Map>();
-    expect(variants.map((v) => (v['contents'] as Map).keys.last), ['leader', 'parallel'],
+    expect(variants.map((v) => (v['contents'] as Map).keys.last), ['leader', 'version:parallel'],
         reason: 'only the top slots whose sheet exists');
     expect(variants.map((v) => v['weight']), [150, 38]);
     expect((variants.first['contents'] as Map)['uncommon'], 2);
     final sheets = booster['sheets'] as Map;
     expect((sheets['leader'] as Map)['cards'], [[0, 1]], reason: 'the base leader');
-    expect((sheets['parallel'] as Map)['cards'], [[1, 1]], reason: 'its parallel art, apart');
+    expect((sheets['version:parallel'] as Map)['cards'], [[1, 1]], reason: 'its parallel art, apart');
     expect(sheets.containsKey('rare'), isFalse);
+    expect(sheets.keys, ['leader', 'uncommon', 'version:base', 'version:parallel'], reason: 'rarities, then the versions in order');
+    expect((sheets['version:base'] as Map)['cards'], [[0, 1], [2, 1], [3, 1]], reason: 'every base print, a sheet no slot draws from');
     final parsed = CardSet.fromJson(jsonDecode(jsonEncode(set)) as Map<String, dynamic>);
     expect(parsed.game, Game.opc);
     expect(parsed.cards.first.rarity, Rarity.leader);
@@ -263,12 +265,15 @@ void main() {
       '7×common:1',
       '2×uncommon:1',
       '2×rare:1',
-      '1×rare:250|superRare:175|leader:150|secretRare:18|parallel:38|manga:2',
+      '1×rare:250|superRare:175|leader:150|secretRare:18|version:parallel:38|version:manga:2',
     ]);
     expect(slots.fold(0, (n, s) => n + s.count), 12);
-    expect(tags['parallel']!.cards, ['OP18-001_p1']);
-    expect(tags['manga']!.cards, ['OP18-005_p2']);
+    expect(tags['version:parallel']!.cards, ['OP18-001_p1']);
+    expect(tags['version:manga']!.cards, ['OP18-005_p2']);
     expect(tags['leader']!.cards, ['OP18-001']);
+    expect(tags['version:base']!.cards, ['OP18-001', 'OP18-002', 'OP18-003', 'OP18-004', 'OP18-005', 'OP18-119'],
+        reason: 'the base sheet is a tag though no slot draws from it');
+    expect(Pool.ofSet(set, name: 'p').valuesOf('version'), ['version:base', 'version:parallel', 'version:manga']);
 
     // Without uncommons (an extra booster), commons and rares fill the pack.
     final extra = CardSet.fromJson(jsonDecode(jsonEncode(buildOpcSet('EB05', 'Heroines', [

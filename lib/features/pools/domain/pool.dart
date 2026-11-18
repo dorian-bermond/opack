@@ -430,6 +430,8 @@ typedef Prefill = ({Map<String, TagDef> tags, List<PackSlot> slots});
 
 /// A set's booster as pool data: one tag per sheet of the main variant with
 /// the sheet's weights and flags, one slot per sheet, plus rarity tags.
+/// A sheet named as a quality value (`version:base`) is a tag even when no
+/// slot draws from it, so the quality comes whole.
 Prefill prefillFromSet(CardSet set, {BoosterType? booster}) {
   final formula = set.booster(booster);
   final tags = <String, TagDef>{};
@@ -447,7 +449,14 @@ Prefill prefillFromSet(CardSet set, {BoosterType? booster}) {
     }
     slots.add(PackSlot(count, name));
   }
-  return (tags: {...tags, ...rarityTags(set.cards)}, slots: slots);
+  for (final MapEntry(key: name, value: sheet) in formula.sheets.entries) {
+    if (Pool.qualityOf(name) != null && !name.startsWith('rarity:')) tags.putIfAbsent(name, () => tagOf(sheet));
+  }
+  // Plain tags in slot order, then quality tags in the formula's sheet order,
+  // so a quality's values come in order.
+  final plain = {for (final MapEntry(key: name, value: def) in tags.entries) if (Pool.qualityOf(name) == null) name: def};
+  final qualities = {for (final name in formula.sheets.keys) if (Pool.qualityOf(name) != null) name: ?tags[name]};
+  return (tags: {...plain, ...qualities, ...rarityTags(set.cards)}, slots: slots);
 }
 
 /// A formula's pack as slots: what every variant shares, one slot per
