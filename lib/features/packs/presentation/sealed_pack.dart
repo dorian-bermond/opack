@@ -270,12 +270,14 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
               final smallDirection = _away(first: !firstBigger, vertical: vertical);
               final bigDirection = _away(first: firstBigger, vertical: vertical);
 
-              // Part 1: both pieces part by a third of the pack. Part 3: they
-              // go on out of sight.
+              // Part 1: both pieces part by a third of the pack. The smaller one
+              // keeps going out of sight without a pause; the bigger one pauses
+              // for part 2 and leaves in part 3.
               const step = 0.35;
+              final smallerGone = Curves.easeIn.transform(((_tear.value - 0.3) / 0.5).clamp(0.0, 1.0));
               final smaller = Transform.translate(
-                offset: scaled(smallDirection, step * p1 + 1.0 * p3),
-                child: Opacity(opacity: 1 - p3, child: piece(first: !firstBigger)),
+                offset: scaled(smallDirection, step * p1 + 1.0 * smallerGone),
+                child: Opacity(opacity: 1 - smallerGone, child: piece(first: !firstBigger)),
               );
               final bigger = Transform.translate(
                 offset: scaled(bigDirection, step * p1 + 1.0 * p3),
