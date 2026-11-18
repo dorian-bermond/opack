@@ -423,22 +423,67 @@ typedef Prefill = ({Map<String, TagDef> tags, List<PackSlot> slots});
 /// the sheet's weights and flags, one slot per sheet, plus rarity tags.
 Prefill prefillFromSet(CardSet set, {BoosterType? booster}) {
   final formula = set.booster(booster);
-  final variant = formula.variants.reduce((a, b) => b.weight > a.weight ? b : a);
   final tags = <String, TagDef>{};
+  TagDef tagOf(BoosterSheet sheet) => TagDef(
+        [for (var i = 0; i < sheet.cards.length; i++) if (sheet.weights[i] > 0) sheet.cards[i].id],
+        weights: {for (var i = 0; i < sheet.cards.length; i++) if (sheet.weights[i] > 0) sheet.cards[i].id: sheet.weights[i]},
+        foil: sheet.foil,
+        balanceColors: sheet.balanceColors,
+        allowDuplicates: sheet.allowDuplicates,
+      );
   final slots = <PackSlot>[];
-  for (final MapEntry(key: name, value: count) in variant.contents.entries) {
-    final sheet = formula.sheets[name];
-    if (sheet == null) continue;
-    tags[name] = TagDef(
-      [for (var i = 0; i < sheet.cards.length; i++) if (sheet.weights[i] > 0) sheet.cards[i].id],
-      weights: {for (var i = 0; i < sheet.cards.length; i++) if (sheet.weights[i] > 0) sheet.cards[i].id: sheet.weights[i]},
-      foil: sheet.foil,
-      balanceColors: sheet.balanceColors,
-      allowDuplicates: sheet.allowDuplicates,
-    );
-    slots.add(PackSlot.single(name, count));
+  for (final (name, count) in formulaSlots(formula)) {
+    for (final option in name) {
+      if (formula.sheets[option.tag] case final sheet?) tags[option.tag] = tagOf(sheet);
+    }
+    slots.add(PackSlot(count, name));
   }
   return (tags: {...tags, ...rarityTags(set.cards)}, slots: slots);
+}
+
+/// A formula's pack as slots: what every variant shares, one slot per
+/// sheet; then, when the variants differ by one card drawn from one sheet
+/// each (a "top slot" of super rare, leader, secret rare…), one slot whose
+/// options are those sheets, weighted as the variants; otherwise, the
+/// commonest variant's remaining sheets as plain slots.
+List<(List<SlotOption>, int)> formulaSlots(BoosterFormula formula) {
+  final variants = formula.variants.where((v) => v.contents.isNotEmpty).toList();
+  if (variants.isEmpty) return const [];
+  final shared = <String, int>{};
+  for (final MapEntry(key: name, value: count) in variants.first.contents.entries) {
+    final least = variants.fold(count, (m, v) => (v.contents[name] ?? 0) < m ? (v.contents[name] ?? 0) : m);
+    if (least > 0) shared[name] = least;
+  }
+  final slots = <(List<SlotOption>, int)>[
+    for (final MapEntry(key: name, value: count) in shared.entries)
+      if (formula.sheets.containsKey(name)) ([SlotOption(name)], count),
+  ];
+  // What each variant adds beyond the shared part.
+  final extras = [
+    for (final v in variants)
+      {
+        for (final MapEntry(key: name, value: count) in v.contents.entries)
+          if (count - (shared[name] ?? 0) > 0) name: count - (shared[name] ?? 0),
+      },
+  ];
+  if (extras.every((e) => e.isEmpty)) return slots;
+  final oneEach = extras.every((e) => e.length == 1 && e.values.single == 1);
+  if (oneEach && variants.length > 1) {
+    final options = <String, int>{};
+    for (final (i, e) in extras.indexed) {
+      options.update(e.keys.single, (w) => w + variants[i].weight, ifAbsent: () => variants[i].weight);
+    }
+    slots.add(([
+      for (final MapEntry(key: name, value: weight) in options.entries)
+        if (formula.sheets.containsKey(name)) SlotOption(name, weight),
+    ], 1));
+    return slots;
+  }
+  final main = variants.reduce((a, b) => b.weight > a.weight ? b : a);
+  for (final MapEntry(key: name, value: count) in extras[variants.indexOf(main)].entries) {
+    if (formula.sheets.containsKey(name)) slots.add(([SlotOption(name)], count));
+  }
+  return slots;
 }
 
 /// Random packs as pool data: every card in [allCardsTag], one slot of

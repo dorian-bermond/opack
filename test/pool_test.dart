@@ -74,7 +74,9 @@ void main() {
   test('a set only prefills tags and slots; all of them are the user\'s', () {
     final set = loadBundled('ygo/CIBR');
     final pool = Pool.ofSet(set, name: 'CIBR');
-    expect(pool.slots.map((s) => s.options.single.tag), ['common', 'rare', 'superRare']);
+    // The variants' top card becomes one slot with weighted options.
+    expect(pool.slots.map((s) => s.options.map((o) => '${o.tag}:${o.weight}').join('|')),
+        ['common:1', 'rare:1', 'superRare:9|ultraRare:2|secretRare:1']);
     expect(pool.tags.keys, containsAll(['common', 'rare', 'superRare', 'rarity:common']));
     expect(pool.tags['common']!.weights, isNotEmpty);
     final back = Pool.fromJson(jsonDecode(jsonEncode(pool)) as Map<String, dynamic>);
@@ -372,12 +374,8 @@ void main() {
     final closed =
         PlayPool.resolve(setPool(set, const PoolConfig.closed(3)), sets: sets, cubes: {});
     expect(closed.packSize, 9);
-    // Cards only in the ultra and secret variants fit no slot of the main layout.
-    final mainSlots = PoolDealer.mainVariant(set.booster()).contents.keys;
-    final inMain = {
-      for (final name in mainSlots) ...set.booster().sheets[name]!.cards.map((c) => c.id),
-    };
-    expect(closed.unplaced, set.cards.where((c) => !inMain.contains(c.id)).length);
+    // The top slot's options place the ultra and secret rares too.
+    expect(closed.unplaced, 0);
     final commons = set.cards.where((c) => c.rarity == Rarity.common).length;
     expect(closed.packCount, lessThanOrEqualTo(commons * 3 ~/ 7));
 

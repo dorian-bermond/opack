@@ -118,11 +118,13 @@ Map<String, Object?> buildOpcSet(String code, String setName, List<OpcCard> inpu
     for (final MapEntry(key: sheet, value: indexes) in bySheet.entries)
       sheet: {'cards': [for (final i in indexes) [i, 1]]},
   };
-  // 11 cards from the common sheets, 1 from the top slot.
+  // 11 cards from the common sheets, 1 from the top slot; extra boosters
+  // have no uncommons, their commons and rares fill the pack.
+  final uncommons = bySheet.containsKey('uncommon');
   final base = <String, int>{
-    if (bySheet.containsKey('common')) 'common': 7,
-    if (bySheet.containsKey('uncommon')) 'uncommon': 2,
-    if (bySheet.containsKey('rare')) 'rare': 2,
+    if (bySheet.containsKey('common')) 'common': uncommons ? 7 : 8,
+    if (uncommons) 'uncommon': 2,
+    if (bySheet.containsKey('rare')) 'rare': uncommons ? 2 : 3,
   };
   final variants = [
     for (final MapEntry(key: top, value: weight) in opcTopSlotWeights.entries)

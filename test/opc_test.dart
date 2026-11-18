@@ -10,6 +10,7 @@ import 'package:opack/features/card_info/domain/card_filter.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_info/domain/pool_metrics.dart';
 import 'package:opack/features/catalog/domain/models.dart';
+import 'package:opack/features/pools/domain/pool.dart';
 import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
@@ -240,6 +241,39 @@ void main() {
     expect(french.pick!({'html': page}), 'https://fr.onepiece-cardgame.com/onepiececg/bccard/fr/products/2026/09/18/u9x6/img_item01.webp');
     expect(french.pick!({'html': '<p>nothing</p>'}), isNull);
     expect(pickOnePieceProduct({'html': '<img src="https://cdn/x/img_item02.png">'}, site: 'en'), 'https://cdn/x/img_item02.png');
+  });
+
+  test("a set's top slot becomes one slot with weighted options in the pool", () {
+    final set = CardSet.fromJson(jsonDecode(jsonEncode(buildOpcSet('OP18', 'The Dominance of God', [
+      (id: 'OP18-001', name: 'Karoo', rarityCode: 'L'),
+      (id: 'OP18-001_p1', name: 'Karoo', rarityCode: 'L'),
+      (id: 'OP18-002', name: 'Vivi', rarityCode: 'C'),
+      (id: 'OP18-003', name: 'Pell', rarityCode: 'UC'),
+      (id: 'OP18-004', name: 'Chaka', rarityCode: 'R'),
+      (id: 'OP18-005', name: 'Crocodile', rarityCode: 'SR'),
+      (id: 'OP18-005_p2', name: 'Crocodile', rarityCode: 'SR'),
+      (id: 'OP18-119', name: 'Imu', rarityCode: 'SEC'),
+    ]))) as Map<String, dynamic>);
+    final (:tags, :slots) = prefillFromSet(set);
+    expect(slots.map((s) => '${s.count}×${s.options.map((o) => '${o.tag}:${o.weight}').join('|')}'), [
+      '7×common:1',
+      '2×uncommon:1',
+      '2×rare:1',
+      '1×rare:250|superRare:175|leader:150|secretRare:18|parallel:38|manga:2',
+    ]);
+    expect(slots.fold(0, (n, s) => n + s.count), 12);
+    expect(tags['parallel']!.cards, ['OP18-001_p1']);
+    expect(tags['manga']!.cards, ['OP18-005_p2']);
+    expect(tags['leader']!.cards, ['OP18-001']);
+
+    // Without uncommons (an extra booster), commons and rares fill the pack.
+    final extra = CardSet.fromJson(jsonDecode(jsonEncode(buildOpcSet('EB05', 'Heroines', [
+      (id: 'EB05-001', name: 'Nami', rarityCode: 'C'),
+      (id: 'EB05-002', name: 'Robin', rarityCode: 'R'),
+      (id: 'EB05-003', name: 'Hancock', rarityCode: 'SR'),
+    ]))) as Map<String, dynamic>);
+    final (slots: extraSlots, tags: _) = prefillFromSet(extra);
+    expect(extraSlots.map((s) => s.count), [8, 3, 1]);
   });
 
   test('the leader rarity sits between super rare and ultra rare', () {
