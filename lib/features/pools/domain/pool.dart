@@ -571,6 +571,7 @@ class Pool {
     this.descending = const {},
     this.tierlistQuality,
     this.cover,
+    this.bestVersions = false,
   });
 
   factory Pool.fromJson(Map<String, dynamic> json) => Pool(
@@ -609,6 +610,7 @@ class Pool {
         descending: (json['descending'] as Map<String, dynamic>? ?? const {}).cast<String, bool>(),
         tierlistQuality: json['tierlistQuality'] as String?,
         cover: json['cover'] as String?,
+        bestVersions: json['bestVersions'] as bool? ?? false,
       );
 
   /// A set's booster print run: every card unlimited, tags and slots
@@ -672,6 +674,7 @@ class Pool {
         if (descending.isNotEmpty) 'descending': descending,
         'tierlistQuality': ?tierlistQuality,
         'cover': ?cover,
+        if (bestVersions) 'bestVersions': true,
       };
 
   final String id;
@@ -705,6 +708,29 @@ class Pool {
   /// device; `null` for the set's picture.
   final String? cover;
 
+  /// Whether every card dealt is replaced by the most valuable version of
+  /// the same card in the pool (a manga art for its super rare).
+  final bool bestVersions;
+
+  /// With every dealt card replaced by its most valuable version or not.
+  Pool withBestVersions(bool on) => Pool(
+        id: id,
+        game: game,
+        name: name,
+        sources: sources,
+        layout: layout,
+        config: config,
+        updatedAt: DateTime.now(),
+        tags: tags,
+        boosters: boosters,
+        formats: formats,
+        artworks: artworks,
+        descending: descending,
+        tierlistQuality: tierlistQuality,
+        cover: cover,
+        bestVersions: on,
+      );
+
   /// With [cover] as the booster picture (`null`: the set's).
   Pool withCover(String? cover) => Pool(
         id: id,
@@ -721,6 +747,7 @@ class Pool {
         descending: descending,
         tierlistQuality: tierlistQuality,
         cover: cover,
+        bestVersions: bestVersions,
       );
 
   /// The quality the tierlist opens on: the last one used, while it
@@ -1014,6 +1041,7 @@ class Pool {
       descending: descending ?? this.descending,
       tierlistQuality: tierlistQuality ?? this.tierlistQuality,
       cover: cover,
+      bestVersions: bestVersions,
     );
   }
 

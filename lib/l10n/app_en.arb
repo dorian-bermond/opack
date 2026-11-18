@@ -417,6 +417,8 @@
   "metricTags": "Tags",
   "allCards": "All cards",
   "boosterComposition": "Booster composition",
+  "bestVersions": "Deal the most valuable versions",
+  "bestVersionsHint": "Every card pulled is replaced by the rarest version of the same card in the pool",
   "slotRow": "{count} × {tag}",
   "@slotRow": {
     "placeholders": {

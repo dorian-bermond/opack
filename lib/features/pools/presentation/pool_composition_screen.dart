@@ -142,6 +142,15 @@ class _CompositionState extends ConsumerState<_Composition> {
           Text(pool.name, style: theme.textTheme.titleMedium),
           if (play.unplaced > 0) Text(l10n.cardsUnplaced(play.unplaced), style: theme.textTheme.bodySmall),
           const SizedBox(height: 12),
+          SwitchListTile(
+            key: const Key('bestVersions'),
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.bestVersions),
+            subtitle: Text(l10n.bestVersionsHint),
+            value: pool.bestVersions,
+            onChanged: (on) => save(pool.withBestVersions(on)),
+          ),
+          const SizedBox(height: 12),
           Text(l10n.boosterKinds, style: theme.textTheme.labelLarge),
           const SizedBox(height: 6),
           Wrap(

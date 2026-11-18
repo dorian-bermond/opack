@@ -359,6 +359,8 @@
   "metricTags": "Étiquettes",
   "allCards": "Toutes les cartes",
   "boosterComposition": "Composition du booster",
+  "bestVersions": "Distribuer les versions les plus précieuses",
+  "bestVersionsHint": "Chaque carte tirée est remplacée par la version la plus rare de la même carte dans le pool",
   "slotRow": "{count} × {tag}",
   "@slotRow": {
     "placeholders": {

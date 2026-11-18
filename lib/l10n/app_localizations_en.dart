@@ -1039,6 +1039,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get boosterComposition => 'Booster composition';
 
   @override
+  String get bestVersions => 'Deal the most valuable versions';
+
+  @override
+  String get bestVersionsHint =>
+      'Every card pulled is replaced by the rarest version of the same card in the pool';
+
+  @override
   String slotRow(int count, String tag) {
     return '$count × $tag';
   }

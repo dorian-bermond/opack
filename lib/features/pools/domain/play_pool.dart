@@ -1,5 +1,6 @@
 import '../../catalog/domain/models.dart';
 import '../../cube/domain/cube.dart';
+import '../../packs/domain/best_versions.dart';
 import '../../packs/domain/pack_generator.dart';
 import '../../packs/domain/pack_source.dart';
 import '../../packs/domain/pool_dealer.dart';
@@ -82,6 +83,9 @@ class PlayPool {
         pool.sources.length == 1 &&
         pool.sources.single == SetSource(layoutSet.code);
 
+    // Dealt cards swapped for their most valuable version when asked.
+    final best = pool.bestVersions ? bestVersions(entries.map((e) => e.card)) : null;
+    PackSource upgraded(PackSource source) => best == null ? source : BestVersionsSource(source, best);
     final boosters = <String, BoosterPlay>{};
     for (final kind in pool.boosters) {
       if (entries.isEmpty) {
@@ -98,7 +102,7 @@ class PlayPool {
         final formula = layoutSet.booster(booster);
         boosters[kind.name] = BoosterPlay(
           packSize: PoolDealer.mainVariant(formula).size,
-          newSource: () => PackGenerator(formula),
+          newSource: () => upgraded(PackGenerator(formula)),
         );
         continue;
       }
@@ -109,7 +113,7 @@ class PlayPool {
       boosters[kind.name] = BoosterPlay(
         packSize: sample.packSize,
         packCount: shortSlot || kind.slots.isEmpty ? 0 : sample.packCount,
-        newSource: () => PoolDealer(formula, copiesOf: copiesOf),
+        newSource: () => upgraded(PoolDealer(formula, copiesOf: copiesOf)),
       );
     }
 

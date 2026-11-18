@@ -1043,6 +1043,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get boosterComposition => 'Composition du booster';
 
   @override
+  String get bestVersions => 'Distribuer les versions les plus précieuses';
+
+  @override
+  String get bestVersionsHint =>
+      'Chaque carte tirée est remplacée par la version la plus rare de la même carte dans le pool';
+
+  @override
   String slotRow(int count, String tag) {
     return '$count × $tag';
   }

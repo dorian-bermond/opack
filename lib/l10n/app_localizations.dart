@@ -1808,6 +1808,18 @@ abstract class AppLocalizations {
   /// **'Booster composition'**
   String get boosterComposition;
 
+  /// No description provided for @bestVersions.
+  ///
+  /// In en, this message translates to:
+  /// **'Deal the most valuable versions'**
+  String get bestVersions;
+
+  /// No description provided for @bestVersionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every card pulled is replaced by the rarest version of the same card in the pool'**
+  String get bestVersionsHint;
+
   /// No description provided for @slotRow.
   ///
   /// In en, this message translates to:
