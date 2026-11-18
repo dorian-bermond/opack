@@ -452,7 +452,7 @@ Prefill prefillFromSet(CardSet set, {BoosterType? booster}) {
     for (final option in name) {
       if (formula.sheets[option.tag] case final sheet?) tags[option.tag] = tagOf(sheet);
     }
-    slots.add(PackSlot(count, name));
+    slots.add(PackSlot(count, name, name: name.length > 1 ? formula.topSlot : null));
   }
   return (tags: {...tags, ...rarityTags(set.cards)}, slots: slots);
 }

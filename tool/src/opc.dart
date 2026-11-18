@@ -41,6 +41,9 @@ const opcTopSlotWeights = {
   'treasure': 1,
 };
 
+/// What the top slot is called in the pool, as players call it.
+const opcTopSlotName = 'Hit';
+
 /// The booster set a print is pulled from: the product named in its
 /// `CardSets` column (`… [EB-05]`) when that is a booster, else its own
 /// set column. Extra boosters reprint other sets' cards in a special art
@@ -160,7 +163,7 @@ Map<String, Object?> buildOpcSet(String code, String setName, List<OpcCard> inpu
     'source': 'https://onepiece.gg/',
     'license': 'Card data from onepiece.gg. ONE PIECE CARD GAME is © Eiichiro Oda / Shueisha, Bandai.',
     'boosters': {
-      'standard': {'approximate': true, 'variants': variants, 'sheets': sheets},
+      'standard': {'approximate': true, 'topSlot': opcTopSlotName, 'variants': variants, 'sheets': sheets},
     },
     'cards': cards,
   };

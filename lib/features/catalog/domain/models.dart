@@ -185,7 +185,7 @@ class BoosterVariant {
 }
 
 class BoosterFormula {
-  BoosterFormula({required this.variants, required this.sheets})
+  BoosterFormula({required this.variants, required this.sheets, this.topSlot})
       : totalWeight = variants.fold(0, (sum, v) => sum + v.weight);
 
   factory BoosterFormula.fromJson(Map<String, dynamic> json, List<CardData> cards) =>
@@ -199,11 +199,16 @@ class BoosterFormula {
               in (json['sheets'] as Map<String, dynamic>).entries)
             key: BoosterSheet.fromJson(value as Map<String, dynamic>, cards),
         },
+        topSlot: json['topSlot'] as String?,
       );
 
   final List<BoosterVariant> variants;
   final Map<String, BoosterSheet> sheets;
   final int totalWeight;
+
+  /// The name of the slot the variants differ by, the one card drawn from
+  /// one sheet or another (a One Piece pack's hit), when the set names it.
+  final String? topSlot;
 }
 
 /// Lightweight description of a set, read from the bundled index.

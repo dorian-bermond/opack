@@ -271,6 +271,7 @@ void main() {
       '1×rare:250|superRare:175|leader:150|secretRare:18|parallel:38|manga:2',
     ]);
     expect(slots.fold(0, (n, s) => n + s.count), 12);
+    expect(slots.map((s) => s.name), [null, null, null, 'Hit'], reason: 'the top slot is named by the set');
     expect(tags['parallel']!.cards, ['OP18-001_p1']);
     expect(tags['manga']!.cards, ['OP18-005_p2']);
     expect(tags['leader']!.cards, ['OP18-001']);
