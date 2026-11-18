@@ -63,19 +63,20 @@ String opcVersion(String id) {
 /// the top slot: `parallel`, `special`, `manga`, `treasure` (its printed
 /// rarity kept apart); `null` for the base print, whose sheet is its
 /// printed rarity's, and for reprints, which boosters never hold. The
-/// version number alone does not tell a manga art (onepiece.gg
-/// numbers every art of a card across products), so [manga] says whether
-/// a print is one (see `limitless.dart`): otherwise the first art of a
-/// card of the [product] itself is its parallel art, and any other art
-/// (another product's card in a new art, a second art of the set's own
-/// card) a special one.
-String? opcVersionSheet(String id, String rarityCode, {String? product, bool manga = false}) {
+/// version number alone does not tell a manga art from a parallel art or
+/// a plain print in another panel (onepiece.gg numbers every art of a
+/// card across products), so [kind] says what the print is when known
+/// (see `limitlessKind`): `base`, `parallel`, `special`, `manga`. Without
+/// it, the first art of a card of the [product] itself is taken for its
+/// parallel art, and any other art (another product's card in a new art,
+/// a second art of the set's own card) for a special one.
+String? opcVersionSheet(String id, String rarityCode, {String? product, String? kind}) {
   final version = opcVersion(id);
   if (version.startsWith('r')) return null;
   final code = rarityCode.trim().toUpperCase();
   if (code == 'TR') return 'treasure';
   if (code == 'SP CARD') return 'special';
-  if (manga) return 'manga';
+  if (kind != null) return kind == 'base' ? null : kind;
   if (version.isEmpty) return null;
   final own = product == null || id.startsWith('${opcSetCode(product)}-');
   if (own && version == 'p1') return 'parallel';
@@ -107,16 +108,16 @@ Map<String, List<OpcCard>> opcCardsBySet(Map<String, dynamic> json) {
 /// its booster rarity (an alternate print keeps its printed rarity in
 /// `printedRarity`), with a 12-card booster formula drawn from the
 /// rarities present, marked approximate: 7 commons, 2 uncommons, 2 rares
-/// and a top slot (see [opcTopSlotWeights]). [manga] names the prints
-/// that are manga arts.
-Map<String, Object?> buildOpcSet(String code, String setName, List<OpcCard> input, {Set<String> manga = const {}}) {
+/// and a top slot (see [opcTopSlotWeights]). [kinds] tells what the
+/// prints are when known (see [opcVersionSheet]).
+Map<String, Object?> buildOpcSet(String code, String setName, List<OpcCard> input, {Map<String, String> kinds = const {}}) {
   final seen = <String>{};
   final cards = <Map<String, Object?>>[];
   final sheetOf = <String, String>{};
   for (final c in input) {
     if (c.id.isEmpty || !seen.add(c.id)) continue;
     final printed = opcRarity(c.rarityCode);
-    final rarity = opcVersionSheet(c.id, c.rarityCode, product: code, manga: manga.contains(c.id)) ?? printed;
+    final rarity = opcVersionSheet(c.id, c.rarityCode, product: code, kind: kinds[c.id]) ?? printed;
     cards.add({
       'id': c.id,
       'names': {'en': c.name.trim()},

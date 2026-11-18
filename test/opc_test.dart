@@ -91,7 +91,7 @@ void main() {
     expect(opcVersion('OP12-090_r1'), 'r1');
     expect(opcVersionSheet('OP17-001', 'L'), isNull);
     expect(opcVersionSheet('OP17-001_p1', 'L'), 'parallel');
-    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17', manga: true), 'manga');
+    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17', kind: 'manga'), 'manga');
     expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17'), 'special',
         reason: 'a second art of the set\'s own card that is no manga art (a gold stamp, a super leader)');
     expect(opcVersionSheet('OP17-001_p1', 'L', product: 'EB05'), 'special', reason: "another set's card in a new art");
@@ -262,7 +262,7 @@ void main() {
       (id: 'OP18-005', name: 'Crocodile', rarityCode: 'SR'),
       (id: 'OP18-005_p2', name: 'Crocodile', rarityCode: 'SR'),
       (id: 'OP18-119', name: 'Imu', rarityCode: 'SEC'),
-    ], manga: {'OP18-005_p2'}))) as Map<String, dynamic>);
+    ], kinds: {'OP18-005_p2': 'manga'}))) as Map<String, dynamic>);
     final (:tags, :slots) = prefillFromSet(set);
     expect(slots.map((s) => '${s.count}×${s.options.map((o) => '${o.tag}:${o.weight}').join('|')}'), [
       '7×common:1',
@@ -288,7 +288,7 @@ void main() {
     expect(extraSlots.map((s) => s.count), [8, 3, 1]);
   });
 
-  test('manga arts are told from the TCGplayer listing names on limitless card pages', () {
+  test('what a print is comes from the limitless labels and TCGplayer listing names', () {
     const index = '<table><tr><th>Code</th></tr>'
         '<tr><td><a href="/cards/eb05-x">EB05</a></td><td><a href="/cards/eb05-x">One Piece Heroines Edition vol.2</a></td>'
         '<td><a href="/cards/eb05-x">30 Oct 26</a></td></tr>'
@@ -310,7 +310,8 @@ void main() {
         '</table>');
     expect(robin.map((p) => p.label), ['', 'aa', 'manga']);
     expect(robin.map(limitlessIsManga), [false, false, false]);
-    expect(opcMangaPrints(product: 'EB05', ids: ['EB05-010', 'EB05-010_p1', 'EB05-010_p2'], prints: robin, setCodes: codes), isEmpty);
+    expect(opcPrintKinds(product: 'EB05', ids: ['EB05-010', 'EB05-010_p1', 'EB05-010_p2'], prints: robin, setCodes: codes),
+        {'EB05-010': 'base', 'EB05-010_p1': 'parallel', 'EB05-010_p2': 'special'});
 
     // Shirahoshi EB05-014: her third print is the manga art.
     final shirahoshi = limitlessPrints('<table>'
@@ -318,10 +319,30 @@ void main() {
         '${row('One Piece Heroines Edition vol.2', 'aa', 'one-piece-card-game-extra-booster-shirahoshi-super-rare-alternate-art', v: '1')}'
         '${row('One Piece Heroines Edition vol.2', 'manga', 'one-piece-card-game-extra-booster-shirahoshi-manga', v: '2')}'
         '</table>');
-    expect(opcMangaPrints(product: 'EB05', ids: ['EB05-014', 'EB05-014_p1', 'EB05-014_p2'], prints: shirahoshi, setCodes: codes),
-        {'EB05-014_p2'});
-    expect(opcMangaPrints(product: 'EB05', ids: ['EB05-014', 'EB05-014_p1'], prints: shirahoshi, setCodes: codes), {'EB05-014_p1'},
-        reason: 'counts apart, the manga art is the last print');
+    expect(opcPrintKinds(product: 'EB05', ids: ['EB05-014', 'EB05-014_p1', 'EB05-014_p2'], prints: shirahoshi, setCodes: codes),
+        {'EB05-014': 'base', 'EB05-014_p1': 'parallel', 'EB05-014_p2': 'manga'});
+    expect(opcPrintKinds(product: 'EB05', ids: ['EB05-014', 'EB05-014_p1'], prints: shirahoshi, setCodes: codes), isEmpty,
+        reason: 'counts apart, nothing is known');
+
+    // Sleeptids OP18-093: a rare printed in three panels, all plain rares.
+    final sleeptids = limitlessPrints('<table>'
+        '${row('The Dominance of God', '', '')}'
+        '${row('The Dominance of God', '', '', v: '1')}'
+        '${row('The Dominance of God', '', '', v: '2')}'
+        '</table>');
+    final ids = ['OP18-093', 'OP18-093_p1', 'OP18-093_p2'];
+    final kinds = opcPrintKinds(product: 'OP18', ids: ids, prints: sleeptids, setCodes: {'The Dominance of God': 'OP18'});
+    expect(kinds, {for (final id in ids) id: 'base'});
+    expect([for (final id in ids) opcVersionSheet(id, 'R', product: 'OP18', kind: kinds[id])], [null, null, null],
+        reason: 'every print is dealt as a rare');
+    expect(opcVersionSheet('OP18-093_p1', 'R', product: 'OP18'), 'parallel', reason: 'the guess without limitless');
+
+    // Gerd OP17-081 in EB05: another set's card, unlabeled, is a special art there.
+    final gerd = limitlessPrints('<table>'
+        '${row("The World's Strongest Warriors", '', 'the-worlds-strongest-warriors-gerd')}'
+        '${row('One Piece Heroines Edition vol.2', '', 'extra-booster-one-piece-heroines-edition-vol-2-gerd-op17-081-sp', v: '1')}'
+        '</table>');
+    expect(opcPrintKinds(product: 'EB05', ids: ['OP17-081_p1'], prints: gerd, setCodes: codes), {'OP17-081_p1': 'special'});
 
     // Luffy OP05-119: the manga art is in OP05, the other products' prints do not count.
     final luffy = limitlessPrints('<table>'
@@ -334,9 +355,9 @@ void main() {
     expect(luffy.length, 5);
     expect(luffy.last.product, '', reason: 'no listing');
     expect(limitlessIsManga(luffy.last), isTrue, reason: 'the label stands in');
-    expect(opcMangaPrints(product: 'OP05', ids: ['OP05-119', 'OP05-119_p1', 'OP05-119_p2'], prints: luffy, setCodes: codes),
-        {'OP05-119_p2'});
-    expect(opcMangaPrints(product: 'OP09', ids: ['OP05-119_p3'], prints: luffy, setCodes: codes), isEmpty,
+    expect(opcPrintKinds(product: 'OP05', ids: ['OP05-119', 'OP05-119_p1', 'OP05-119_p2'], prints: luffy, setCodes: codes),
+        {'OP05-119': 'base', 'OP05-119_p1': 'parallel', 'OP05-119_p2': 'manga'});
+    expect(opcPrintKinds(product: 'OP09', ids: ['OP05-119_p3'], prints: luffy, setCodes: codes), isEmpty,
         reason: 'OP09 is not in the index');
   });
 

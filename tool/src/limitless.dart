@@ -41,20 +41,34 @@ Map<String, String> limitlessSetCodes(String html) {
 bool limitlessIsManga(LimitlessPrint print) =>
     print.product.isEmpty ? print.label == 'manga' : RegExp(r'(^|-)manga($|-)').hasMatch(print.product);
 
-/// Which of a card's prints pulled from [product] (onepiece.gg ids, base
-/// first then by version) are manga arts, matched against the limitless
-/// prints of the same product in order; when the counts differ, a manga
-/// art is taken to be the last print.
-Set<String> opcMangaPrints({
+/// What a limitless print of a card is, in the set the card is [own] to
+/// or in another product: `manga` a manga art; `parallel` an alternate
+/// art (`aa`) of the set's own card; `base` an unlabeled print of the
+/// set's own card, a plain rare printed in several panels; `special`
+/// everything else: another product's card in a new or plain art, a
+/// serial or gold-stamped print, a wanted poster.
+String limitlessKind(LimitlessPrint print, {required bool own}) {
+  if (limitlessIsManga(print)) return 'manga';
+  if (!own) return 'special';
+  return switch (print.label) {
+    'aa' => 'parallel',
+    '' => 'base',
+    _ => 'special',
+  };
+}
+
+/// What each of a card's prints pulled from [product] is (onepiece.gg
+/// ids, base first then by version), matched against the limitless
+/// prints of the same product in order (see [limitlessKind]); empty
+/// when the counts differ, leaving the guess to the version numbers.
+Map<String, String> opcPrintKinds({
   required String product,
   required List<String> ids,
   required List<LimitlessPrint> prints,
   required Map<String, String> setCodes,
 }) {
   final here = prints.where((p) => setCodes[p.set] == product).toList();
-  if (ids.isEmpty || !here.any(limitlessIsManga)) return const {};
-  if (here.length == ids.length) {
-    return {for (final (i, p) in here.indexed) if (limitlessIsManga(p)) ids[i]};
-  }
-  return {ids.last};
+  if (ids.isEmpty || here.length != ids.length) return const {};
+  final own = ids.first.startsWith('$product-');
+  return {for (final (i, p) in here.indexed) ids[i]: limitlessKind(p, own: own)};
 }
