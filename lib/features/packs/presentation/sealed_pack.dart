@@ -84,9 +84,6 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
       if (status == AnimationStatus.completed) widget.onOpen();
     });
 
-  /// The smaller piece's tear, as a share of the animation.
-  static const _tearShare = 0.35;
-
   /// Tears the pack open, by a slash or a tap.
   void _tearOpen() {
     setState(() {
