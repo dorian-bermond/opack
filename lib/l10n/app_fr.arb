@@ -256,6 +256,7 @@
   },
   "addSelected": "Ajouter au pool",
   "searchFailed": "Recherche impossible : {error}",
+  "slotName": "Nom de l'emplacement (facultatif)",
   "boosterPicture": "Image du booster",
   "boosterPictureHint": "Le paquet montré à l'ouverture : l'image de l'extension, ou une des vôtres.",
   "choosePicture": "Choisir une image",

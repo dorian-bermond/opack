@@ -485,7 +485,7 @@ Future<void> deletePoolTag(BuildContext context, WidgetRef ref, PlayPool play, S
   final pool = play.pool;
   final affected = [
     for (final slot in pool.slots)
-      if (slot.options.any((o) => o.tag == tag)) l10n.slotRow(slot.count, slotOptionsLabel(l10n, slot)),
+      if (slot.options.any((o) => o.tag == tag)) l10n.slotRow(slot.count, slotLabel(l10n, slot)),
   ];
   if (affected.isNotEmpty) {
     final confirmed = await showDialog<bool>(

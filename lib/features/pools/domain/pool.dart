@@ -264,7 +264,7 @@ class SlotOption {
 /// chance (a weight 1 option against a weight 3 one is drawn one time in
 /// four).
 class PackSlot {
-  const PackSlot(this.count, this.options);
+  const PackSlot(this.count, this.options, {this.name});
 
   /// A slot with a single option.
   PackSlot.single(String tag, int count) : this(count, [SlotOption(tag)]);
@@ -278,27 +278,36 @@ class PackSlot {
                 SlotOption.fromJson(option as Map<String, dynamic>),
             ],
         },
+        name: switch (json['name']) { final String n when n.trim().isNotEmpty => n.trim(), _ => null },
       );
 
   final int count;
   final List<SlotOption> options;
 
+  /// A name of the user's, shown in place of the options ("Hit slot").
+  final String? name;
+
   int get totalWeight => options.fold(0, (sum, o) => sum + o.weight);
+
+  PackSlot copyWith({int? count, List<SlotOption>? options, String? Function()? name}) =>
+      PackSlot(count ?? this.count, options ?? this.options, name: name == null ? this.name : name());
 
   Map<String, Object?> toJson() => {
         'count': count,
         'options': [for (final option in options) option.toJson()],
+        'name': ?name,
       };
 
   @override
   bool operator ==(Object other) =>
       other is PackSlot &&
       other.count == count &&
+      other.name == name &&
       other.options.length == options.length &&
       [for (var i = 0; i < options.length; i++) other.options[i] == options[i]].every((same) => same);
 
   @override
-  int get hashCode => Object.hash(count, Object.hashAll(options));
+  int get hashCode => Object.hash(count, name, Object.hashAll(options));
 }
 
 /// A kind of booster a pool can open: a name and its slots.
@@ -905,7 +914,7 @@ class Pool {
             booster.copyWith(slots: [
               for (final slot in booster.slots)
                 if (slot.options.any((o) => o.tag != tag))
-                  PackSlot(slot.count, [for (final o in slot.options) if (o.tag != tag) o]),
+                  slot.copyWith(options: [for (final o in slot.options) if (o.tag != tag) o]),
             ]),
         ],
       );
@@ -920,7 +929,7 @@ class Pool {
         for (final booster in boosters)
           booster.copyWith(slots: [
             for (final slot in booster.slots)
-              PackSlot(slot.count, [
+              slot.copyWith(options: [
                 for (final o in slot.options) o.tag == tag ? SlotOption(name, o.weight) : o,
               ]),
           ]),

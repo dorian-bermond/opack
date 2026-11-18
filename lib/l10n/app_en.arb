@@ -312,6 +312,7 @@
   },
   "addSelected": "Add to the pool",
   "searchFailed": "Search failed: {error}",
+  "slotName": "Slot name (optional)",
   "boosterPicture": "Booster picture",
   "boosterPictureHint": "The pack shown when opening: the set's own picture, or one of yours.",
   "choosePicture": "Choose a picture",

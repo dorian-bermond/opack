@@ -96,7 +96,7 @@ class _PoolDetails extends ConsumerWidget {
                     saved.slots.isEmpty
                         ? l10n.noUserSlots
                         : [
-                            for (final slot in saved.slots) l10n.slotRow(slot.count, slotOptionsLabel(l10n, slot)),
+                            for (final slot in saved.slots) l10n.slotRow(slot.count, slotLabel(l10n, slot)),
                           ].join(' · '),
                     style: theme.textTheme.bodyMedium,
                   ),

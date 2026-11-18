@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:opack/features/catalog/domain/models.dart';
 import 'package:opack/features/pools/domain/pool.dart';
@@ -150,6 +152,26 @@ void main() {
     expect(Pool.fromJson(pool.toJson()).tierlistQuality, 'tier');
     expect(pool.withoutTag('tier:S').defaultTierlistQuality, 'rarity', reason: 'gone: back to the first');
     expect(Pool.empty(Game.mtg, name: 'q').defaultTierlistQuality, isNull);
+  });
+
+  test('a slot may carry a name, kept through saving and tag edits', () {
+    var pool = Pool.empty(Game.mtg, name: 'p').withTag('rare', ['a']).withTag('mine', ['b']).copyWith(slots: [
+      const PackSlot(1, [SlotOption('rare', 3), SlotOption('mine')], name: 'Hit slot'),
+      const PackSlot(2, [SlotOption('mine')]),
+    ]);
+    expect(pool.slots.first.name, 'Hit slot');
+    expect(pool.slots.last.name, isNull);
+    final reloaded = Pool.fromJson(jsonDecode(jsonEncode(pool.toJson())) as Map<String, dynamic>);
+    expect(reloaded.slots.first.name, 'Hit slot');
+    expect(reloaded.slots.first, pool.slots.first);
+    expect(reloaded.slots.first.toJson().containsKey('name'), isTrue);
+    expect(reloaded.slots.last.toJson().containsKey('name'), isFalse);
+    expect(PackSlot.fromJson({'count': 1, 'options': [], 'name': '  '}).name, isNull);
+    expect(pool.slots.first.copyWith(name: () => null).name, isNull);
+    expect(pool.slots.first.copyWith(count: 3).name, 'Hit slot');
+    expect(pool.withoutTag('mine').slots.first.name, 'Hit slot', reason: 'dropping an option keeps the name');
+    expect(pool.withTagRenamed('rare', 'top').slots.first.name, 'Hit slot');
+    expect(pool.withTagRenamed('rare', 'top').slots.first.options.first.tag, 'top');
   });
 
   test('a value keeps its color through edits and saving', () {

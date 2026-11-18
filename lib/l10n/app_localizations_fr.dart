@@ -722,6 +722,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get slotName => 'Nom de l\'emplacement (facultatif)';
+
+  @override
   String get boosterPicture => 'Image du booster';
 
   @override

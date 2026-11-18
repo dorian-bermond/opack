@@ -719,6 +719,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get slotName => 'Slot name (optional)';
+
+  @override
   String get boosterPicture => 'Booster picture';
 
   @override

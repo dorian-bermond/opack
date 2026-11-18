@@ -25,6 +25,9 @@ class PoolCompositionScreen extends StatelessWidget {
 }
 
 /// `X 1/4 · Y 3/4`, the options of a slot with their chances.
+/// A slot as the user reads it: its name when it has one, else its options.
+String slotLabel(AppLocalizations l10n, PackSlot slot) => slot.name ?? slotOptionsLabel(l10n, slot);
+
 String slotOptionsLabel(AppLocalizations l10n, PackSlot slot) => [
       for (final option in slot.options)
         slot.options.length == 1
@@ -181,8 +184,9 @@ class _CompositionState extends ConsumerState<_Composition> {
           for (final (i, slot) in booster.slots.indexed)
             Card(
               child: ListTile(
-                title: Text(l10n.slotRow(slot.count, slotOptionsLabel(l10n, slot))),
+                title: Text(l10n.slotRow(slot.count, slotLabel(l10n, slot))),
                 subtitle: Text([
+                  if (slot.name != null) slotOptionsLabel(l10n, slot),
                   for (final option in slot.options)
                     '${tagLabel(l10n, option.tag)}: ${l10n.slotCards(play.tagCards[option.tag]?.length ?? 0)}',
                 ].join(' · ')),
@@ -253,11 +257,18 @@ class _SlotDialog extends StatefulWidget {
 class _SlotDialogState extends State<_SlotDialog> {
   late int _count = widget.initial?.count ?? 1;
   late List<SlotOption> _options = [...?widget.initial?.options];
+  late final _name = TextEditingController(text: widget.initial?.name ?? '');
 
   @override
   void initState() {
     super.initState();
     if (_options.isEmpty) _options = [SlotOption(widget.tags.first)];
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
   }
 
   @override
@@ -283,6 +294,12 @@ class _SlotDialogState extends State<_SlotDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              TextField(
+                key: const Key('slotName'),
+                controller: _name,
+                decoration: InputDecoration(labelText: l10n.slotName, isDense: true),
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(child: Text(l10n.slotCount, style: theme.textTheme.labelLarge)),
@@ -334,7 +351,8 @@ class _SlotDialogState extends State<_SlotDialog> {
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
         FilledButton(
-          onPressed: () => Navigator.pop(context, PackSlot(_count, _options)),
+          onPressed: () => Navigator.pop(
+              context, PackSlot(_count, _options, name: _name.text.trim().isEmpty ? null : _name.text.trim())),
           child: Text(l10n.apply),
         ),
       ],

@@ -1238,6 +1238,12 @@ abstract class AppLocalizations {
   /// **'Search failed: {error}'**
   String searchFailed(String error);
 
+  /// No description provided for @slotName.
+  ///
+  /// In en, this message translates to:
+  /// **'Slot name (optional)'**
+  String get slotName;
+
   /// No description provided for @boosterPicture.
   ///
   /// In en, this message translates to:
