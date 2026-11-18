@@ -2803,20 +2803,6 @@
   "path": "assets/sets/opc/OP18.json"
  },
  {
-  "code": "PRB02",
-  "prefix": "PRB02",
-  "game": "opc",
-  "names": {
-   "en": "One Piece Card the Best Vol.2"
-  },
-  "releaseDate": null,
-  "boosterTypes": [
-   "standard"
-  ],
-  "cardCount": 38,
-  "path": "assets/sets/opc/PRB02.json"
- },
- {
   "code": "25TH",
   "prefix": "25TH",
   "game": "ygo",

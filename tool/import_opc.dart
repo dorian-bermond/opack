@@ -43,8 +43,8 @@ Future<void> main(List<String> arguments) async {
     for (final code in bySet.keys.toList()..sort()) {
       if (wanted.isNotEmpty && !wanted.contains(code)) continue;
       final cards = bySet[code]!;
-      if (cards.length < 20) {
-        stderr.writeln('Skipping $code: ${cards.length} cards');
+      if (cards.length < 20 || !cards.any((c) => opcRarity(c.rarityCode) == 'common' && opcVersion(c.id).isEmpty)) {
+        stderr.writeln('Skipping $code: ${cards.length} cards, no booster of its own');
         continue;
       }
       final file = buildOpcSet(code, _knownNames[code] ?? setNames[code] ?? code, cards);
