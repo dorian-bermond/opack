@@ -60,6 +60,9 @@ extension RarityPresentation on Rarity {
         Rarity.special => l10n.raritySpecial,
         Rarity.secretRare => l10n.raritySecretRare,
         Rarity.leader => l10n.rarityLeader,
+        Rarity.parallel => l10n.rarityParallel,
+        Rarity.manga => l10n.rarityManga,
+        Rarity.treasure => l10n.rarityTreasure,
       };
 
   Color get color => _chosen[this] ?? defaultColor;
@@ -74,6 +77,9 @@ extension RarityPresentation on Rarity {
         Rarity.special => Colors.indigo,
         Rarity.secretRare => Colors.pink,
         Rarity.leader => Colors.cyan.shade700,
+        Rarity.parallel => Colors.lime.shade700,
+        Rarity.manga => Colors.red.shade900,
+        Rarity.treasure => Colors.yellow.shade600,
       };
 }
 

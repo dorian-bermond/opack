@@ -1304,6 +1304,30 @@ abstract class AppLocalizations {
   /// **'Leader'**
   String get rarityLeader;
 
+  /// No description provided for @rarityParallel.
+  ///
+  /// In en, this message translates to:
+  /// **'Parallel art'**
+  String get rarityParallel;
+
+  /// No description provided for @rarityManga.
+  ///
+  /// In en, this message translates to:
+  /// **'Manga art'**
+  String get rarityManga;
+
+  /// No description provided for @rarityTreasure.
+  ///
+  /// In en, this message translates to:
+  /// **'Treasure rare'**
+  String get rarityTreasure;
+
+  /// No description provided for @facetPrintedRarity.
+  ///
+  /// In en, this message translates to:
+  /// **'Printed rarity'**
+  String get facetPrintedRarity;
+
   /// No description provided for @noCubesOpc.
   ///
   /// In en, this message translates to:

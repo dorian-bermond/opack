@@ -35,18 +35,11 @@ const opcTopSlotWeights = {
   'superRare': 175,
   'leader': 150,
   'secretRare': 18,
-  'version:parallel': 38,
-  'version:special': 3,
-  'version:manga': 2,
-  'version:treasure': 1,
+  'parallel': 38,
+  'special': 3,
+  'manga': 2,
+  'treasure': 1,
 };
-
-/// The quality telling a print's version apart from its rarity, which a
-/// manga or parallel art keeps: `version:base`, `version:parallel`…
-const opcVersionQuality = 'version';
-
-/// The version values in order, the base print first.
-const opcVersions = ['base', 'parallel', 'special', 'manga', 'treasure'];
 
 /// The booster set a print is pulled from: the product named in its
 /// `CardSets` column (`… [EB-05]`) when that is a booster, else its own
@@ -66,11 +59,11 @@ String opcVersion(String id) {
   return m == null ? '' : m.group(1)!;
 }
 
-/// The sheet a print pulls from in the top slot, beyond its rarity, as a
-/// value of the version quality: `version:parallel`, `version:special`,
-/// `version:manga`, `version:treasure`; `null` for the base print, whose
-/// sheet is its rarity's, and for reprints, which boosters never hold.
-/// The version number alone does not tell a manga art (onepiece.gg
+/// The booster rarity of an alternate print, the sheet it pulls from in
+/// the top slot: `parallel`, `special`, `manga`, `treasure` (its printed
+/// rarity kept apart); `null` for the base print, whose sheet is its
+/// printed rarity's, and for reprints, which boosters never hold. The
+/// version number alone does not tell a manga art (onepiece.gg
 /// numbers every art of a card across products), so [manga] says whether
 /// a print is one (see `limitless.dart`): otherwise the first art of a
 /// card of the [product] itself is its parallel art, and any other art
@@ -80,13 +73,13 @@ String? opcVersionSheet(String id, String rarityCode, {String? product, bool man
   final version = opcVersion(id);
   if (version.startsWith('r')) return null;
   final code = rarityCode.trim().toUpperCase();
-  if (code == 'TR') return '$opcVersionQuality:treasure';
-  if (code == 'SP CARD') return '$opcVersionQuality:special';
-  if (manga) return '$opcVersionQuality:manga';
+  if (code == 'TR') return 'treasure';
+  if (code == 'SP CARD') return 'special';
+  if (manga) return 'manga';
   if (version.isEmpty) return null;
   final own = product == null || id.startsWith('${opcSetCode(product)}-');
-  if (own && version == 'p1') return '$opcVersionQuality:parallel';
-  return '$opcVersionQuality:special';
+  if (own && version == 'p1') return 'parallel';
+  return 'special';
 }
 
 /// One card as the set builder needs it.
@@ -110,34 +103,37 @@ Map<String, List<OpcCard>> opcCardsBySet(Map<String, dynamic> json) {
   return bySet;
 }
 
-/// A set file: the cards once each, every version a card of its own,
-/// with a 12-card booster formula drawn from the rarities and versions
-/// present, marked approximate: 7 commons, 2 uncommons, 2 rares and a top
-/// slot (see [opcTopSlotWeights]). [manga] names the prints that are
-/// manga arts. The base prints make a `version:base` sheet no slot draws
-/// from, so the pool gets the whole version quality.
+/// A set file: the cards once each, every version a card of its own at
+/// its booster rarity (an alternate print keeps its printed rarity in
+/// `printedRarity`), with a 12-card booster formula drawn from the
+/// rarities present, marked approximate: 7 commons, 2 uncommons, 2 rares
+/// and a top slot (see [opcTopSlotWeights]). [manga] names the prints
+/// that are manga arts.
 Map<String, Object?> buildOpcSet(String code, String setName, List<OpcCard> input, {Set<String> manga = const {}}) {
   final seen = <String>{};
   final cards = <Map<String, Object?>>[];
   final sheetOf = <String, String>{};
   for (final c in input) {
     if (c.id.isEmpty || !seen.add(c.id)) continue;
-    cards.add({'id': c.id, 'names': {'en': c.name.trim()}, 'rarity': opcRarity(c.rarityCode)});
-    sheetOf[c.id] = opcVersionSheet(c.id, c.rarityCode, product: code, manga: manga.contains(c.id)) ?? opcRarity(c.rarityCode);
+    final printed = opcRarity(c.rarityCode);
+    final rarity = opcVersionSheet(c.id, c.rarityCode, product: code, manga: manga.contains(c.id)) ?? printed;
+    cards.add({
+      'id': c.id,
+      'names': {'en': c.name.trim()},
+      'rarity': rarity,
+      if (rarity != printed) 'printedRarity': printed,
+    });
+    sheetOf[c.id] = rarity;
   }
   cards.sort((a, b) => (a['id'] as String).compareTo(b['id'] as String));
 
   final bySheet = <String, List<int>>{};
   for (final (i, card) in cards.indexed) {
-    final id = card['id'] as String;
-    (bySheet[sheetOf[id]!] ??= []).add(i);
-    if (!sheetOf[id]!.startsWith('$opcVersionQuality:')) (bySheet['$opcVersionQuality:base'] ??= []).add(i);
+    (bySheet[sheetOf[card['id'] as String]!] ??= []).add(i);
   }
-  // Rarities first, then the versions in order.
-  final order = [...bySheet.keys.where((s) => !s.startsWith('$opcVersionQuality:')), for (final v in opcVersions) '$opcVersionQuality:$v'];
   final sheets = {
-    for (final sheet in order)
-      if (bySheet[sheet] case final indexes?) sheet: {'cards': [for (final i in indexes) [i, 1]]},
+    for (final MapEntry(key: sheet, value: indexes) in bySheet.entries)
+      sheet: {'cards': [for (final i in indexes) [i, 1]]},
   };
   // 11 cards from the common sheets, 1 from the top slot; extra boosters
   // have no uncommons, their commons and rares fill the pack.

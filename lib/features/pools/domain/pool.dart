@@ -124,6 +124,13 @@ class RandomLayout extends PackLayout {
 /// Tag of the cards of one rarity, e.g. `rarity:rare`.
 String rarityTag(Rarity rarity) => 'rarity:${rarity.name}';
 
+/// The quality of the rarity printed on a card, present when it differs
+/// from the booster rarity for some card (a manga art of a super rare).
+const printedRarityQuality = 'printedRarity';
+
+/// Tag of the cards of one printed rarity, e.g. `printedRarity:superRare`.
+String printedRarityTag(Rarity rarity) => '$printedRarityQuality:${rarity.name}';
+
 /// The tag every card of a random pack pool carries.
 const allCardsTag = 'all';
 
@@ -430,8 +437,6 @@ typedef Prefill = ({Map<String, TagDef> tags, List<PackSlot> slots});
 
 /// A set's booster as pool data: one tag per sheet of the main variant with
 /// the sheet's weights and flags, one slot per sheet, plus rarity tags.
-/// A sheet named as a quality value (`version:base`) is a tag even when no
-/// slot draws from it, so the quality comes whole.
 Prefill prefillFromSet(CardSet set, {BoosterType? booster}) {
   final formula = set.booster(booster);
   final tags = <String, TagDef>{};
@@ -449,14 +454,7 @@ Prefill prefillFromSet(CardSet set, {BoosterType? booster}) {
     }
     slots.add(PackSlot(count, name));
   }
-  for (final MapEntry(key: name, value: sheet) in formula.sheets.entries) {
-    if (Pool.qualityOf(name) != null && !name.startsWith('rarity:')) tags.putIfAbsent(name, () => tagOf(sheet));
-  }
-  // Plain tags in slot order, then quality tags in the formula's sheet order,
-  // so a quality's values come in order.
-  final plain = {for (final MapEntry(key: name, value: def) in tags.entries) if (Pool.qualityOf(name) == null) name: def};
-  final qualities = {for (final name in formula.sheets.keys) if (Pool.qualityOf(name) != null) name: ?tags[name]};
-  return (tags: {...plain, ...qualities, ...rarityTags(set.cards)}, slots: slots);
+  return (tags: {...tags, ...rarityTags(set.cards)}, slots: slots);
 }
 
 /// A formula's pack as slots: what every variant shares, one slot per
@@ -533,15 +531,23 @@ Prefill withCardsByRarity(Prefill prefill, Iterable<CardData> cards) {
   return (tags: tags, slots: prefill.slots);
 }
 
-/// One tag per rarity present in [cards].
+/// One tag per rarity present in [cards]; then, when some card's printed
+/// rarity differs from its booster rarity, one tag per printed rarity.
 Map<String, TagDef> rarityTags(Iterable<CardData> cards) {
   final byRarity = <Rarity, List<String>>{};
+  final byPrinted = <Rarity, List<String>>{};
+  var printedDiffers = false;
   for (final card in cards) {
     (byRarity[card.rarity] ??= []).add(card.id);
+    (byPrinted[card.printed] ??= []).add(card.id);
+    printedDiffers |= card.printedRarity != null;
   }
   return {
     for (final rarity in Rarity.values)
       if (byRarity[rarity] case final ids?) rarityTag(rarity): TagDef(ids),
+    if (printedDiffers)
+      for (final rarity in Rarity.values)
+        if (byPrinted[rarity] case final ids?) printedRarityTag(rarity): TagDef(ids),
   };
 }
 
@@ -1033,7 +1039,7 @@ class Pool {
     if (set != null) {
       final (tags: sheets, slots: _) = prefillFromSet(set);
       for (final MapEntry(key: name, value: def) in sheets.entries) {
-        if (name.startsWith('rarity:')) continue;
+        if (name.startsWith('rarity:') || name.startsWith('$printedRarityQuality:')) continue;
         if (tags[name] case final current?) {
           tags[name] = current.plus(def.cards, weightOf: (id) => def.weights[id]);
         }

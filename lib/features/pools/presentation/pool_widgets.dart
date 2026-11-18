@@ -36,8 +36,8 @@ Color? tagColor(Pool pool, String tag) => switch (pool.tags[tag]?.color) {
 Color valueColor(Pool pool, String tag) {
   if (tagColor(pool, tag) case final color?) return color;
   final quality = Pool.qualityOf(tag);
-  if (quality == 'rarity') {
-    final rarity = Rarity.values.where((r) => r.name == tag.substring('rarity:'.length)).firstOrNull;
+  if (quality == 'rarity' || quality == printedRarityQuality) {
+    final rarity = Rarity.values.where((r) => r.name == tag.substring(quality!.length + 1)).firstOrNull;
     if (rarity != null) return rarity.color;
   }
   final rank = quality == null ? 0 : pool.orderedValuesOf(quality).indexOf(tag);

@@ -23,7 +23,15 @@ enum Rarity {
   ultraRare,
   mythic,
   special,
+
+  /// Booster rarities of One Piece alternate prints, which keep their
+  /// printed rarity (see [CardData.printedRarity]): the parallel art of a
+  /// card, then the secret rares, then the manga art and the treasure
+  /// rare, rarer still.
+  parallel,
   secretRare,
+  manga,
+  treasure,
 }
 
 /// Booster products, in the order used to pick a set's default booster.
@@ -40,12 +48,14 @@ class CardData {
     this.passcode,
     this.scryfallId,
     this.artwork,
+    this.printedRarity,
   });
 
   factory CardData.fromJson(Map<String, dynamic> json) => CardData(
         id: json['id'] as String,
         names: _localized(json['names']),
         rarity: Rarity.values.byName(json['rarity'] as String),
+        printedRarity: switch (json['printedRarity']) { final String name => Rarity.values.byName(name), _ => null },
         colors: json['colors'] as String? ?? '',
         score: (json['score'] as num?)?.toDouble(),
         passcode: json['passcode'] as String?,
@@ -57,6 +67,7 @@ class CardData {
         'id': id,
         'names': names,
         'rarity': rarity.name,
+        'printedRarity': ?printedRarity?.name,
         if (colors.isNotEmpty) 'colors': colors,
         'score': ?score,
         'passcode': ?passcode,
@@ -69,7 +80,17 @@ class CardData {
 
   /// Card name per language code (`en`, `fr`).
   final Map<String, String> names;
+
+  /// The rarity the booster deals the card at: for an alternate print
+  /// (a parallel or manga art) its own, rarer one.
   final Rarity rarity;
+
+  /// The rarity printed on the card when it differs from [rarity]: a
+  /// manga art of a super rare is still a super rare.
+  final Rarity? printedRarity;
+
+  /// The rarity printed on the card.
+  Rarity get printed => printedRarity ?? rarity;
 
   /// MtG color letters (`WUBRG`), used to balance commons.
   final String colors;
@@ -101,6 +122,7 @@ class CardData {
         passcode: passcode,
         scryfallId: scryfallId,
         artwork: artwork,
+        printedRarity: printedRarity,
       );
 
   /// This card shown with [artwork]'s picture (`null` for its own print's).
@@ -114,6 +136,7 @@ class CardData {
         passcode: passcode,
         scryfallId: scryfallId,
         artwork: artwork,
+        printedRarity: printedRarity,
       );
 }
 

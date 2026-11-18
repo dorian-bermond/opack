@@ -757,6 +757,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rarityLeader => 'Leader';
 
   @override
+  String get rarityParallel => 'Art parallèle';
+
+  @override
+  String get rarityManga => 'Art manga';
+
+  @override
+  String get rarityTreasure => 'Treasure rare';
+
+  @override
+  String get facetPrintedRarity => 'Rareté imprimée';
+
+  @override
   String get noCubesOpc =>
       'Aucun cube. Importez un fichier texte avec une carte par ligne, par nom ou par code (ex. « OP01-001 »).';
 

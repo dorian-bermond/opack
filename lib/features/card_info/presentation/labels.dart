@@ -4,6 +4,7 @@ import '../../catalog/domain/models.dart';
 import '../domain/card_filter.dart';
 import '../domain/card_info.dart';
 import '../domain/pool_metrics.dart';
+import '../../pools/domain/pool.dart';
 
 String sortLabel(AppLocalizations l10n, CardSort sort) => switch (sort) {
       CardSort.name => l10n.sortName,
@@ -85,6 +86,7 @@ String metricLabel(AppLocalizations l10n, Metric metric) => switch (metric) {
 /// built-in sheet names such as `foilCommon` spelled out, user tags as is.
 String tagLabel(AppLocalizations l10n, String tag) {
   if (tag.startsWith('rarity:')) return '${l10n.facetRarity}: ${valueLabel(l10n, tag)}';
+  if (tag.startsWith('$printedRarityQuality:')) return '${l10n.facetPrintedRarity}: ${valueLabel(l10n, tag)}';
   if (tag.indexOf(':') case final i when i > 0) {
     return '${qualityLabel(l10n, tag.substring(0, i))}: ${tagLabel(l10n, tag.substring(i + 1))}';
   }
@@ -98,6 +100,7 @@ String tagLabel(AppLocalizations l10n, String tag) {
 /// name capitalized.
 String qualityLabel(AppLocalizations l10n, String quality) => switch (quality) {
       'rarity' => l10n.facetRarity,
+      printedRarityQuality => l10n.facetPrintedRarity,
       _ => quality.isEmpty ? quality : quality[0].toUpperCase() + quality.substring(1),
     };
 
@@ -132,6 +135,7 @@ String valueLabel(AppLocalizations l10n, String value) {
   final rarity = Rarity.values.where((r) => r.name == value).firstOrNull;
   if (rarity != null) return rarity.label(l10n);
   if (value.startsWith('rarity:')) return valueLabel(l10n, value.substring(7));
+  if (value.startsWith('$printedRarityQuality:')) return valueLabel(l10n, value.substring(printedRarityQuality.length + 1));
   if (value == 'pool') return l10n.allCards;
   if (value.contains(':')) {
     final [kind, property] = value.split(':');
