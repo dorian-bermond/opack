@@ -231,9 +231,18 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
     return vertical ? mean > widget.width / 2 : mean > widget.height / 2;
   }
 
-  /// The way a piece leaves: away from the cut, as a unit-ish offset.
+  /// The way a piece leaves: straight away from the cut, up or down for a
+  /// sideways cut, left or right for a vertical one.
   Offset _away({required bool first, required bool vertical}) =>
-      vertical ? Offset(first ? -1 : 1, 0.15) : Offset(0.2, first ? -1 : 1);
+      vertical ? Offset(first ? -1 : 1, 0) : Offset(0, first ? -1 : 1);
+
+  /// The opening in three parts: the pieces part ways; the bigger one
+  /// pauses while the cards are pulled out of it back to the middle; then
+  /// it leaves. Each as a 0 to 1 progress.
+  static (double, double, double) _parts(double t) {
+    double part(double from, double to) => Curves.easeInOut.transform(((t - from) / (to - from)).clamp(0.0, 1.0));
+    return (part(0, 0.3), part(0.3, 0.65), part(0.65, 1));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -255,36 +264,29 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
           child: AnimatedBuilder(
             animation: _tear,
             builder: (context, _) {
-              // The smaller piece tears off first; then the bigger one slides
-              // away, taking the cards along for a moment before they settle.
-              final tA = Curves.easeIn.transform((_tear.value / _tearShare).clamp(0.0, 1.0));
-              final tB = Curves.easeInOut.transform(((_tear.value - _tearShare) / (1 - _tearShare)).clamp(0.0, 1.0));
+              final (p1, p2, p3) = _parts(_tear.value);
               final firstBigger = _firstIsBigger(cut, vertical);
               final size = Offset(widget.width, widget.height);
               Offset scaled(Offset direction, double by) => Offset(direction.dx * size.dx * by, direction.dy * size.dy * by);
-
               Widget piece({required bool first}) =>
                   ClipPath(clipper: _Side(cut: cut, vertical: vertical, first: first), child: widget.child);
               final smallDirection = _away(first: !firstBigger, vertical: vertical);
               final bigDirection = _away(first: firstBigger, vertical: vertical);
+
+              // Part 1: both pieces part by a third of the pack. Part 3: they
+              // go on out of sight.
+              const step = 0.35;
               final smaller = Transform.translate(
-                offset: scaled(smallDirection, tA * 0.6),
-                child: Transform.rotate(
-                  angle: (vertical ? 0.4 : -0.5) * tA * (firstBigger ? -1 : 1),
-                  alignment: vertical ? Alignment.topCenter : Alignment.centerLeft,
-                  child: Opacity(opacity: 1 - tA, child: piece(first: !firstBigger)),
-                ),
+                offset: scaled(smallDirection, step * p1 + 1.0 * p3),
+                child: Opacity(opacity: 1 - p3, child: piece(first: !firstBigger)),
               );
               final bigger = Transform.translate(
-                offset: scaled(bigDirection, tB * 1.1),
-                child: Opacity(
-                  opacity: 1 - Curves.easeIn.transform(((tB - 0.4) / 0.6).clamp(0.0, 1.0)),
-                  child: piece(first: firstBigger),
-                ),
+                offset: scaled(bigDirection, step * p1 + 1.0 * p3),
+                child: Opacity(opacity: 1 - p3, child: piece(first: firstBigger)),
               );
-              // The cards follow the bigger piece a little, then come back.
-              final bump = tB == 0 ? 0.0 : 1 - (2 * tB - 1) * (2 * tB - 1);
-              final shift = scaled(bigDirection, 0.18 * bump);
+              // The cards ride in the bigger piece, then are pulled back to
+              // the middle while it pauses.
+              final shift = scaled(bigDirection, step * p1 * (1 - p2));
 
               return Stack(
                 clipBehavior: Clip.none,
