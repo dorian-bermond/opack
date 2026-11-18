@@ -130,14 +130,24 @@ void main() {
     expect(isOnePieceId('OP01-077'), isTrue);
     expect(isOnePieceId('OP01-003_p1'), isTrue);
     expect(isOnePieceId('CIBR-FR077'), isFalse);
-    final source = cardImageSource(card, language: 'fr')!;
-    expect(source.key, 'opc-OP01-077');
-    expect(source.url.toString(), 'https://static.dotgg.gg/onepiece/card/OP01-077.webp');
-    expect(source.extension, 'webp');
-    expect(source.fallback, isNull);
-    final alt = artworkImageSource(card, 'OP01-077_p1');
-    expect(alt.url.path, '/onepiece/card/OP01-077_p1.webp');
-    expect(alt.key, 'opc-OP01-077_p1');
+    // The official card list first, in the picture language's edition,
+    // then English, then onepiece.gg.
+    final french = cardImageSource(card, language: 'fr')!;
+    expect(french.key, 'opc-OP01-077-fr');
+    expect(french.url.toString(), 'https://fr.onepiece-cardgame.com/images/cardlist/card/OP01-077.png');
+    expect(french.extension, 'png');
+    final english = french.fallback!;
+    expect(english.url.toString(), 'https://en.onepiece-cardgame.com/images/cardlist/card/OP01-077.png');
+    final gg = english.fallback!;
+    expect(gg.key, 'opc-OP01-077');
+    expect(gg.url.toString(), 'https://static.dotgg.gg/onepiece/card/OP01-077.webp');
+    expect(gg.extension, 'webp');
+    expect(gg.fallback, isNull);
+    expect(cardImageSource(card, language: 'en')!.key, 'opc-OP01-077-en');
+    final alt = artworkImageSource(card, 'ST17-004_p1');
+    expect(alt.url.toString(), 'https://en.onepiece-cardgame.com/images/cardlist/card/ST17-004_p1.png',
+        reason: 'the special art as the official list shows it');
+    expect(alt.fallback!.url.path, '/onepiece/card/ST17-004_p1.webp');
   });
 
   test('details, search and alternate arts all read the one list', () async {

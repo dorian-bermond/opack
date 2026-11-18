@@ -51,9 +51,7 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
       fallback: ImageSource('scryfall-$id', english),
     );
   }
-  if (isOnePieceId(card.id)) {
-    return ImageSource('opc-${card.id}', opcCardImage(card.id), extension: 'webp');
-  }
+  if (isOnePieceId(card.id)) return opcImageSource(card.id, language: language);
   if (card.passcode case final passcode?) {
     // The importer stores the English name as passcode for cards without one;
     // YGOPRODeck can still find those by name.
@@ -89,12 +87,30 @@ bool isOnePieceId(String id) => RegExp(r'^(OP|EB|ST|PRB|P)\d*-\d+').hasMatch(id)
 /// alternate art (`OP01-001_p1`).
 Uri opcCardImage(String id) => Uri.https('static.dotgg.gg', '/onepiece/card/$id.webp');
 
+/// The official card list's picture of a print on the [site] edition
+/// (`en`, `fr`): the right art for every English print, its versions
+/// included, watermarked "SAMPLE".
+Uri opcOfficialCardImage(String id, {String site = 'en'}) =>
+    Uri.https('$site.onepiece-cardgame.com', '/images/cardlist/card/$id.png');
+
+/// The picture of a One Piece print: the official card list in the
+/// picture [language]'s edition when the site has one (fr), then the
+/// English one, then onepiece.gg's. The official list names every
+/// version's art reliably; onepiece.gg's versions sometimes show the
+/// Japanese art instead.
+ImageSource opcImageSource(String id, {String language = 'en'}) {
+  final gg = ImageSource('opc-$id', opcCardImage(id), extension: 'webp');
+  final english = ImageSource('opc-$id-en', opcOfficialCardImage(id), extension: 'png', fallback: gg);
+  if (language != 'fr') return english;
+  return ImageSource('opc-$id-fr', opcOfficialCardImage(id, site: 'fr'), extension: 'png', fallback: english);
+}
+
 /// The picture of [artwork] for [card] (see [CardData.artwork]): a wiki scan
 /// when it is a URL, else Scryfall's normal picture of that print for MtG,
 /// YGOPRODeck's image for Yu-Gi-Oh!. With [small], the thumbnail instead
 /// (for choosing among scans).
 ImageSource artworkImageSource(CardData card, String artwork, {bool small = false}) {
-  if (isOnePieceId(artwork)) return ImageSource('opc-$artwork', opcCardImage(artwork), extension: 'webp');
+  if (isOnePieceId(artwork)) return opcImageSource(artwork);
   if (artwork.startsWith('http')) {
     final url = Uri.parse(artwork);
     // Fandom files: `…/File.png/revision/latest?cb=…`; a width-limited
