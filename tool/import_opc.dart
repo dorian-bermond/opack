@@ -5,9 +5,10 @@
 //   dart run tool/import_opc.dart            # every booster set
 //   dart run tool/import_opc.dart OP18 EB05  # only these sets
 //
-// One call lists every card with its details; the base print of each card
-// of a booster set is kept (alternate arts and other languages are left
-// out). The source gives no pull rates, so the booster formula is derived
+// One call lists every card with its details; every print of each card of
+// a booster set is kept, the base one and its other versions (parallel,
+// manga, treasure), each a card of its own; reprints from other products
+// and other languages are left out. The source gives no pull rates, so the booster formula is derived
 // from the rarities present and marked approximate: 12 cards, 7 commons,
 // 2 uncommons, 2 rares and a top slot.
 

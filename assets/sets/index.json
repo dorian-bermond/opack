@@ -2491,7 +2491,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 61,
+  "cardCount": 113,
   "path": "assets/sets/opc/EB01.json"
  },
  {
@@ -2505,7 +2505,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 61,
+  "cardCount": 91,
   "path": "assets/sets/opc/EB02.json"
  },
  {
@@ -2519,7 +2519,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 62,
+  "cardCount": 96,
   "path": "assets/sets/opc/EB03.json"
  },
  {
@@ -2533,7 +2533,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 61,
+  "cardCount": 88,
   "path": "assets/sets/opc/EB04.json"
  },
  {
@@ -2547,7 +2547,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 61,
+  "cardCount": 85,
   "path": "assets/sets/opc/EB05.json"
  },
  {
@@ -2561,7 +2561,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 121,
+  "cardCount": 232,
   "path": "assets/sets/opc/OP01.json"
  },
  {
@@ -2575,7 +2575,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 121,
+  "cardCount": 212,
   "path": "assets/sets/opc/OP02.json"
  },
  {
@@ -2589,7 +2589,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 123,
+  "cardCount": 225,
   "path": "assets/sets/opc/OP03.json"
  },
  {
@@ -2603,7 +2603,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 193,
   "path": "assets/sets/opc/OP04.json"
  },
  {
@@ -2617,7 +2617,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 243,
   "path": "assets/sets/opc/OP05.json"
  },
  {
@@ -2631,7 +2631,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 247,
   "path": "assets/sets/opc/OP06.json"
  },
  {
@@ -2645,7 +2645,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 206,
   "path": "assets/sets/opc/OP07.json"
  },
  {
@@ -2659,7 +2659,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 167,
   "path": "assets/sets/opc/OP08.json"
  },
  {
@@ -2673,7 +2673,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 219,
   "path": "assets/sets/opc/OP09.json"
  },
  {
@@ -2687,7 +2687,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 174,
   "path": "assets/sets/opc/OP10.json"
  },
  {
@@ -2701,7 +2701,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 161,
   "path": "assets/sets/opc/OP11.json"
  },
  {
@@ -2715,7 +2715,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 179,
   "path": "assets/sets/opc/OP12.json"
  },
  {
@@ -2729,7 +2729,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 120,
+  "cardCount": 178,
   "path": "assets/sets/opc/OP13.json"
  },
  {
@@ -2743,7 +2743,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 120,
+  "cardCount": 169,
   "path": "assets/sets/opc/OP14.json"
  },
  {
@@ -2757,7 +2757,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 150,
   "path": "assets/sets/opc/OP15.json"
  },
  {
@@ -2771,7 +2771,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 153,
   "path": "assets/sets/opc/OP16.json"
  },
  {
@@ -2785,7 +2785,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 160,
   "path": "assets/sets/opc/OP17.json"
  },
  {
@@ -2799,8 +2799,22 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 119,
+  "cardCount": 151,
   "path": "assets/sets/opc/OP18.json"
+ },
+ {
+  "code": "PRB02",
+  "prefix": "PRB02",
+  "game": "opc",
+  "names": {
+   "en": "One Piece Card the Best Vol.2"
+  },
+  "releaseDate": null,
+  "boosterTypes": [
+   "standard"
+  ],
+  "cardCount": 38,
+  "path": "assets/sets/opc/PRB02.json"
  },
  {
   "code": "25TH",

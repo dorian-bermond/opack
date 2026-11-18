@@ -83,22 +83,36 @@ void main() {
     expect(opcIsBooster('ST01'), isFalse);
     expect(opcIsBooster('P'), isFalse);
 
+    expect(opcVersion('OP17-001'), '');
+    expect(opcVersion('OP17-001_p1'), 'p1');
+    expect(opcVersion('OP12-090_r1'), 'r1');
+    expect(opcVersionSheet('OP17-001', 'L'), isNull);
+    expect(opcVersionSheet('OP17-001_p1', 'L'), 'parallel');
+    expect(opcVersionSheet('OP17-034_p2', 'SR'), 'manga');
+    expect(opcVersionSheet('OP17-040_p1', 'SP CARD'), 'manga');
+    expect(opcVersionSheet('OP17-119_p1', 'TR'), 'treasure');
+    expect(opcVersionSheet('OP12-090_r1', 'C'), isNull, reason: 'a reprint, never in a booster');
+
     final bySet = opcCardsBySet(_json);
     expect(bySet.keys, unorderedEquals(['OP01', 'OP18']), reason: 'booster sets only');
-    expect(bySet['OP01']!.map((c) => c.id), ['OP01-077', 'OP01-015', 'OP01-003'],
-        reason: 'base prints, English, no DON');
+    expect(bySet['OP01']!.map((c) => c.id), ['OP01-077', 'OP01-015', 'OP01-003', 'OP01-003_p1'],
+        reason: 'every English print but DON cards');
 
     final set = buildOpcSet('OP01', 'Romance Dawn', [...bySet['OP01']!, ...bySet['OP01']!]);
     expect(set['code'], 'OP01');
-    expect((set['cards'] as List).length, 3, reason: 'a repeated card counts once');
+    expect((set['cards'] as List).length, 4, reason: 'a repeated card counts once, a version is its own');
     expect(((set['cards'] as List).first as Map)['id'], 'OP01-003', reason: 'sorted by code');
     final booster = (set['boosters'] as Map)['standard'] as Map;
     expect(booster['approximate'], isTrue);
     final variants = (booster['variants'] as List).cast<Map>();
-    expect(variants.map((v) => (v['contents'] as Map).keys.last), ['leader'],
-        reason: 'only the top slots whose rarity exists');
-    expect((variants.single['contents'] as Map)['uncommon'], 2);
-    expect(((booster['sheets'] as Map)['leader'] as Map)['cards'], [[0, 1]]);
+    expect(variants.map((v) => (v['contents'] as Map).keys.last), ['leader', 'parallel'],
+        reason: 'only the top slots whose sheet exists');
+    expect(variants.map((v) => v['weight']), [150, 38]);
+    expect((variants.first['contents'] as Map)['uncommon'], 2);
+    final sheets = booster['sheets'] as Map;
+    expect((sheets['leader'] as Map)['cards'], [[0, 1]], reason: 'the base leader');
+    expect((sheets['parallel'] as Map)['cards'], [[1, 1]], reason: 'its parallel art, apart');
+    expect(sheets.containsKey('rare'), isFalse);
     final parsed = CardSet.fromJson(jsonDecode(jsonEncode(set)) as Map<String, dynamic>);
     expect(parsed.game, Game.opc);
     expect(parsed.cards.first.rarity, Rarity.leader);

@@ -70,7 +70,8 @@ class CardInfoFetcher {
   /// One Piece details come from onepiece.gg's full list, loaded once.
   Future<Map<String, CardInfo>> _fetchOpc(List<CardData> cards) async {
     final rows = await DotggOnePiece.rows(_client);
-    final byId = {for (final row in rows) if (DotggOnePiece.isBase(row)) DotggOnePiece.baseId(row): row};
+    // By print id, so an alternate art (`OP17-001_p1`) gets its details too.
+    final byId = {for (final row in rows) '${row['id']}': row};
     return {
       for (final card in cards)
         if (byId[card.id] case final row?) card.id: OpcCardInfo.fromDotgg(row),
