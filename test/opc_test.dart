@@ -15,6 +15,7 @@ import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 
+import '../tool/src/limitless.dart';
 import '../tool/src/opc.dart';
 
 /// A onepiece.gg indexed answer: Perona, Chopper, the Luffy leader with an
@@ -90,7 +91,10 @@ void main() {
     expect(opcVersion('OP12-090_r1'), 'r1');
     expect(opcVersionSheet('OP17-001', 'L'), isNull);
     expect(opcVersionSheet('OP17-001_p1', 'L'), 'parallel');
-    expect(opcVersionSheet('OP17-034_p2', 'SR'), 'manga');
+    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17', manga: true), 'manga');
+    expect(opcVersionSheet('OP17-034_p2', 'SR', product: 'OP17'), 'special',
+        reason: 'a second art of the set\'s own card that is no manga art (a gold stamp, a super leader)');
+    expect(opcVersionSheet('OP17-001_p1', 'L', product: 'EB05'), 'special', reason: "another set's card in a new art");
     expect(opcVersionSheet('OP17-040_p1', 'SP CARD'), 'special');
     expect(opcPulledFrom('EXTRA BOOSTER -ONE PIECE HEROINES EDITION vol.2- [EB-05]', 'OP17'), 'EB05',
         reason: 'a special art reprint is pulled from the extra booster');
@@ -253,7 +257,7 @@ void main() {
       (id: 'OP18-005', name: 'Crocodile', rarityCode: 'SR'),
       (id: 'OP18-005_p2', name: 'Crocodile', rarityCode: 'SR'),
       (id: 'OP18-119', name: 'Imu', rarityCode: 'SEC'),
-    ]))) as Map<String, dynamic>);
+    ], manga: {'OP18-005_p2'}))) as Map<String, dynamic>);
     final (:tags, :slots) = prefillFromSet(set);
     expect(slots.map((s) => '${s.count}×${s.options.map((o) => '${o.tag}:${o.weight}').join('|')}'), [
       '7×common:1',
@@ -274,6 +278,58 @@ void main() {
     ]))) as Map<String, dynamic>);
     final (slots: extraSlots, tags: _) = prefillFromSet(extra);
     expect(extraSlots.map((s) => s.count), [8, 3, 1]);
+  });
+
+  test('manga arts are told from the TCGplayer listing names on limitless card pages', () {
+    const index = '<table><tr><th>Code</th></tr>'
+        '<tr><td><a href="/cards/eb05-x">EB05</a></td><td><a href="/cards/eb05-x">One Piece Heroines Edition vol.2</a></td>'
+        '<td><a href="/cards/eb05-x">30 Oct 26</a></td></tr>'
+        '<tr><td><a href="/cards/op05-x">OP05</a></td><td><a href="/cards/op05-x">Awakening of the New Era</a></td></tr>'
+        '<tr><td><a href="/cards/promos">P</a></td><td><a href="/cards/promos">Promos</a></td></tr></table>';
+    final codes = limitlessSetCodes(index);
+    expect(codes, {'One Piece Heroines Edition vol.2': 'EB05', 'Awakening of the New Era': 'OP05'});
+
+    String row(String set, String label, String product, {String? v}) =>
+        '<tr${v == null ? ' class="current"' : ''}><td><a ${v == null ? '' : 'href="/cards/X?v=$v" '}> $set '
+        '<span class="prints-table-card-number">$label</span></a></td><td><a class="card-price usd" '
+        'href="https://partner.tcgplayer.com/ONEPIECE?u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F1%2F$product" '
+        'target="_blank">\$1</a></td></tr>';
+    // Nico Robin EB05-010: limitless calls her super leader a manga art, TCGplayer does not.
+    final robin = limitlessPrints('<table><tr><th>Print</th></tr>'
+        '${row('One Piece Heroines Edition vol.2', '', 'one-piece-card-game-extra-booster-nico-robin-010')}'
+        '${row('One Piece Heroines Edition vol.2', 'aa', 'one-piece-card-game-extra-booster-nico-robin-010-heroine-leader', v: '1')}'
+        '${row('One Piece Heroines Edition vol.2', 'manga', 'one-piece-card-game-extra-booster-nico-robin-010-super-leader-alternate-art', v: '2')}'
+        '</table>');
+    expect(robin.map((p) => p.label), ['', 'aa', 'manga']);
+    expect(robin.map(limitlessIsManga), [false, false, false]);
+    expect(opcMangaPrints(product: 'EB05', ids: ['EB05-010', 'EB05-010_p1', 'EB05-010_p2'], prints: robin, setCodes: codes), isEmpty);
+
+    // Shirahoshi EB05-014: her third print is the manga art.
+    final shirahoshi = limitlessPrints('<table>'
+        '${row('One Piece Heroines Edition vol.2', '', 'one-piece-card-game-extra-booster-shirahoshi')}'
+        '${row('One Piece Heroines Edition vol.2', 'aa', 'one-piece-card-game-extra-booster-shirahoshi-super-rare-alternate-art', v: '1')}'
+        '${row('One Piece Heroines Edition vol.2', 'manga', 'one-piece-card-game-extra-booster-shirahoshi-manga', v: '2')}'
+        '</table>');
+    expect(opcMangaPrints(product: 'EB05', ids: ['EB05-014', 'EB05-014_p1', 'EB05-014_p2'], prints: shirahoshi, setCodes: codes),
+        {'EB05-014_p2'});
+    expect(opcMangaPrints(product: 'EB05', ids: ['EB05-014', 'EB05-014_p1'], prints: shirahoshi, setCodes: codes), {'EB05-014_p1'},
+        reason: 'counts apart, the manga art is the last print');
+
+    // Luffy OP05-119: the manga art is in OP05, the other products' prints do not count.
+    final luffy = limitlessPrints('<table>'
+        '${row('Awakening of the New Era', '', 'awakening-of-the-new-era-monkeydluffy-119')}'
+        '${row('Awakening of the New Era', 'aa', 'awakening-of-the-new-era-monkeydluffy-119-alternate-art', v: '1')}'
+        '${row('Awakening of the New Era', 'manga', 'awakening-of-the-new-era-monkeydluffy-119-alternate-art-manga', v: '2')}'
+        '${row('Emperors in the New World', 'wanted', 'emperors-in-the-new-world-monkeydluffy-wanted-poster', v: '3')}'
+        '<tr><td><a href="/cards/X?v=4" > One Piece Card The Best <span class="prints-table-card-number">manga</span></a></td><td>-</td></tr>'
+        '</table>');
+    expect(luffy.length, 5);
+    expect(luffy.last.product, '', reason: 'no listing');
+    expect(limitlessIsManga(luffy.last), isTrue, reason: 'the label stands in');
+    expect(opcMangaPrints(product: 'OP05', ids: ['OP05-119', 'OP05-119_p1', 'OP05-119_p2'], prints: luffy, setCodes: codes),
+        {'OP05-119_p2'});
+    expect(opcMangaPrints(product: 'OP09', ids: ['OP05-119_p3'], prints: luffy, setCodes: codes), isEmpty,
+        reason: 'OP09 is not in the index');
   });
 
   test('the leader rarity sits between super rare and ultra rare', () {

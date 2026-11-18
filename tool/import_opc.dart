@@ -8,7 +8,9 @@
 // One call lists every card with its details; every print of each card of
 // a booster set is kept, the base one and its other versions (parallel,
 // manga, treasure), each a card of its own; reprints from other products
-// and other languages are left out. The source gives no pull rates, so the booster formula is derived
+// and other languages are left out. Which arts are manga arts is read from
+// onepiece.limitlesstcg.com's card pages (one call per card with other
+// arts). The source gives no pull rates, so the booster formula is derived
 // from the rarities present and marked approximate: 12 cards, 7 commons,
 // 2 uncommons, 2 rares and a top slot.
 
@@ -16,9 +18,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'src/common.dart';
+import 'src/limitless.dart';
 import 'src/opc.dart';
 
 final _http = CachedHttp('.cache/opc', delay: const Duration(milliseconds: 300));
+final _limitless = CachedHttp('.cache/limitless', delay: const Duration(milliseconds: 400));
 
 Future<void> main(List<String> arguments) async {
   try {
@@ -47,7 +51,7 @@ Future<void> main(List<String> arguments) async {
         stderr.writeln('Skipping $code: ${cards.length} cards, no booster of its own');
         continue;
       }
-      final file = buildOpcSet(code, _knownNames[code] ?? setNames[code] ?? code, cards);
+      final file = buildOpcSet(code, _knownNames[code] ?? setNames[code] ?? code, cards, manga: await _mangaPrints(code, cards));
       await writeSet(file);
       written++;
       stdout.writeln('$code ${file['names']}: ${(file['cards'] as List).length} cards');
@@ -56,7 +60,32 @@ Future<void> main(List<String> arguments) async {
     await rebuildIndex();
   } finally {
     _http.close();
+    _limitless.close();
   }
+}
+
+Map<String, String>? _setCodes;
+
+/// The manga arts among a set's prints, per limitless's card pages.
+Future<Set<String>> _mangaPrints(String code, List<OpcCard> cards) async {
+  _setCodes ??= limitlessSetCodes(await _limitless.get(Uri.https('onepiece.limitlesstcg.com', '/cards')) ?? '');
+  String base(String id) => id.replaceAll(RegExp(r'_.*$'), '');
+  final byCard = <String, List<String>>{};
+  for (final c in cards) {
+    if (opcVersion(c.id).isNotEmpty) byCard.putIfAbsent(base(c.id), () => []);
+  }
+  for (final c in cards) {
+    byCard[base(c.id)]?.add(c.id);
+  }
+  final manga = <String>{};
+  for (final MapEntry(key: card, value: ids) in byCard.entries) {
+    final page = await _limitless.get(Uri.https('onepiece.limitlesstcg.com', '/cards/$card'));
+    if (page == null) continue;
+    int order(String id) => opcVersion(id).isEmpty ? 0 : int.tryParse(opcVersion(id).substring(1)) ?? 99;
+    ids.sort((a, b) => order(a) - order(b));
+    manga.addAll(opcMangaPrints(product: code, ids: ids, prints: limitlessPrints(page), setCodes: _setCodes!));
+  }
+  return manga;
 }
 
 /// Names the source leaves empty or wrong.
