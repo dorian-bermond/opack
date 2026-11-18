@@ -29,6 +29,7 @@ const _data = [
   ['OP01-003_p1', 'OP01-003', 'L', 'LEADER', 'Monkey.D.Luffy', null, 'Strike', '5000', null, 'Red/Green', 'Supernovas/Straw Hat Crew', 'x', '-ROMANCE DAWN- [OP01]', 4, 'OP01', 'en'],
   ['OP01-003_p2', 'OP01-003', 'L', 'LEADER', 'モンキー・D・ルフィ', null, '打', '5000', null, 'Red/Green', '', 'x', '', 4, 'OP01', 'jp'],
   ['OP18-001', 'OP18-001', 'L', 'LEADER', 'Karoo', null, 'Strike', '5000', null, 'Red/Blue', 'Animal/Alabasta', 'y', 'BOOSTER PACK -THE DOMINANCE OF GOD- [OP-18]', 4, 'OP18', 'en'],
+  ['OP17-081_p1', 'OP17-081', 'SP CARD', 'CHARACTER', 'Gerd', 4, 'Strike', 5000, 1000, 'Green', 'Giant', '', 'EXTRA BOOSTER -ONE PIECE HEROINES EDITION vol.2- [EB-05]', null, 'OP17', 'en'],
   ['DON-001', 'DON-001', 'C', 'DON', 'DON!! card', null, null, null, null, null, '', '', '', null, 'OP01', 'en'],
   ['ST01-001', 'ST01-001', 'L', 'LEADER', 'Luffy (ST)', null, 'Strike', '5000', null, 'Red', 'Straw Hat Crew', '', 'STARTER DECK -Straw Hat Crew- [ST-01]', 5, 'ST01', 'en'],
 ];
@@ -89,12 +90,18 @@ void main() {
     expect(opcVersionSheet('OP17-001', 'L'), isNull);
     expect(opcVersionSheet('OP17-001_p1', 'L'), 'parallel');
     expect(opcVersionSheet('OP17-034_p2', 'SR'), 'manga');
-    expect(opcVersionSheet('OP17-040_p1', 'SP CARD'), 'manga');
+    expect(opcVersionSheet('OP17-040_p1', 'SP CARD'), 'special');
+    expect(opcPulledFrom('EXTRA BOOSTER -ONE PIECE HEROINES EDITION vol.2- [EB-05]', 'OP17'), 'EB05',
+        reason: 'a special art reprint is pulled from the extra booster');
+    expect(opcPulledFrom('-ROMANCE DAWN- [OP01]', 'OP01'), 'OP01');
+    expect(opcPulledFrom('STARTER DECK -Straw Hat Crew- [ST-01]', 'OP01'), 'OP01', reason: 'not a booster: its own set');
+    expect(opcPulledFrom('', 'EB05'), 'EB05');
     expect(opcVersionSheet('OP17-119_p1', 'TR'), 'treasure');
     expect(opcVersionSheet('OP12-090_r1', 'C'), isNull, reason: 'a reprint, never in a booster');
 
     final bySet = opcCardsBySet(_json);
-    expect(bySet.keys, unorderedEquals(['OP01', 'OP18']), reason: 'booster sets only');
+    expect(bySet.keys, unorderedEquals(['OP01', 'OP18', 'EB05']), reason: 'booster sets only');
+    expect(bySet['EB05']!.map((c) => c.id), ['OP17-081_p1'], reason: "Gerd's special art is pulled from EB-05");
     expect(bySet['OP01']!.map((c) => c.id), ['OP01-077', 'OP01-015', 'OP01-003', 'OP01-003_p1'],
         reason: 'every English print but DON cards');
 

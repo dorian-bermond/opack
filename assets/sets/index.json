@@ -2491,7 +2491,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 113,
+  "cardCount": 101,
   "path": "assets/sets/opc/EB01.json"
  },
  {
@@ -2505,7 +2505,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 91,
+  "cardCount": 115,
   "path": "assets/sets/opc/EB02.json"
  },
  {
@@ -2519,7 +2519,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 96,
+  "cardCount": 95,
   "path": "assets/sets/opc/EB03.json"
  },
  {
@@ -2533,7 +2533,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 88,
+  "cardCount": 85,
   "path": "assets/sets/opc/EB04.json"
  },
  {
@@ -2547,7 +2547,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 85,
+  "cardCount": 96,
   "path": "assets/sets/opc/EB05.json"
  },
  {
@@ -2561,7 +2561,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 232,
+  "cardCount": 191,
   "path": "assets/sets/opc/OP01.json"
  },
  {
@@ -2575,7 +2575,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 212,
+  "cardCount": 183,
   "path": "assets/sets/opc/OP02.json"
  },
  {
@@ -2589,7 +2589,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 225,
+  "cardCount": 177,
   "path": "assets/sets/opc/OP03.json"
  },
  {
@@ -2603,7 +2603,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 193,
+  "cardCount": 160,
   "path": "assets/sets/opc/OP04.json"
  },
  {
@@ -2617,7 +2617,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 243,
+  "cardCount": 167,
   "path": "assets/sets/opc/OP05.json"
  },
  {
@@ -2631,7 +2631,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 247,
+  "cardCount": 171,
   "path": "assets/sets/opc/OP06.json"
  },
  {
@@ -2645,7 +2645,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 206,
+  "cardCount": 191,
   "path": "assets/sets/opc/OP07.json"
  },
  {
@@ -2659,7 +2659,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 167,
+  "cardCount": 162,
   "path": "assets/sets/opc/OP08.json"
  },
  {
@@ -2673,7 +2673,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 219,
+  "cardCount": 200,
   "path": "assets/sets/opc/OP09.json"
  },
  {
@@ -2687,7 +2687,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 174,
+  "cardCount": 167,
   "path": "assets/sets/opc/OP10.json"
  },
  {
@@ -2701,7 +2701,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 161,
+  "cardCount": 166,
   "path": "assets/sets/opc/OP11.json"
  },
  {
@@ -2715,7 +2715,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 179,
+  "cardCount": 187,
   "path": "assets/sets/opc/OP12.json"
  },
  {
@@ -2729,7 +2729,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 178,
+  "cardCount": 186,
   "path": "assets/sets/opc/OP13.json"
  },
  {
@@ -2743,7 +2743,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 169,
+  "cardCount": 164,
   "path": "assets/sets/opc/OP14.json"
  },
  {
@@ -2757,7 +2757,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 150,
+  "cardCount": 149,
   "path": "assets/sets/opc/OP15.json"
  },
  {
@@ -2771,7 +2771,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 153,
+  "cardCount": 158,
   "path": "assets/sets/opc/OP16.json"
  },
  {
@@ -2785,7 +2785,7 @@
   "boosterTypes": [
    "standard"
   ],
-  "cardCount": 160,
+  "cardCount": 169,
   "path": "assets/sets/opc/OP17.json"
  },
  {
