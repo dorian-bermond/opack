@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../shared/widgets/set_icon.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -109,7 +110,7 @@ class _SourcePickerState extends ConsumerState<_SourcePicker> {
                     ),
                   for (final set in sets)
                     ListTile(
-                      leading: const Icon(Icons.style),
+                      leading: SetSymbol(set, code: set.code, size: 28),
                       title: Text('${set.nameFor(language)} (${set.displayCode})'),
                       subtitle: Text(l10n.cardsCount(set.cardCount)),
                       onTap: () => Navigator.pop(context, SetSource(set.code)),

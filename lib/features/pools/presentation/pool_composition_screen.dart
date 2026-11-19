@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../shared/widgets/set_icon.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -229,7 +230,9 @@ class _CompositionState extends ConsumerState<_Composition> {
             children: [
               for (final layout in prefills)
                 ActionChip(
-                  avatar: Icon(layout is BoosterLayout ? Icons.style : Icons.shuffle, size: 18),
+                  avatar: layout is BoosterLayout
+                      ? SetIcon(pool.game, layout.setCode, size: 18)
+                      : const Icon(Icons.shuffle, size: 18),
                   label: Text(prefillLabel(layout)),
                   onPressed: () => _prefill(context, ref, layout),
                 ),

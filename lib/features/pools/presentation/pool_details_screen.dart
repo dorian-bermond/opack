@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import '../../../shared/widgets/set_icon.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -75,7 +76,9 @@ class _PoolDetails extends ConsumerWidget {
               children: [
                 for (final source in saved.sources)
                   InputChip(
-                    avatar: Icon(source is SetSource ? Icons.style : Icons.view_module, size: 18),
+                    avatar: source is SetSource
+                        ? SetIcon(saved.game, source.code, size: 18)
+                        : const Icon(Icons.view_module, size: 18),
                     label: Text(sourceName(ref, saved.game, source, uiLanguage)),
                     onDeleted: () => savePool(ref, saved.withoutSource(source)),
                   ),

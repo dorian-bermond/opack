@@ -90,6 +90,7 @@ Future<void> rebuildIndex() async {
       'game': set['game'],
       'names': set['names'],
       'releaseDate': set['releaseDate'],
+      'icon': ?set['icon'],
       'boosterTypes': (set['boosters'] as Map).keys.toList(),
       'cardCount': (set['cards'] as List).length,
       'path': file.path.replaceAll(r'\', '/'),

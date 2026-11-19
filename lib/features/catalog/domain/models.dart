@@ -222,6 +222,7 @@ class SetSummary {
     required this.assetPath,
     this.releaseDate,
     this.prefix,
+    this.icon,
   });
 
   factory SetSummary.fromJson(Map<String, dynamic> json) => SetSummary(
@@ -236,6 +237,7 @@ class SetSummary {
         ]..sort((a, b) => a.index.compareTo(b.index)),
         cardCount: json['cardCount'] as int,
         releaseDate: DateTime.tryParse(json['releaseDate'] as String? ?? ''),
+        icon: json['icon'] as String?,
       );
 
   final String code;
@@ -250,6 +252,9 @@ class SetSummary {
 
   /// Printed set code when [code] had to be made unique (`IOC2` -> `IOC`).
   final String? prefix;
+
+  /// Bundled SVG of the set's expansion symbol, when it has one.
+  final String? icon;
 
   String get displayCode => prefix ?? code;
 

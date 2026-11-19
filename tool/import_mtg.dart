@@ -13,6 +13,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'src/common.dart';
+import 'src/mtg_icons.dart';
 
 const _mtgjson = 'https://mtgjson.com/api/v5';
 
@@ -67,6 +68,7 @@ Future<void> main(List<String> args) async {
       }
     }
     stdout.writeln('Wrote $written of ${codes.length} sets');
+    await importMtgIcons(_http);
     await rebuildIndex();
   } finally {
     _http.close();
