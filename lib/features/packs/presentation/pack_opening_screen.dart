@@ -89,6 +89,9 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
       BoosterLayout(:final booster) => booster,
       RandomLayout() => null,
     };
+    // The pack takes the shape of its picture, so the cards inside match it.
+    final picture = coverPicture(ref, context, set: pool.layoutSet, booster: booster, custom: pool.pool.cover);
+    final aspect = picture == null ? 180 / 280 : ref.watch(coverAspectProvider(picture.path)).value ?? 180 / 280;
 
     return Scaffold(
       appBar: AppBar(title: Text(pool.name)),
@@ -96,7 +99,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
           ? LayoutBuilder(builder: (context, constraints) {
               // The pack takes the height left by the texts around it.
               final packHeight = (constraints.maxHeight - 190).clamp(200.0, 720.0);
-              final packWidth = (packHeight * 180 / 280).clamp(120.0, constraints.maxWidth - 32);
+              final packWidth = (packHeight * aspect).clamp(120.0, constraints.maxWidth - 32);
               // A slash may start anywhere: the whole screen relays it.
               return GestureDetector(
               key: const Key('slashArea'),
@@ -123,7 +126,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                   SealedPack(
                     key: ValueKey('sealed-${_opened[_kind] ?? 0}'),
                     width: packWidth,
-                    height: packWidth * 280 / 180,
+                    height: packWidth / aspect,
                     enabled: !_exhausted,
                     onOpen: _open,
                     controller: _slash,
@@ -134,7 +137,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                       booster: booster,
                       custom: pool.pool.cover,
                       width: packWidth,
-                      height: packWidth * 280 / 180,
+                      height: packWidth / aspect,
                     ),
                   ),
                   const SizedBox(height: 16),

@@ -17,6 +17,27 @@ class TrimmedImage extends StatefulWidget {
   /// Measured subject bounds per file path, so a picture is scanned once.
   static final Map<String, Rect> _bounds = {};
 
+  /// The bounds of [file]'s subject, measured once.
+  static Future<Rect> boundsOf(File file) async {
+    if (_bounds[file.path] case final bounds?) return bounds;
+    final image = await decodeImageFromList(await file.readAsBytes());
+    try {
+      final pixels = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+      final bounds = pixels == null
+          ? Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble())
+          : subjectBounds(image, pixels);
+      return _bounds[file.path] = bounds;
+    } finally {
+      image.dispose();
+    }
+  }
+
+  /// Width over height of [file]'s subject.
+  static Future<double> aspectOf(File file) async {
+    final bounds = await boundsOf(file);
+    return bounds.height == 0 ? 1 : bounds.width / bounds.height;
+  }
+
   /// The bounds of the pixels that are neither transparent nor near-white.
   static Rect subjectBounds(ui.Image image, ByteData pixels) {
     final width = image.width;
@@ -62,15 +83,8 @@ class _TrimmedImageState extends State<TrimmedImage> {
 
   Future<void> _load() async {
     final path = widget.file.path;
+    final bounds = await TrimmedImage.boundsOf(widget.file);
     final image = await decodeImageFromList(await widget.file.readAsBytes());
-    var bounds = TrimmedImage._bounds[path];
-    if (bounds == null) {
-      final pixels = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-      bounds = pixels == null
-          ? Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble())
-          : TrimmedImage.subjectBounds(image, pixels);
-      TrimmedImage._bounds[path] = bounds;
-    }
     if (!mounted || widget.file.path != path) {
       image.dispose();
       return;

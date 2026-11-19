@@ -8,9 +8,26 @@ import '../../features/catalog/domain/models.dart';
 import '../images/card_image_cache.dart';
 import 'trimmed_image.dart';
 
+/// The aspect ratio (width over height) of a pack picture's subject, its
+/// blank margins left out; the plain pack's until measured.
+final coverAspectProvider = FutureProvider.family<double, String>((ref, path) => TrimmedImage.aspectOf(File(path)));
+
+/// The pack picture a pool shows, as [BoosterCover] picks it: the user's
+/// own, else the set's once downloaded; `null` for the plain pack or MtG
+/// card art, which get a frame of the plain pack's shape.
+File? coverPicture(WidgetRef ref, BuildContext context, {CardSet? set, BoosterType? booster, String? custom}) {
+  if (custom != null && File(custom).existsSync()) return File(custom);
+  if (set == null) return null;
+  final source = boosterImageSource(set, language: pictureLanguage(ref, context), booster: booster);
+  final image = source == null ? null : ref.watch(cardImageProvider(source)).value;
+  if (image == null || (set.game == Game.mtg && image.path.endsWith('-art.jpg'))) return null;
+  return image;
+}
+
 /// A sealed booster: the pack picture of [set] once downloaded (or, for MtG
 /// sets without one, card art under the set name), else a plain pack
 /// showing [label]. Without a set (random packs) always the plain pack.
+/// A pack picture is shown without its blank margins, filling the box.
 class BoosterCover extends ConsumerWidget {
   const BoosterCover({
     super.key,
@@ -44,7 +61,7 @@ class BoosterCover extends ConsumerWidget {
     // A picture of the pack stands alone; the plain pack and MtG's art get a backdrop.
     var backdrop = false;
     if (custom != null && custom.existsSync()) {
-      front = Image.file(custom, key: const Key('customCover'), fit: BoxFit.contain);
+      front = TrimmedImage(custom, key: const Key('customCover'));
     } else if (image == null) {
       backdrop = true;
       front = Center(
@@ -80,12 +97,10 @@ class BoosterCover extends ConsumerWidget {
           ),
         ],
       );
-    } else if (set.game == Game.opc && !image.path.endsWith('-card.webp')) {
-      // The official product picture comes with wide blank margins around
-      // the pack: they are cropped away so the pack fills the cover.
-      front = TrimmedImage(image);
     } else {
-      front = Image.file(image, fit: BoxFit.contain);
+      // Product pictures come with blank margins around the pack: they are
+      // cropped away so the pack fills the cover.
+      front = TrimmedImage(image);
     }
 
     if (!backdrop) return SizedBox(width: width, height: height, child: front);
