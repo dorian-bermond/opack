@@ -218,14 +218,14 @@ void main() {
     await tester.tap(find.descendant(of: commonChipWidget, matching: find.byTooltip('Delete')));
     await tester.pumpAndSettle();
     expect(find.text('Delete the tag Common?'), findsOneWidget);
-    expect(find.textContaining('7 × Common'), findsNWidgets(2), reason: 'the composition and the warning');
+    expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the warning');
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(commonChip, findsOneWidget);
 
-    // The composition is edited from the details page too.
-    await tester.tap(find.text('Edit composition'));
-    await settleLoading(tester);
+    // The composition sits on the booster tab of the details page.
+    await tester.tap(find.byKey(const Key('boosterTab')));
+    await tester.pumpAndSettle();
     expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the prefilled common slot');
     await tester.tap(find.text('Add a slot'));
     await tester.pumpAndSettle();
@@ -239,9 +239,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('1 × Common 1/2 · Common 1/2'), findsNothing);
     expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the prefilled slots stay');
-    await tester.tap(find.byType(BackButton));
-    await tester.pumpAndSettle();
-    expect(find.text('Booster composition'), findsOneWidget);
+    expect(find.byKey(const Key('chooseCover')), findsOneWidget, reason: 'the pack picture lives here too');
 
     await tester.pageBack();
     await tester.pumpAndSettle();

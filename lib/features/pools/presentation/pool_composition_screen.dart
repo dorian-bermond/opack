@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/set_icon.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/router.dart';
+import '../../../shared/widgets/booster_cover.dart';
+import '../../../shared/widgets/set_icon.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/card_tile.dart';
@@ -8,6 +14,7 @@ import '../../card_info/presentation/labels.dart';
 import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
+import 'pool_actions.dart';
 import 'pool_loader.dart';
 
 /// The booster composition of a pool: its slots with their weighted
@@ -21,7 +28,10 @@ class PoolCompositionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PoolLoader(
         poolId: poolId,
-        builder: (context, pool) => _Composition(play: pool),
+        builder: (context, pool) => Scaffold(
+          appBar: AppBar(title: Text(AppLocalizations.of(context).boosterComposition)),
+          body: BoosterSettings(play: pool),
+        ),
       );
 }
 
@@ -36,16 +46,18 @@ String slotOptionsLabel(AppLocalizations l10n, PackSlot slot) => [
             : '${tagLabel(l10n, option.tag)} ${option.weight}/${slot.totalWeight}',
     ].join(' · ');
 
-class _Composition extends ConsumerStatefulWidget {
-  const _Composition({required this.play});
+/// Everything about a pool's boosters: the pack picture, the versions
+/// dealt, the kinds of booster with their slots, and prefilling.
+class BoosterSettings extends ConsumerStatefulWidget {
+  const BoosterSettings({super.key, required this.play});
 
   final PlayPool play;
 
   @override
-  ConsumerState<_Composition> createState() => _CompositionState();
+  ConsumerState<BoosterSettings> createState() => _BoosterSettingsState();
 }
 
-class _CompositionState extends ConsumerState<_Composition> {
+class _BoosterSettingsState extends ConsumerState<BoosterSettings> {
   static const packSizes = [5, 8, 9, 10, 11, 12, 14, 15, 16, 18, 20];
 
   /// The booster being edited (the first one at start).
@@ -127,119 +139,175 @@ class _CompositionState extends ConsumerState<_Composition> {
           RandomLayout(:final packSize) => '${l10n.randomPacks} · ${l10n.cardsCount(packSize)}',
         };
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.boosterComposition)),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        label: Text(l10n.addSlot),
-        onPressed: () async {
-          final slot = await editSlot(context, play, null);
-          if (slot != null) saveSlots([...booster.slots, slot]);
-        },
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-        children: [
-          Text(pool.name, style: theme.textTheme.titleMedium),
-          if (play.unplaced > 0) Text(l10n.cardsUnplaced(play.unplaced), style: theme.textTheme.bodySmall),
-          const SizedBox(height: 12),
-          SwitchListTile(
-            key: const Key('bestVersions'),
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.bestVersions),
-            subtitle: Text(l10n.bestVersionsHint),
-            value: pool.bestVersions,
-            onChanged: (on) => save(pool.withBestVersions(on)),
+    final layoutBooster = switch (pool.layout) {
+      BoosterLayout(:final booster) => booster,
+      RandomLayout() => null,
+    };
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      children: [
+        Text(l10n.boosterPicture, style: theme.textTheme.labelLarge),
+        const SizedBox(height: 6),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BoosterCover(
+              set: play.layoutSet,
+              label: pool.name,
+              booster: layoutBooster,
+              custom: pool.cover,
+              width: 108,
+              height: 168,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.boosterPictureHint, style: theme.textTheme.bodySmall),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      FilledButton.tonalIcon(
+                        key: const Key('chooseCover'),
+                        icon: const Icon(Icons.image_outlined),
+                        label: Text(l10n.choosePicture),
+                        onPressed: () => pickPoolCover(context, ref, pool),
+                      ),
+                      if (pool.cover case final path? when File(path).existsSync())
+                        OutlinedButton.icon(
+                          key: const Key('clearCover'),
+                          icon: const Icon(Icons.restart_alt),
+                          label: Text(l10n.removePicture),
+                          onPressed: () => clearPoolCover(ref, pool),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (play.unplaced > 0) Text(l10n.cardsUnplaced(play.unplaced), style: theme.textTheme.bodySmall),
+        const SizedBox(height: 12),
+        SwitchListTile(
+          key: const Key('bestVersions'),
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.bestVersions),
+          subtitle: Text(l10n.bestVersionsHint),
+          value: pool.bestVersions,
+          onChanged: (on) => save(pool.withBestVersions(on)),
+        ),
+        const SizedBox(height: 12),
+        Text(l10n.boosterKinds, style: theme.textTheme.labelLarge),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final kind in pool.boosters)
+              InputChip(
+                label: Text('${kind.name} · ${l10n.cardsCount(play.boosterPlay(kind.name)?.packSize ?? 0)}'),
+                selected: kind.name == booster.name,
+                onSelected: (_) => setState(() => _selected = kind.name),
+                deleteButtonTooltipMessage: l10n.deleteBooster,
+                onDeleted: pool.boosters.length > 1
+                    ? () {
+                        save(pool.withoutBooster(kind.name));
+                        if (_selected == kind.name) setState(() => _selected = null);
+                      }
+                    : null,
+              ),
+            ActionChip(
+              avatar: const Icon(Icons.sports_esports, size: 18),
+              label: Text(l10n.formats),
+              onPressed: () => context.push(poolModePath(pool.game, pool.id, 'formats')),
+            ),
+            ActionChip(
+              avatar: const Icon(Icons.add, size: 18),
+              label: Text(l10n.newBooster),
+              onPressed: () async {
+                final name = await _askName(l10n.newBooster);
+                if (name == null || pool.boosters.any((b) => b.name == name)) return;
+                save(pool.withBooster(BoosterDef(name, const [])));
+                setState(() => _selected = name);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text('${booster.name} · ${l10n.cardsCount(play.boosterPlay(booster.name)?.packSize ?? 0)}',
+            style: theme.textTheme.titleSmall),
+        if (booster.slots.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(l10n.noUserSlots, style: theme.textTheme.bodySmall),
           ),
-          const SizedBox(height: 12),
-          Text(l10n.boosterKinds, style: theme.textTheme.labelLarge),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final kind in pool.boosters)
-                InputChip(
-                  label: Text('${kind.name} · ${l10n.cardsCount(play.boosterPlay(kind.name)?.packSize ?? 0)}'),
-                  selected: kind.name == booster.name,
-                  onSelected: (_) => setState(() => _selected = kind.name),
-                  deleteButtonTooltipMessage: l10n.deleteBooster,
-                  onDeleted: pool.boosters.length > 1
-                      ? () {
-                          save(pool.withoutBooster(kind.name));
-                          if (_selected == kind.name) setState(() => _selected = null);
-                        }
-                      : null,
-                ),
+        for (final (i, slot) in booster.slots.indexed)
+          Card(
+            child: ListTile(
+              title: Text(l10n.slotRow(slot.count, slotLabel(l10n, slot))),
+              subtitle: Text([
+                if (slot.name != null) slotOptionsLabel(l10n, slot),
+                for (final option in slot.options)
+                  '${tagLabel(l10n, option.tag)}: ${l10n.slotCards(play.tagCards[option.tag]?.length ?? 0)}',
+              ].join(' · ')),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: l10n.editSlot,
+                    icon: const Icon(Icons.edit_outlined),
+                    onPressed: () async {
+                      final edited = await editSlot(context, play, slot);
+                      if (edited != null) saveSlots([...booster.slots]..[i] = edited);
+                    },
+                  ),
+                  IconButton(
+                    tooltip: l10n.deleteSlot,
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: () => saveSlots([...booster.slots]..removeAt(i)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: FilledButton.tonalIcon(
+              icon: const Icon(Icons.add),
+              label: Text(l10n.addSlot),
+              onPressed: () async {
+                final slot = await editSlot(context, play, null);
+                if (slot != null) saveSlots([...booster.slots, slot]);
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(l10n.prefillFrom, style: theme.textTheme.labelLarge),
+        Text(l10n.prefillHint, style: theme.textTheme.bodySmall),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final layout in prefills)
               ActionChip(
-                avatar: const Icon(Icons.add, size: 18),
-                label: Text(l10n.newBooster),
-                onPressed: () async {
-                  final name = await _askName(l10n.newBooster);
-                  if (name == null || pool.boosters.any((b) => b.name == name)) return;
-                  save(pool.withBooster(BoosterDef(name, const [])));
-                  setState(() => _selected = name);
-                },
+                avatar: layout is BoosterLayout
+                    ? SetIcon(pool.game, layout.setCode, size: 18)
+                    : const Icon(Icons.shuffle, size: 18),
+                label: Text(prefillLabel(layout)),
+                onPressed: () => _prefill(context, ref, layout),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text('${booster.name} · ${l10n.cardsCount(play.boosterPlay(booster.name)?.packSize ?? 0)}',
-              style: theme.textTheme.titleSmall),
-          if (booster.slots.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(l10n.noUserSlots, style: theme.textTheme.bodySmall),
-            ),
-          for (final (i, slot) in booster.slots.indexed)
-            Card(
-              child: ListTile(
-                title: Text(l10n.slotRow(slot.count, slotLabel(l10n, slot))),
-                subtitle: Text([
-                  if (slot.name != null) slotOptionsLabel(l10n, slot),
-                  for (final option in slot.options)
-                    '${tagLabel(l10n, option.tag)}: ${l10n.slotCards(play.tagCards[option.tag]?.length ?? 0)}',
-                ].join(' · ')),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      tooltip: l10n.editSlot,
-                      icon: const Icon(Icons.edit_outlined),
-                      onPressed: () async {
-                        final edited = await editSlot(context, play, slot);
-                        if (edited != null) saveSlots([...booster.slots]..[i] = edited);
-                      },
-                    ),
-                    IconButton(
-                      tooltip: l10n.deleteSlot,
-                      icon: const Icon(Icons.delete_outline),
-                      onPressed: () => saveSlots([...booster.slots]..removeAt(i)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          const SizedBox(height: 24),
-          Text(l10n.prefillFrom, style: theme.textTheme.labelLarge),
-          Text(l10n.prefillHint, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final layout in prefills)
-                ActionChip(
-                  avatar: layout is BoosterLayout
-                      ? SetIcon(pool.game, layout.setCode, size: 18)
-                      : const Icon(Icons.shuffle, size: 18),
-                  label: Text(prefillLabel(layout)),
-                  onPressed: () => _prefill(context, ref, layout),
-                ),
-            ],
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -314,6 +314,8 @@
   "searchFailed": "Search failed: {error}",
   "slotName": "Slot name (optional)",
   "boosterPicture": "Booster picture",
+  "tabPool": "Pool",
+  "tabBooster": "Booster",
   "boosterPictureHint": "The pack shown when opening: the set's own picture, or one of yours.",
   "choosePicture": "Choose a picture",
   "removePicture": "Back to the set's picture",

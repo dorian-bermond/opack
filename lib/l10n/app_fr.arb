@@ -258,6 +258,8 @@
   "searchFailed": "Recherche impossible : {error}",
   "slotName": "Nom de l'emplacement (facultatif)",
   "boosterPicture": "Image du booster",
+  "tabPool": "Pool",
+  "tabBooster": "Booster",
   "boosterPictureHint": "Le paquet montré à l'ouverture : l'image de l'extension, ou une des vôtres.",
   "choosePicture": "Choisir une image",
   "removePicture": "Revenir à l'image de l'extension",

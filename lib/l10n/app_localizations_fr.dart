@@ -728,6 +728,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get boosterPicture => 'Image du booster';
 
   @override
+  String get tabPool => 'Pool';
+
+  @override
+  String get tabBooster => 'Booster';
+
+  @override
   String get boosterPictureHint =>
       'Le paquet montré à l\'ouverture : l\'image de l\'extension, ou une des vôtres.';
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/set_icon.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,9 +42,15 @@ class _PoolDetails extends ConsumerWidget {
     final saved = play.pool;
     final config = saved.config;
 
-    return Scaffold(
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
       appBar: AppBar(
         title: InkWell(onTap: () => renamePool(context, ref, saved), child: Text(saved.name)),
+        bottom: TabBar(tabs: [
+          Tab(key: const Key('poolTab'), text: l10n.tabPool),
+          Tab(key: const Key('boosterTab'), text: l10n.tabBooster),
+        ]),
         actions: [
           IconButton(
             tooltip: l10n.renamePool,
@@ -65,7 +69,8 @@ class _PoolDetails extends ConsumerWidget {
           ),
         ],
       ),
-      body: ListView(
+      body: TabBarView(children: [
+        ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
           PoolSection(
@@ -86,33 +91,6 @@ class _PoolDetails extends ConsumerWidget {
                   avatar: const Icon(Icons.add, size: 18),
                   label: Text(l10n.addSource),
                   onPressed: () => addPoolSource(context, ref, play),
-                ),
-              ],
-            ),
-          ),
-              PoolSection(
-            title: l10n.boosterComposition,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    saved.slots.isEmpty
-                        ? l10n.noUserSlots
-                        : [
-                            for (final slot in saved.slots) l10n.slotRow(slot.count, slotLabel(l10n, slot)),
-                          ].join(' · '),
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ),
-                TextButton.icon(
-                  icon: const Icon(Icons.tune),
-                  label: Text(l10n.editComposition),
-                  onPressed: () => context.push(poolModePath(saved.game, saved.id, 'composition')),
-                ),
-                TextButton.icon(
-                  icon: const Icon(Icons.sports_esports),
-                  label: Text(l10n.formats),
-                  onPressed: () => context.push(poolModePath(saved.game, saved.id, 'formats')),
                 ),
               ],
             ),
@@ -224,47 +202,6 @@ class _PoolDetails extends ConsumerWidget {
             ),
           ),
           PoolSection(
-            title: l10n.boosterPicture,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.boosterPictureHint, style: theme.textTheme.bodySmall),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    if (saved.cover case final path? when File(path).existsSync())
-                      Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(File(path), key: const Key('coverThumbnail'), width: 64, height: 96, fit: BoxFit.cover),
-                        ),
-                      ),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        FilledButton.tonalIcon(
-                          key: const Key('chooseCover'),
-                          icon: const Icon(Icons.image_outlined),
-                          label: Text(l10n.choosePicture),
-                          onPressed: () => pickPoolCover(context, ref, saved),
-                        ),
-                        if (saved.cover != null)
-                          OutlinedButton.icon(
-                            key: const Key('clearCover'),
-                            icon: const Icon(Icons.restart_alt),
-                            label: Text(l10n.removePicture),
-                            onPressed: () => clearPoolCover(ref, saved),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          PoolSection(
             title: l10n.poolCopies,
             child: PresetPicker(config: config, onChanged: (c) => savePool(ref, saved.copyWith(config: c))),
           ),
@@ -273,6 +210,9 @@ class _PoolDetails extends ConsumerWidget {
             child: Text(play.summary(l10n), style: theme.textTheme.bodyMedium),
           ),
         ],
+        ),
+        BoosterSettings(play: play),
+      ]),
       ),
     );
   }

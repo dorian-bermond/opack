@@ -1250,6 +1250,18 @@ abstract class AppLocalizations {
   /// **'Booster picture'**
   String get boosterPicture;
 
+  /// No description provided for @tabPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Pool'**
+  String get tabPool;
+
+  /// No description provided for @tabBooster.
+  ///
+  /// In en, this message translates to:
+  /// **'Booster'**
+  String get tabBooster;
+
   /// No description provided for @boosterPictureHint.
   ///
   /// In en, this message translates to:

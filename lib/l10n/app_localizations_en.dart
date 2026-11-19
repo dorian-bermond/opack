@@ -725,6 +725,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get boosterPicture => 'Booster picture';
 
   @override
+  String get tabPool => 'Pool';
+
+  @override
+  String get tabBooster => 'Booster';
+
+  @override
   String get boosterPictureHint =>
       'The pack shown when opening: the set\'s own picture, or one of yours.';
 
