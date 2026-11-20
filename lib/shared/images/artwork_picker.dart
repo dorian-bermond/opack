@@ -83,7 +83,7 @@ class _ArtworkPickerState extends ConsumerState<ArtworkPicker> {
               }
               final shown = shownArtwork(found, artwork: card.artwork, language: preferred);
               final groups = groupedByLanguage(found, preferred: preferred);
-              final languages = [for (final l in groups.keys) if (l != null) l];
+              final languages = [for (final l in groups.keys) ?l];
               return CustomScrollView(
                 slivers: [
                   if (languages.length > 1)
