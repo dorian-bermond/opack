@@ -1,3 +1,4 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,18 +26,29 @@ Future<bool> pickArtwork(BuildContext context, {required String poolId, required
 
 /// The artworks of [card] in grids by language, the pictures' language
 /// first, then English, then the others; the one the card is shown with
-/// is marked. Tapping one saves it on the pool, the card's own print
-/// clearing the choice.
-class ArtworkPicker extends ConsumerWidget {
+/// is marked, and a row of flags narrows the list to one language.
+/// Tapping an artwork saves it on the pool, the card's own print clearing
+/// the choice.
+class ArtworkPicker extends ConsumerStatefulWidget {
   const ArtworkPicker({super.key, required this.poolId, required this.card});
 
   final String poolId;
   final CardData card;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ArtworkPicker> createState() => _ArtworkPickerState();
+}
+
+class _ArtworkPickerState extends ConsumerState<ArtworkPicker> {
+  /// The language the list is narrowed to; `null` for every language.
+  String? _language;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final poolId = widget.poolId;
+    final card = widget.card;
     final artworks = ref.watch(artworksProvider(artworkKeyOf(card)));
     final preferred = pictureLanguage(ref, context);
 
@@ -71,9 +83,33 @@ class ArtworkPicker extends ConsumerWidget {
               }
               final shown = shownArtwork(found, artwork: card.artwork, language: preferred);
               final groups = groupedByLanguage(found, preferred: preferred);
+              final languages = [for (final l in groups.keys) if (l != null) l];
               return CustomScrollView(
                 slivers: [
-                  for (final MapEntry(key: language, value: artworks) in groups.entries) ...[
+                  if (languages.length > 1)
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                      sliver: SliverToBoxAdapter(
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            for (final language in languages)
+                              ChoiceChip(
+                                key: ValueKey('artworkFlag-$language'),
+                                avatar: LanguageFlag(language),
+                                label: Text('${groups[language]!.length}'),
+                                tooltip: languageName(l10n, language),
+                                selected: _language == language,
+                                showCheckmark: false,
+                                onSelected: (on) => setState(() => _language = on ? language : null),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  for (final MapEntry(key: language, value: artworks) in groups.entries)
+                    if (_language == null || language == _language) ...[
                     if (language != null)
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -129,6 +165,26 @@ Map<String?, List<Artwork>> groupedByLanguage(List<Artwork> found, {required Str
   int rank(String? l) => l == preferred ? 0 : l == 'en' ? 1 : l == null ? 3 : 2;
   final ordered = languages.toList()..sort((a, b) => rank(a) != rank(b) ? rank(a) - rank(b) : (a ?? '').compareTo(b ?? ''));
   return {for (final l in ordered) l: [for (final a in found) if (a.language == l) a]};
+}
+
+/// The flag of the country a language is most spoken in, the code in a
+/// circle when none is known.
+class LanguageFlag extends StatelessWidget {
+  const LanguageFlag(this.language, {super.key, this.size = 20});
+
+  final String language;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    if (FlagCode.fromLanguageCode(language) != null) {
+      return CountryFlag.fromLanguageCode(language, theme: ImageTheme(width: size, height: size, shape: const Circle()));
+    }
+    return CircleAvatar(
+      radius: size / 2,
+      child: Text(language.toUpperCase(), style: TextStyle(fontSize: size * 0.4)),
+    );
+  }
 }
 
 /// A language as the user reads it: the ones the app knows by name, the
