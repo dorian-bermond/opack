@@ -9,7 +9,10 @@ import '../images/card_image_cache.dart';
 import 'trimmed_image.dart';
 
 /// The plain pack's width over height.
-const packAspect = 180 / 280;
+const packAspect = 493 / 818;
+
+/// The blank foil pack a picture not shaped like a pack is printed on.
+const blankPackAsset = 'assets/images/blank_pack.png';
 
 /// Whether a picture of this aspect ratio (width over height) looks like
 /// a booster pack, a tall rectangle; a logo or a landscape does not.
@@ -118,16 +121,19 @@ class BoosterCover extends ConsumerWidget {
     } else {
       final aspect = ref.watch(coverAspectProvider(picture.path)).value;
       if (own ? printed : aspect != null && !isPackShaped(aspect)) {
-        // A logo or a landscape: printed on a plain pack under the name.
-        backdrop = true;
+        // A logo or a landscape: printed on the blank foil pack under the name.
         front = Stack(
           fit: StackFit.expand,
           children: [
+            Image.asset(blankPackAsset, fit: BoxFit.fill),
             Padding(
-              padding: EdgeInsets.fromLTRB(width / 10, height / 12, width / 10, height / 4),
+              padding: EdgeInsets.fromLTRB(width / 8, height / 8, width / 8, height / 3.2),
               child: TrimmedImage(picture, key: const Key('printedCover')),
             ),
-            _banner(theme, name),
+            Padding(
+              padding: EdgeInsets.fromLTRB(width / 14, 0, width / 14, height / 9),
+              child: _banner(theme, name),
+            ),
           ],
         );
       } else {
