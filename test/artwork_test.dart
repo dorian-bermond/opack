@@ -6,6 +6,7 @@ import 'package:http/testing.dart';
 import 'package:opack/features/catalog/domain/models.dart';
 import 'package:opack/features/pools/domain/play_pool.dart';
 import 'package:opack/features/pools/domain/pool.dart';
+import 'package:opack/shared/images/artwork_picker.dart';
 import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 
@@ -88,6 +89,8 @@ void main() {
         if (request.url.path == '/cards/abc') {
           return http.Response(jsonEncode({
             'id': 'abc',
+            'set': 'dmu',
+            'collector_number': '1',
             'prints_search_uri': 'https://api.scryfall.com/cards/search?q=oracleid%3Ao1&unique=prints',
           }), 200);
         }
@@ -121,6 +124,18 @@ void main() {
     expect(found[1].label, 'LEA 1 · Alpha');
     expect(found[2].label, 'DMU 1 · FR · Dominaria United');
     expect(found[3].label, 'PLST DMU-1');
+    expect(found.map((a) => a.language), ['en', 'en', 'fr', 'en'], reason: 'English when Scryfall says nothing');
+    expect(found.map((a) => a.samePrint), [true, false, true, false], reason: 'the own print in any language');
+
+    // The picker shows the pictures' language first, then English, then the rest,
+    // and marks the print the card is shown with.
+    final groups = groupedByLanguage(found, preferred: 'fr');
+    expect(groups.keys, ['fr', 'en']);
+    expect(groups['fr']!.single.key, 'abcfr');
+    expect(shownArtwork(found, language: 'fr')!.key, 'abcfr', reason: 'the own print in French');
+    expect(shownArtwork(found, language: 'de')!.key, 'abc', reason: 'no German print: the own one');
+    expect(shownArtwork(found, artwork: 'old', language: 'fr')!.key, 'old', reason: 'a chosen artwork');
+    expect(groupedByLanguage(found, preferred: 'en').keys, ['en', 'fr']);
   });
 
   test('lists every wiki scan of a Yu-Gi-Oh! card, then YGOPRODeck pictures', () async {
@@ -158,6 +173,13 @@ void main() {
     expect(found.map((a) => a.key), [scan, 'https://w/PSV-EN.png', 'https://w/CIBR-FR-OP.png', '423705', '423706']);
     expect(found.first.own, isTrue, reason: "the scan of the card's own print code");
     expect(found.map((a) => a.label), ['CIBR-FR · C · 1E', 'PSV-EN · C · 1E', 'CIBR-FR · OP', 'YGOPRODeck #1', 'YGOPRODeck #2']);
+    expect(found.map((a) => a.language), ['fr', 'en', 'fr', 'en', 'en']);
+    expect(found.map((a) => a.samePrint), [true, false, false, false, false], reason: 'the own set, no OP scan');
+    expect(ArtworkSearch.scanLanguage('SDY-SP · C'), 'es');
+    expect(ArtworkSearch.scanLanguage('SDY-JP · C'), 'ja');
+    expect(ArtworkSearch.scanLanguage('SDY-AE · C'), 'en');
+    expect(groupedByLanguage(found, preferred: 'fr').keys, ['fr', 'en']);
+    expect(groupedByLanguage(found, preferred: 'de').keys, ['en', 'fr'], reason: 'no German scan');
   });
 
   test('scan file names of other cards sharing the prefix are left out', () {

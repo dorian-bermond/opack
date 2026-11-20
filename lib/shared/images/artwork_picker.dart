@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/settings/card_languages.dart';
 import '../../features/catalog/domain/models.dart';
 import '../../features/pools/data/pool_repository.dart';
 import '../../l10n/app_localizations.dart';
@@ -22,8 +23,10 @@ Future<bool> pickArtwork(BuildContext context, {required String poolId, required
   return changed ?? false;
 }
 
-/// A grid of the artworks of [card], the chosen one highlighted; tapping
-/// one saves it on the pool, the card's own print clearing the choice.
+/// The artworks of [card] in grids by language, the pictures' language
+/// first, then English, then the others; the one the card is shown with
+/// is marked. Tapping one saves it on the pool, the card's own print
+/// clearing the choice.
 class ArtworkPicker extends ConsumerWidget {
   const ArtworkPicker({super.key, required this.poolId, required this.card});
 
@@ -35,6 +38,7 @@ class ArtworkPicker extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final artworks = ref.watch(artworksProvider(artworkKeyOf(card)));
+    final preferred = pictureLanguage(ref, context);
 
     Future<void> choose(Artwork artwork) async {
       final pools = ref.read(poolsProvider.notifier);
@@ -65,21 +69,42 @@ class ArtworkPicker extends ConsumerWidget {
                   child: Text(l10n.noOtherArtwork, textAlign: TextAlign.center),
                 );
               }
-              return GridView.builder(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 160,
-                  childAspectRatio: 63 / 112,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                ),
-                itemCount: found.length,
-                itemBuilder: (context, i) => _ArtworkTile(
-                  card: card,
-                  artwork: found[i],
-                  chosen: card.artwork == null ? found[i].own : card.artwork == found[i].key,
-                  onTap: () => choose(found[i]),
-                ),
+              final shown = shownArtwork(found, artwork: card.artwork, language: preferred);
+              final groups = groupedByLanguage(found, preferred: preferred);
+              return CustomScrollView(
+                slivers: [
+                  for (final MapEntry(key: language, value: artworks) in groups.entries) ...[
+                    if (language != null)
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                        sliver: SliverToBoxAdapter(
+                          child: Text(
+                            languageName(l10n, language),
+                            key: ValueKey('artworkLanguage-$language'),
+                            style: theme.textTheme.titleSmall,
+                          ),
+                        ),
+                      ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+                      sliver: SliverGrid.builder(
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 160,
+                          childAspectRatio: 63 / 112,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
+                        itemCount: artworks.length,
+                        itemBuilder: (context, i) => _ArtworkTile(
+                          card: card,
+                          artwork: artworks[i],
+                          chosen: artworks[i].key == shown?.key,
+                          onTap: () => choose(artworks[i]),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               );
             },
           ),
@@ -88,6 +113,31 @@ class ArtworkPicker extends ConsumerWidget {
     );
   }
 }
+
+/// The artwork the card is shown with: the chosen [artwork], else its
+/// own print in the pictures' [language], else its own print.
+Artwork? shownArtwork(List<Artwork> found, {String? artwork, required String language}) {
+  if (artwork != null) return found.where((a) => a.key == artwork).firstOrNull;
+  return found.where((a) => a.samePrint && a.language == language).firstOrNull ??
+      found.where((a) => a.own).firstOrNull;
+}
+
+/// The artworks by language: the [preferred] one first, then English,
+/// then the others by code, then the ones serving every language (`null`).
+Map<String?, List<Artwork>> groupedByLanguage(List<Artwork> found, {required String preferred}) {
+  final languages = {for (final a in found) a.language};
+  int rank(String? l) => l == preferred ? 0 : l == 'en' ? 1 : l == null ? 3 : 2;
+  final ordered = languages.toList()..sort((a, b) => rank(a) != rank(b) ? rank(a) - rank(b) : (a ?? '').compareTo(b ?? ''));
+  return {for (final l in ordered) l: [for (final a in found) if (a.language == l) a]};
+}
+
+/// A language as the user reads it: the ones the app knows by name, the
+/// others by code.
+String languageName(AppLocalizations l10n, String code) => switch (code) {
+      'en' => l10n.languageEnglish,
+      'fr' => l10n.languageFrench,
+      _ => code.toUpperCase(),
+    };
 
 class _ArtworkTile extends ConsumerWidget {
   const _ArtworkTile({required this.card, required this.artwork, required this.chosen, required this.onTap});

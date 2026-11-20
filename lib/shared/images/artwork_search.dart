@@ -9,9 +9,11 @@ import '../../features/catalog/domain/models.dart';
 import 'card_image_cache.dart';
 
 /// One picture a card can be shown with: its [key] (see
-/// [CardData.artwork]), a [label] naming the scan, and whether it is the
-/// card's own print.
-typedef Artwork = ({String key, String label, bool own});
+/// [CardData.artwork]), a [label] naming the scan, whether it is the
+/// card's own print, the [language] it is printed in (`null` when the
+/// scan serves every language) and whether it is the card's own print in
+/// another language ([samePrint], the own print included).
+typedef Artwork = ({String key, String label, bool own, String? language, bool samePrint});
 
 /// Lists every scan a card exists with, as the errata chooser lists every
 /// text version. MtG: every print of the card on Scryfall, in every
@@ -57,6 +59,7 @@ class ArtworkSearch {
       ...prints.queryParameters,
       'include_multilingual': 'true',
     });
+    final ownPrint = (card['set'], card['collector_number']);
     final found = <Artwork>[];
     for (var page = 0; page < maxPages; page++) {
       final listing = await _getJson(next);
@@ -73,6 +76,8 @@ class ArtworkSearch {
               ?setName,
             ].join(' · '),
             own: printId == id,
+            language: lang ?? 'en',
+            samePrint: printId == id || (print['set'], print['collector_number']) == ownPrint,
           ));
         }
       }
@@ -109,8 +114,24 @@ class ArtworkSearch {
               own: ownPrint != null &&
                   label.startsWith('${ownPrint.group(1)}-${ownPrint.group(2)}') &&
                   !label.contains('OP'),
+              language: scanLanguage(label),
+              samePrint: ownPrint != null && label.startsWith('${ownPrint.group(1)}-') && !label.contains('OP'),
             ),
     ];
+  }
+
+  /// The language of a wiki scan from its region (`CIBR-FR · C · 1E`):
+  /// the usual codes, `en` for the English regions.
+  static String scanLanguage(String label) {
+    final region = label.split('-')[1].split(' ').first;
+    return switch (region) {
+      'EN' || 'NA' || 'AE' || 'AU' || 'E' || 'A' => 'en',
+      'SP' => 'es',
+      'JP' || 'JA' => 'ja',
+      'KR' => 'ko',
+      'TC' || 'SC' => 'zh',
+      _ => region.toLowerCase(),
+    };
   }
 
   /// `SET-REGION · RARITY · EDITION` from a wiki scan file name after the
@@ -139,7 +160,7 @@ class ArtworkSearch {
     return [
       for (final (i, image) in images.indexed)
         if (image['id'] case final id?)
-          (key: '$id', label: 'YGOPRODeck #${i + 1}', own: false),
+          (key: '$id', label: 'YGOPRODeck #${i + 1}', own: false, language: 'en', samePrint: false),
     ];
   }
 
@@ -154,6 +175,8 @@ class ArtworkSearch {
             key: '${row['id']}',
             label: DotggOnePiece.isBase(row) ? id : 'Alt ${'${row['id']}'.split('_p').last}',
             own: DotggOnePiece.isBase(row),
+            language: null,
+            samePrint: DotggOnePiece.isBase(row),
           ),
     ]);
   }
