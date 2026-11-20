@@ -710,6 +710,30 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @settingsGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get settingsGeneral;
+
+  /// No description provided for @settingsCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get settingsCards;
+
+  /// No description provided for @settingsOpening.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening'**
+  String get settingsOpening;
+
+  /// No description provided for @languagesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Languages'**
+  String get languagesSection;
+
   /// No description provided for @cardImagesSetting.
   ///
   /// In en, this message translates to:

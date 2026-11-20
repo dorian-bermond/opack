@@ -9,12 +9,14 @@ import '../../features/packs/presentation/opening_mode.dart';
 import '../../features/catalog/domain/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../features/pools/presentation/pool_widgets.dart';
+import '../images/artwork_picker.dart';
 import '../images/card_image_cache.dart';
 import 'card_tile.dart';
 
-/// The settings, one section per setting: UI language, card picture and
-/// card data languages, default card text version, pack opening mode,
-/// online pictures, the hover preview and the rarity marker.
+/// The settings in three tabs: General (languages, card text), Cards
+/// (pictures, rarity marker and colors) and Opening (pack opening, sealed
+/// reveal order), each cut into titled sections. A language is picked on
+/// one line, by flag.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -27,116 +29,193 @@ class SettingsScreen extends ConsumerWidget {
     final hoverPreview = ref.watch(cardHoverPreviewProvider);
     final marker = ref.watch(rarityMarkerProvider);
     final opening = ref.watch(openingModeProvider);
+    final sealedOrder = ref.watch(sealedOrderProvider);
     final rarityColors = ref.watch(rarityColorsProvider);
     final cardLanguages = ref.watch(cardLanguagesProvider);
     final languagesSetting = ref.read(cardLanguagesProvider.notifier);
-    final languageChoices = [(null, l10n.languageSystem), ('en', l10n.languageEnglish), ('fr', l10n.languageFrench)];
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.settings)),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
-        children: [
-          _Choice<String?>(
-            title: l10n.language,
-            value: language.isEmpty ? null : language,
-            choices: languageChoices,
-            onChanged: (code) => ref.read(localeProvider.notifier).select(code == null ? null : Locale(code)),
-          ),
-          _Choice<String?>(
-            title: l10n.pictureLanguage,
-            value: cardLanguages.picture,
-            choices: languageChoices,
-            onChanged: languagesSetting.selectPicture,
-          ),
-          _Choice<String?>(
-            title: l10n.dataLanguage,
-            value: cardLanguages.data,
-            choices: languageChoices,
-            onChanged: languagesSetting.selectData,
-          ),
-          _Choice<TextVersionMode>(
-            title: l10n.cardTextSetting,
-            value: mode,
-            choices: [
-              (TextVersionMode.printed, l10n.textModePrinted),
-              (TextVersionMode.latest, l10n.textModeLatest),
-            ],
-            onChanged: (m) => ref.read(textPreferencesProvider.notifier).setMode(m!),
-          ),
-          _Choice<OpeningMode>(
-            title: l10n.openingModeSetting,
-            value: opening,
-            choices: [(OpeningMode.grid, l10n.openingGrid), (OpeningMode.swipe, l10n.openingSwipe)],
-            onChanged: (m) => ref.read(openingModeProvider.notifier).select(m!),
-          ),
-          _Section(
-            title: l10n.cardImagesSetting,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.settings),
+          bottom: TabBar(tabs: [
+            Tab(key: const Key('settingsGeneral'), text: l10n.settingsGeneral),
+            Tab(key: const Key('settingsCards'), text: l10n.settingsCards),
+            Tab(key: const Key('settingsOpening'), text: l10n.settingsOpening),
+          ]),
+        ),
+        body: TabBarView(children: [
+          ListView(
+            padding: const EdgeInsets.only(bottom: 24),
             children: [
-              SwitchListTile(
-                key: const Key('settingImages'),
-                title: Text(l10n.cardImagesOnline),
-                value: images,
-                onChanged: ref.read(cardImagesEnabledProvider.notifier).set,
+              _Section(
+                title: l10n.languagesSection,
+                children: [
+                  _LanguageRow(
+                    key: const Key('setting-language'),
+                    title: l10n.language,
+                    value: language.isEmpty ? null : language,
+                    onChanged: (code) => ref.read(localeProvider.notifier).select(code == null ? null : Locale(code)),
+                  ),
+                  _LanguageRow(
+                    key: const Key('setting-pictureLanguage'),
+                    title: l10n.pictureLanguage,
+                    value: cardLanguages.picture,
+                    onChanged: languagesSetting.selectPicture,
+                  ),
+                  _LanguageRow(
+                    key: const Key('setting-dataLanguage'),
+                    title: l10n.dataLanguage,
+                    value: cardLanguages.data,
+                    onChanged: languagesSetting.selectData,
+                  ),
+                ],
               ),
-              SwitchListTile(
-                key: const Key('settingHoverPreview'),
-                title: Text(l10n.cardHoverPreview),
-                value: hoverPreview,
-                onChanged: ref.read(cardHoverPreviewProvider.notifier).set,
+              _Choice<TextVersionMode>(
+                title: l10n.cardTextSetting,
+                value: mode,
+                choices: [
+                  (TextVersionMode.printed, l10n.textModePrinted),
+                  (TextVersionMode.latest, l10n.textModeLatest),
+                ],
+                onChanged: (m) => ref.read(textPreferencesProvider.notifier).setMode(m!),
               ),
             ],
           ),
-          _Choice<RarityMarker>(
-            title: l10n.rarityMarkerSetting,
-            value: marker,
-            choices: [(RarityMarker.border, l10n.rarityMarkerBorder), (RarityMarker.dot, l10n.rarityMarkerDot)],
-            onChanged: (m) => ref.read(rarityMarkerProvider.notifier).select(m!),
-          ),
-          _Section(
-            title: l10n.rarityColorsSetting,
+          ListView(
+            padding: const EdgeInsets.only(bottom: 24),
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-                child: Text(l10n.rarityColorsHint, style: Theme.of(context).textTheme.bodySmall),
+              _Section(
+                title: l10n.cardImagesSetting,
+                children: [
+                  SwitchListTile(
+                    key: const Key('settingImages'),
+                    title: Text(l10n.cardImagesOnline),
+                    value: images,
+                    onChanged: ref.read(cardImagesEnabledProvider.notifier).set,
+                  ),
+                  SwitchListTile(
+                    key: const Key('settingHoverPreview'),
+                    title: Text(l10n.cardHoverPreview),
+                    value: hoverPreview,
+                    onChanged: ref.read(cardHoverPreviewProvider.notifier).set,
+                  ),
+                ],
               ),
-              for (final rarity in Rarity.values)
-                ListTile(
-                  key: ValueKey('rarityColor-${rarity.name}'),
-                  leading: ColorDot(rarity.color, size: 20),
-                  title: Text(rarity.label(l10n)),
-                  subtitle: rarityColors.containsKey(rarity) ? null : Text(l10n.colorDefault),
-                  trailing: rarityColors.containsKey(rarity)
-                      ? IconButton(
-                          key: ValueKey('rarityColorReset-${rarity.name}'),
-                          tooltip: l10n.colorReset,
-                          icon: const Icon(Icons.restart_alt),
-                          onPressed: () => ref.read(rarityColorsProvider.notifier).set(rarity, null),
-                        )
-                      : null,
-                  onTap: () async {
-                    final chosen = await showModalBottomSheet<Color>(
-                      context: context,
-                      builder: (context) => SafeArea(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(rarity.label(l10n), style: Theme.of(context).textTheme.titleMedium),
-                              const SizedBox(height: 12),
-                              ColorPicker(value: rarity.color, onChanged: (c) => Navigator.pop(context, c)),
-                            ],
+              _Choice<RarityMarker>(
+                title: l10n.rarityMarkerSetting,
+                value: marker,
+                choices: [(RarityMarker.border, l10n.rarityMarkerBorder), (RarityMarker.dot, l10n.rarityMarkerDot)],
+                onChanged: (m) => ref.read(rarityMarkerProvider.notifier).select(m!),
+              ),
+              _Section(
+                title: l10n.rarityColorsSetting,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                    child: Text(l10n.rarityColorsHint, style: Theme.of(context).textTheme.bodySmall),
+                  ),
+                  for (final rarity in Rarity.values)
+                    ListTile(
+                      key: ValueKey('rarityColor-${rarity.name}'),
+                      leading: ColorDot(rarity.color, size: 20),
+                      title: Text(rarity.label(l10n)),
+                      subtitle: rarityColors.containsKey(rarity) ? null : Text(l10n.colorDefault),
+                      trailing: rarityColors.containsKey(rarity)
+                          ? IconButton(
+                              key: ValueKey('rarityColorReset-${rarity.name}'),
+                              tooltip: l10n.colorReset,
+                              icon: const Icon(Icons.restart_alt),
+                              onPressed: () => ref.read(rarityColorsProvider.notifier).set(rarity, null),
+                            )
+                          : null,
+                      onTap: () async {
+                        final chosen = await showModalBottomSheet<Color>(
+                          context: context,
+                          builder: (context) => SafeArea(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(rarity.label(l10n), style: Theme.of(context).textTheme.titleMedium),
+                                  const SizedBox(height: 12),
+                                  ColorPicker(value: rarity.color, onChanged: (c) => Navigator.pop(context, c)),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                    if (chosen != null) ref.read(rarityColorsProvider.notifier).set(rarity, chosen);
-                  },
-                ),
+                        );
+                        if (chosen != null) ref.read(rarityColorsProvider.notifier).set(rarity, chosen);
+                      },
+                    ),
+                ],
+              ),
             ],
           ),
+          ListView(
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              _Choice<OpeningMode>(
+                title: l10n.openingModeSetting,
+                value: opening,
+                choices: [(OpeningMode.grid, l10n.openingGrid), (OpeningMode.swipe, l10n.openingSwipe)],
+                onChanged: (m) => ref.read(openingModeProvider.notifier).select(m!),
+              ),
+              _Choice<SealedOrder>(
+                title: l10n.sealedOrder,
+                value: sealedOrder,
+                choices: [for (final o in SealedOrder.values) (o, o.label(l10n))],
+                onChanged: (o) => ref.read(sealedOrderProvider.notifier).select(o!),
+              ),
+            ],
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// The languages a user may pick, by code; `null` follows the device.
+const settingLanguages = ['en', 'fr'];
+
+/// A language setting on one line: its title, then a chip per language
+/// with its flag, and one for the device's language.
+class _LanguageRow extends StatelessWidget {
+  const _LanguageRow({super.key, required this.title, required this.value, required this.onChanged});
+
+  final String title;
+  final String? value;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListTile(
+      title: Text(title),
+      trailing: Wrap(
+        spacing: 6,
+        children: [
+          ChoiceChip(
+            key: ValueKey('$title-system'),
+            avatar: const Icon(Icons.language, size: 18),
+            label: Text(l10n.languageSystem),
+            selected: value == null,
+            showCheckmark: false,
+            onSelected: (_) => onChanged(null),
+          ),
+          for (final code in settingLanguages)
+            ChoiceChip(
+              key: ValueKey('$title-$code'),
+              avatar: LanguageFlag(code, size: 18),
+              label: Text(code.toUpperCase()),
+              tooltip: languageName(l10n, code),
+              selected: value == code,
+              showCheckmark: false,
+              onSelected: (_) => onChanged(code),
+            ),
         ],
       ),
     );

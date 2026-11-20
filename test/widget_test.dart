@@ -729,18 +729,22 @@ void main() {
     await tester.tap(find.byKey(const Key('settingsButton')));
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsOneWidget);
+    expect(find.byKey(const Key('setting-language')), findsOneWidget, reason: 'languages on the General tab');
+    await tester.tap(find.byKey(const Key('settingsCards')));
+    await tester.pumpAndSettle();
     expect(find.text('Rarity colors'), findsOneWidget);
 
     // A switch flips its setting.
     expect(container.read(cardHoverPreviewProvider), isTrue);
-    await tester.scrollUntilVisible(find.byKey(const Key('settingHoverPreview')), 300);
     await tester.tap(find.byKey(const Key('settingHoverPreview')));
     await tester.pumpAndSettle();
     expect(container.read(cardHoverPreviewProvider), isFalse);
 
     // A rarity color is picked from the palette, then reset.
     final before = Rarity.rare.color;
-    await tester.scrollUntilVisible(find.byKey(const ValueKey('rarityColor-rare')), 300);
+    // The tab view scrolls too: the list inside it is the one to scroll.
+    final list = find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)).first;
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('rarityColor-rare')), 300, scrollable: list);
     await tester.tap(find.byKey(const ValueKey('rarityColor-rare')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(ValueKey('swatch-${const Color(0xFF1E88E5).toARGB32()}')));

@@ -415,6 +415,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings => 'Paramètres';
 
   @override
+  String get settingsGeneral => 'Général';
+
+  @override
+  String get settingsCards => 'Cartes';
+
+  @override
+  String get settingsOpening => 'Ouverture';
+
+  @override
+  String get languagesSection => 'Langues';
+
+  @override
   String get cardImagesSetting => 'Images des cartes';
 
   @override

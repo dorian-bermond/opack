@@ -413,6 +413,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get settingsGeneral => 'General';
+
+  @override
+  String get settingsCards => 'Cards';
+
+  @override
+  String get settingsOpening => 'Opening';
+
+  @override
+  String get languagesSection => 'Languages';
+
+  @override
   String get cardImagesSetting => 'Card pictures';
 
   @override
