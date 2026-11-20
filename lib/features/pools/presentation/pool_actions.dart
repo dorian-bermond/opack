@@ -12,6 +12,8 @@ import '../../cube/data/cube_repository.dart';
 import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
+import '../../../shared/widgets/booster_cover.dart';
+import '../../../shared/widgets/trimmed_image.dart';
 import 'pool_composition_screen.dart';
 import 'pool_widgets.dart';
 import 'source_picker.dart';
@@ -40,7 +42,8 @@ Future<Directory> poolCoversDirectory() async =>
     Directory('${(await getApplicationSupportDirectory()).path}/pools/covers');
 
 /// Lets the user pick a picture file for the pool's booster, copied next
-/// to the app's data so the original may go.
+/// to the app's data so the original may go. A picture not shaped like a
+/// pack is shown as it is or printed on a plain pack, as the user picks.
 Future<void> pickPoolCover(BuildContext context, WidgetRef ref, Pool pool) async {
   final file = await FilePicker.pickFile(type: FileType.image);
   if (file == null) return;
@@ -50,11 +53,52 @@ Future<void> pickPoolCover(BuildContext context, WidgetRef ref, Pool pool) async
   await dir.create(recursive: true);
   final target = File('${dir.path}/${pool.id}.$extension');
   await target.writeAsBytes(bytes, flush: true);
+  // A new picture under an old path: measures and decoded pixels are stale.
+  TrimmedImage.forget(target.path);
+  ref.invalidate(coverAspectProvider(target.path));
+  await FileImage(target).evict();
   if (pool.cover case final old? when old != target.path) {
     final previous = File(old);
     if (await previous.exists()) await previous.delete();
   }
-  savePool(ref, pool.withCover(target.path));
+  var printed = false;
+  if (!isPackShaped(await TrimmedImage.aspectOf(target))) {
+    if (!context.mounted) return;
+    final choice = await askOddPicture(context);
+    if (choice == null) {
+      await target.delete();
+      return;
+    }
+    printed = choice;
+  }
+  savePool(ref, pool.withCover(target.path, printed: printed));
+}
+
+/// Tells that the picked picture is not shaped like a pack and asks what
+/// to do: `false` to use it as it is, `true` to print it on a plain pack,
+/// `null` to give it up.
+Future<bool?> askOddPicture(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
+  return showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(l10n.oddPictureTitle),
+      content: Text(l10n.oddPictureBody),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+        TextButton(
+          key: const Key('useAnyway'),
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.useAnyway),
+        ),
+        FilledButton(
+          key: const Key('printOnPack'),
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.printOnPack),
+        ),
+      ],
+    ),
+  );
 }
 
 /// Drops the pool's own booster picture, back to the set's.

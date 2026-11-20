@@ -32,6 +32,9 @@ class TrimmedImage extends StatefulWidget {
     }
   }
 
+  /// Forgets the measure of [path], for a picture written anew there.
+  static void forget(String path) => _bounds.remove(path);
+
   /// Width over height of [file]'s subject.
   static Future<double> aspectOf(File file) async {
     final bounds = await boundsOf(file);

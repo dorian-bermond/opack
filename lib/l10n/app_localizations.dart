@@ -1250,6 +1250,30 @@ abstract class AppLocalizations {
   /// **'Booster picture'**
   String get boosterPicture;
 
+  /// No description provided for @oddPictureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not shaped like a pack'**
+  String get oddPictureTitle;
+
+  /// No description provided for @oddPictureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This picture does not have the usual proportions of a booster pack. Use it as it is, or print it on a plain pack under the pool\'s name?'**
+  String get oddPictureBody;
+
+  /// No description provided for @useAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Use it anyway'**
+  String get useAnyway;
+
+  /// No description provided for @printOnPack.
+  ///
+  /// In en, this message translates to:
+  /// **'Print it on a pack'**
+  String get printOnPack;
+
   /// No description provided for @tabPool.
   ///
   /// In en, this message translates to:

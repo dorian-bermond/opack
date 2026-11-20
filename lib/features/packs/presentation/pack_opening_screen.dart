@@ -90,8 +90,9 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
       RandomLayout() => null,
     };
     // The pack takes the shape of its picture, so the cards inside match it.
-    final picture = coverPicture(ref, context, set: pool.layoutSet, booster: booster, custom: pool.pool.cover);
-    final aspect = picture == null ? 180 / 280 : ref.watch(coverAspectProvider(picture.path)).value ?? 180 / 280;
+    final cover = coverPicture(ref, context,
+        set: pool.layoutSet, booster: booster, custom: pool.pool.cover, printed: pool.pool.coverPrinted);
+    final aspect = packAspectOf(ref, cover);
 
     return Scaffold(
       appBar: AppBar(title: Text(pool.name)),
@@ -136,6 +137,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                       label: pool.name,
                       booster: booster,
                       custom: pool.pool.cover,
+                      printed: pool.pool.coverPrinted,
                       width: packWidth,
                       height: packWidth / aspect,
                     ),

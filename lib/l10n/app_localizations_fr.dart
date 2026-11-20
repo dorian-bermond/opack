@@ -728,6 +728,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get boosterPicture => 'Image du booster';
 
   @override
+  String get oddPictureTitle => 'Pas la forme d\'un booster';
+
+  @override
+  String get oddPictureBody =>
+      'Cette image n\'a pas les proportions habituelles d\'un booster. L\'utiliser telle quelle, ou l\'imprimer sur un booster sous le nom du pool ?';
+
+  @override
+  String get useAnyway => 'L\'utiliser quand même';
+
+  @override
+  String get printOnPack => 'L\'imprimer sur un booster';
+
+  @override
   String get tabPool => 'Pool';
 
   @override

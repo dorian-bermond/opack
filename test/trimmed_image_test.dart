@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:opack/shared/widgets/booster_cover.dart';
 import 'package:opack/shared/widgets/trimmed_image.dart';
 
 /// A [width]×[height] image whose pixels are [paint]'s colors (RGBA).
@@ -32,5 +33,14 @@ void main() {
     // Nothing to keep: the whole picture.
     final (blank, blankPixels) = await _image(3, 2, (x, y) => [255, 255, 255, 255]);
     expect(TrimmedImage.subjectBounds(blank, blankPixels), const Rect.fromLTWH(0, 0, 3, 2));
+  });
+
+  test('a pack is a tall rectangle; a logo or a landscape is not', () {
+    expect(isPackShaped(packAspect), isTrue);
+    expect(isPackShaped(0.6), isTrue, reason: 'a One Piece pack');
+    expect(isPackShaped(0.8), isTrue, reason: 'a wide MtG pack picture');
+    expect(isPackShaped(2.0), isFalse, reason: 'the Lorwyn logo');
+    expect(isPackShaped(1.0), isFalse, reason: 'a square picture');
+    expect(isPackShaped(0.3), isFalse, reason: 'a banner');
   });
 }

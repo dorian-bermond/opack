@@ -571,6 +571,7 @@ class Pool {
     this.descending = const {},
     this.tierlistQuality,
     this.cover,
+    this.coverPrinted = false,
     this.bestVersions = false,
   });
 
@@ -610,6 +611,7 @@ class Pool {
         descending: (json['descending'] as Map<String, dynamic>? ?? const {}).cast<String, bool>(),
         tierlistQuality: json['tierlistQuality'] as String?,
         cover: json['cover'] as String?,
+        coverPrinted: json['coverPrinted'] as bool? ?? false,
         bestVersions: json['bestVersions'] as bool? ?? false,
       );
 
@@ -674,6 +676,7 @@ class Pool {
         if (descending.isNotEmpty) 'descending': descending,
         'tierlistQuality': ?tierlistQuality,
         'cover': ?cover,
+        if (coverPrinted) 'coverPrinted': true,
         if (bestVersions) 'bestVersions': true,
       };
 
@@ -708,6 +711,10 @@ class Pool {
   /// device; `null` for the set's picture.
   final String? cover;
 
+  /// Whether [cover], not shaped like a pack, is printed on a plain pack
+  /// rather than shown as it is.
+  final bool coverPrinted;
+
   /// Whether every card dealt is replaced by the most valuable version of
   /// the same card in the pool (a manga art for its super rare).
   final bool bestVersions;
@@ -728,11 +735,13 @@ class Pool {
         descending: descending,
         tierlistQuality: tierlistQuality,
         cover: cover,
+        coverPrinted: coverPrinted,
         bestVersions: on,
       );
 
-  /// With [cover] as the booster picture (`null`: the set's).
-  Pool withCover(String? cover) => Pool(
+  /// With [cover] as the booster picture (`null`: the set's), [printed]
+  /// on a plain pack or shown as it is.
+  Pool withCover(String? cover, {bool printed = false}) => Pool(
         id: id,
         game: game,
         name: name,
@@ -747,6 +756,7 @@ class Pool {
         descending: descending,
         tierlistQuality: tierlistQuality,
         cover: cover,
+        coverPrinted: cover != null && printed,
         bestVersions: bestVersions,
       );
 
@@ -1041,6 +1051,7 @@ class Pool {
       descending: descending ?? this.descending,
       tierlistQuality: tierlistQuality ?? this.tierlistQuality,
       cover: cover,
+      coverPrinted: coverPrinted,
       bestVersions: bestVersions,
     );
   }

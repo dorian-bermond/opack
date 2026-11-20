@@ -157,6 +157,7 @@ class _BoosterSettingsState extends ConsumerState<BoosterSettings> {
               label: pool.name,
               booster: layoutBooster,
               custom: pool.cover,
+              printed: pool.coverPrinted,
               width: 108,
               height: 168,
             ),

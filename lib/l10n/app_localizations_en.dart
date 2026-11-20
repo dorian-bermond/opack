@@ -725,6 +725,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get boosterPicture => 'Booster picture';
 
   @override
+  String get oddPictureTitle => 'Not shaped like a pack';
+
+  @override
+  String get oddPictureBody =>
+      'This picture does not have the usual proportions of a booster pack. Use it as it is, or print it on a plain pack under the pool\'s name?';
+
+  @override
+  String get useAnyway => 'Use it anyway';
+
+  @override
+  String get printOnPack => 'Print it on a pack';
+
+  @override
   String get tabPool => 'Pool';
 
   @override

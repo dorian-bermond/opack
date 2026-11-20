@@ -70,6 +70,16 @@ void main() {
     expect(reloaded.copyWith(name: 'q').cover, 'C:/covers/x.png', reason: 'kept by copyWith');
     expect(reloaded.withCover(null).cover, isNull);
     expect(reloaded.withCover(null).toJson().containsKey('cover'), isFalse);
+
+    // A picture not shaped like a pack may be printed on one.
+    expect(reloaded.coverPrinted, isFalse);
+    final printed = reloaded.withCover('C:/covers/logo.png', printed: true);
+    expect(printed.coverPrinted, isTrue);
+    final printedBack = Pool.fromJson(jsonDecode(jsonEncode(printed.toJson())) as Map<String, dynamic>);
+    expect(printedBack.coverPrinted, isTrue);
+    expect(printedBack.copyWith(name: 'q').coverPrinted, isTrue, reason: 'kept by copyWith');
+    expect(printedBack.withCover(null, printed: true).coverPrinted, isFalse, reason: 'nothing to print');
+    expect(printedBack.withCover(null).toJson().containsKey('coverPrinted'), isFalse);
   });
 
   test('lists every Scryfall print of an MtG card in every language, its own first', () async {
