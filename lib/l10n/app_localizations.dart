@@ -236,6 +236,30 @@ abstract class AppLocalizations {
   /// **'Deal again'**
   String get dealAgain;
 
+  /// No description provided for @sealedOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal order'**
+  String get sealedOrder;
+
+  /// No description provided for @sealedByBooster.
+  ///
+  /// In en, this message translates to:
+  /// **'Booster after booster'**
+  String get sealedByBooster;
+
+  /// No description provided for @sealedBySlot.
+  ///
+  /// In en, this message translates to:
+  /// **'Slot after slot'**
+  String get sealedBySlot;
+
+  /// No description provided for @sealedByQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Best cards first'**
+  String get sealedByQuality;
+
   /// No description provided for @newPool.
   ///
   /// In en, this message translates to:

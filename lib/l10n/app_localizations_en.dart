@@ -87,6 +87,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dealAgain => 'Deal again';
 
   @override
+  String get sealedOrder => 'Reveal order';
+
+  @override
+  String get sealedByBooster => 'Booster after booster';
+
+  @override
+  String get sealedBySlot => 'Slot after slot';
+
+  @override
+  String get sealedByQuality => 'Best cards first';
+
+  @override
   String get newPool => 'New pool';
 
   @override

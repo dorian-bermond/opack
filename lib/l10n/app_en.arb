@@ -30,6 +30,10 @@
     }
   },
   "dealAgain": "Deal again",
+  "sealedOrder": "Reveal order",
+  "sealedByBooster": "Booster after booster",
+  "sealedBySlot": "Slot after slot",
+  "sealedByQuality": "Best cards first",
   "newPool": "New pool",
   "sealedPool": "Sealed pool",
   "cardsCount": "{count, plural, =1{1 card} other{{count} cards}}",

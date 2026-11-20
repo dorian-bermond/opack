@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/card_tile.dart';
 import '../../catalog/domain/models.dart';
 import '../../packs/domain/pack_source.dart';
+import '../../packs/presentation/opening_mode.dart';
+import '../../packs/presentation/pack_stack.dart';
 import '../../pools/domain/play_pool.dart';
 import '../../pools/domain/pool.dart';
 import '../../pools/presentation/pool_widgets.dart';
@@ -32,9 +35,36 @@ class SealedScreen extends StatelessWidget {
       );
 }
 
-/// Opens the packs of [format] from a fresh deal of [pool] into one sorted
-/// pool.
-class SealedView extends StatefulWidget {
+/// One card of a sealed deal: which pack it came in and its place in it.
+typedef SealedCard = ({int pack, int slot, CardData card});
+
+/// The cards of [packs] in [order]: pack after pack (A1, A2… B1, B2…),
+/// slot after slot (A1, B1… A2, B2…), or the best first (by rarity, packs
+/// and slots breaking ties).
+List<SealedCard> sealedOrder(List<List<CardData>> packs, SealedOrder order) {
+  final cards = [
+    for (final (p, pack) in packs.indexed)
+      for (final (s, card) in pack.indexed) (pack: p, slot: s, card: card),
+  ];
+  switch (order) {
+    case SealedOrder.byBooster:
+      return cards;
+    case SealedOrder.bySlot:
+      return cards..sort((a, b) => a.slot != b.slot ? a.slot - b.slot : a.pack - b.pack);
+    case SealedOrder.byQuality:
+      return cards
+        ..sort((a, b) => a.card.rarity != b.card.rarity
+            ? b.card.rarity.index - a.card.rarity.index
+            : a.pack != b.pack
+                ? a.pack - b.pack
+                : a.slot - b.slot);
+  }
+}
+
+/// Opens the packs of [format] from a fresh deal of [pool] the way a loose
+/// pack is opened (a grid of face-down cards, or a stack swiped card by
+/// card), in the order the user picks.
+class SealedView extends ConsumerStatefulWidget {
   const SealedView({super.key, required this.pool, required this.format});
 
   final PlayPool pool;
@@ -43,24 +73,38 @@ class SealedView extends StatefulWidget {
   int get packCount => format.rounds.length;
 
   @override
-  State<SealedView> createState() => _SealedViewState();
+  ConsumerState<SealedView> createState() => _SealedViewState();
 }
 
-class _SealedViewState extends State<SealedView> {
-  late List<CardData> _cards = _deal();
+class _SealedViewState extends ConsumerState<SealedView> {
+  late List<List<CardData>> _packs = _deal();
 
-  List<CardData> _deal() {
+  /// Cards turned face up, as (pack, slot), so a change of order keeps them.
+  final Set<(int, int)> _revealed = {};
+  int _deals = 0;
+
+  List<List<CardData>> _deal() {
     final sources = <String, PackSource>{};
     return [
       for (final round in widget.format.rounds)
-        ...(sources[round.booster] ??= widget.pool.boosterPlay(round.booster)!.newSource()).nextPack(),
-    ]..sort((a, b) => b.rarity.index.compareTo(a.rarity.index));
+        (sources[round.booster] ??= widget.pool.boosterPlay(round.booster)!.newSource()).nextPack(),
+    ];
   }
+
+  void _dealAgain() => setState(() {
+        _packs = _deal();
+        _revealed.clear();
+        _deals++;
+      });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final pool = widget.pool;
+    final order = ref.watch(sealedOrderProvider);
+    final swipe = ref.watch(openingModeProvider) == OpeningMode.swipe;
+    final cards = sealedOrder(_packs, order);
+    final total = cards.length;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.sealedPool),
@@ -72,22 +116,56 @@ class _SealedViewState extends State<SealedView> {
               pool.name,
               pool.config.label(l10n),
               l10n.packsCount(widget.packCount),
-              l10n.cardsCount(_cards.length),
+              l10n.cardsCount(total),
             ].join(' · ')),
           ),
         ),
         actions: [
+          PopupMenuButton<SealedOrder>(
+            key: const Key('sealedOrder'),
+            tooltip: l10n.sealedOrder,
+            icon: const Icon(Icons.sort),
+            initialValue: order,
+            onSelected: ref.read(sealedOrderProvider.notifier).select,
+            itemBuilder: (context) => [
+              for (final o in SealedOrder.values)
+                PopupMenuItem(value: o, child: Text(o.label(l10n))),
+            ],
+          ),
           IconButton(
             tooltip: l10n.dealAgain,
             icon: const Icon(Icons.refresh),
-            onPressed: () => setState(() => _cards = _deal()),
+            onPressed: _dealAgain,
           ),
         ],
       ),
-      body: CardGrid(
-        itemCount: _cards.length,
-        itemBuilder: (context, i) => CardTile(card: _cards[i]),
-      ),
+      body: swipe
+          ? PackStack(key: ValueKey((_deals, order)), cards: [for (final c in cards) c.card])
+          : CardGrid(
+              key: ValueKey((_deals, order)),
+              itemCount: total,
+              itemBuilder: (context, i) {
+                final (:pack, :slot, :card) = cards[i];
+                return CardTile(
+                  card: card,
+                  revealed: _revealed.contains((pack, slot)),
+                  onTap: () => setState(() => _revealed.add((pack, slot))),
+                );
+              },
+            ),
+      bottomNavigationBar: swipe
+          ? null
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: OutlinedButton(
+                  onPressed: _revealed.length == total
+                      ? null
+                      : () => setState(() => _revealed.addAll([for (final c in cards) (c.pack, c.slot)])),
+                  child: Text(l10n.revealAll),
+                ),
+              ),
+            ),
     );
   }
 }

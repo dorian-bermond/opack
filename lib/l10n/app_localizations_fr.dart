@@ -89,6 +89,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dealAgain => 'Redistribuer';
 
   @override
+  String get sealedOrder => 'Ordre de révélation';
+
+  @override
+  String get sealedByBooster => 'Booster après booster';
+
+  @override
+  String get sealedBySlot => 'Emplacement après emplacement';
+
+  @override
+  String get sealedByQuality => 'Meilleures cartes d\'abord';
+
+  @override
   String get newPool => 'Nouveau pool';
 
   @override

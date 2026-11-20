@@ -30,6 +30,10 @@
     }
   },
   "dealAgain": "Redistribuer",
+  "sealedOrder": "Ordre de révélation",
+  "sealedByBooster": "Booster après booster",
+  "sealedBySlot": "Emplacement après emplacement",
+  "sealedByQuality": "Meilleures cartes d'abord",
   "newPool": "Nouveau pool",
   "sealedPool": "Pool scellé",
   "cardsCount": "{count, plural, =1{1 carte} other{{count} cartes}}",
