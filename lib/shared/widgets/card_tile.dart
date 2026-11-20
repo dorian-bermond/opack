@@ -324,8 +324,21 @@ class _HoverPreviewState extends State<_HoverPreview> {
   void _hide() {
     _timer?.cancel();
     _timer = null;
-    _entry?.remove();
+    final entry = _entry;
     _entry = null;
+    if (entry == null) return;
+    // The card may go while the tree is being built (the last card of a
+    // stack flying out under the pointer): the overlay is cleaned up
+    // once the frame is done, not in the middle of it.
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        entry.remove();
+        entry.dispose();
+      });
+    } else {
+      entry.remove();
+      entry.dispose();
+    }
   }
 
   void _show() {
