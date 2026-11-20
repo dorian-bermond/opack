@@ -128,6 +128,7 @@ class _PackOpeningState extends ConsumerState<_PackOpening> {
                     key: ValueKey('sealed-${_opened[_kind] ?? 0}'),
                     width: packWidth,
                     height: packWidth / aspect,
+                    cardAspect: gameCardAspect(pool.pool.game),
                     enabled: !_exhausted,
                     onOpen: _open,
                     controller: _slash,

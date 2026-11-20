@@ -65,7 +65,7 @@ class _PackStackState extends State<PackStack> with SingleTickerProviderStateMix
             child: Center(
               child: SizedBox(
                 width: width,
-                height: width * 88 / 63,
+                height: width / cardAspectRatio(cards[_top]),
                 child: AnimatedBuilder(
                   animation: _flyOut,
                   builder: (context, _) {

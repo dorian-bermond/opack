@@ -113,9 +113,12 @@ class RarityMarkerSetting extends Notifier<RarityMarker> {
   }
 }
 
-/// Width over height of a card: Yu-Gi-Oh! cards are 59 × 86 mm, MtG ones
-/// 63 × 88 mm.
+/// Width over height of a card: Yu-Gi-Oh! cards are 59 × 86 mm, MtG and
+/// One Piece ones 63 × 88 mm.
 double cardAspectRatio(CardData card) => card.passcode != null ? 59 / 86 : 63 / 88;
+
+/// Width over height of [game]'s cards (see [cardAspectRatio]).
+double gameCardAspect(Game game) => game == Game.ygo ? 59 / 86 : 63 / 88;
 
 /// A card face (its picture once downloaded, else name and rarity), or its
 /// back while [revealed] is false. Long-press or right-click a revealed card

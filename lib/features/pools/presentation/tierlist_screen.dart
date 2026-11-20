@@ -251,6 +251,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final play = widget.pool;
+    final aspect = gameCardAspect(play.pool.game);
     final quality = _quality;
     final infos = ref.watch(poolCardInfoProvider(_pool.id)).value?.infos ?? const <String, CardInfo>{};
     final cardWidth = ref.watch(tierlistCardWidthProvider);
@@ -416,6 +417,7 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                               onColor: (c) => setTagColor(ref, _pool, tier, c),
                               cards: valued[tier]!,
                               cardWidth: cardWidth,
+                              aspect: aspect,
                               spacing: spacing,
                               onDrop: (card, {before}) => _dropOnTier(tier, card, before: before),
                               onMoveUp: i == 0 ? null : () => _moveTier(tier, -1),
@@ -440,12 +442,13 @@ class _TierlistState extends ConsumerState<_Tierlist> {
                 _Feed(
                   cards: feed,
                   hint: l10n.tierlistFeedHint,
-                  height: _feedHeight ?? cardWidth * 88 / 63 + 16,
+                  aspect: aspect,
+                  height: _feedHeight ?? cardWidth / aspect + 16,
                   collapsed: _feedCollapsed,
                   onToggle: () => setState(() => _feedCollapsed = !_feedCollapsed),
                   onResize: (delta) => setState(() {
                     _feedCollapsed = false;
-                    _feedHeight = ((_feedHeight ?? cardWidth * 88 / 63 + 16) - delta).clamp(80.0, 600.0);
+                    _feedHeight = ((_feedHeight ?? cardWidth / aspect + 16) - delta).clamp(80.0, 600.0);
                   }),
                   onDrop: _dropOnFeed,
                 ),
@@ -469,6 +472,7 @@ class _Tier extends StatelessWidget {
     this.onColor,
     required this.cards,
     required this.cardWidth,
+    this.aspect = 63 / 88,
     required this.spacing,
     required this.onDrop,
     this.onMoveUp,
@@ -482,6 +486,9 @@ class _Tier extends StatelessWidget {
   final ValueChanged<Color?>? onColor;
   final List<CardData> cards;
   final double cardWidth;
+
+  /// Width over height of the cards.
+  final double aspect;
 
   /// The gap between cards; negative to overlap them.
   final double spacing;
@@ -562,13 +569,13 @@ class _Tier extends StatelessWidget {
               ),
               Expanded(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: cardWidth * 88 / 63 + 16),
+                  constraints: BoxConstraints(minHeight: cardWidth / aspect + 16),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: _CardFlow(
                       width: flowWidth,
                       cardWidth: cardWidth,
-                      cardHeight: cardWidth * 88 / 63,
+                      cardHeight: cardWidth / aspect,
                       spacing: spacing,
                       children: [
                         for (final card in cards)
@@ -745,6 +752,7 @@ class _Feed extends StatelessWidget {
     required this.onToggle,
     required this.onResize,
     required this.onDrop,
+    this.aspect = 63 / 88,
   });
 
   final List<CardData> cards;
@@ -757,11 +765,14 @@ class _Feed extends StatelessWidget {
   final ValueChanged<double> onResize;
   final void Function(CardData card) onDrop;
 
+  /// Width over height of the cards.
+  final double aspect;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final cardWidth = (height - 16) * 63 / 88;
+    final cardWidth = (height - 16) * aspect;
     return DragTarget<CardData>(
       onWillAcceptWithDetails: (d) => !cards.any((c) => c.id == d.data.id),
       onAcceptWithDetails: (d) => onDrop(d.data),

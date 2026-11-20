@@ -568,7 +568,7 @@ void main() {
     expect(rankedRect(1).left, rankedRect(0).left + 120 - 40);
     expect(rankedRect(0).top, rankedRect(1).top);
     final columns = ((tester.getSize(rare).width - 96 - 16 - 120) / 80).floor() + 1;
-    expect(rankedRect(columns).top, closeTo(rankedRect(0).top + 120 * 88 / 63 - 40, 0.5), reason: 'rows overlap too');
+    expect(rankedRect(columns).top, closeTo(rankedRect(0).top + 120 * 86 / 59 - 40, 0.5), reason: 'rows overlap too, a Yu-Gi-Oh! card tall');
     expect(rankedRect(columns).left, rankedRect(0).left);
     container.read(tierlistSpacingProvider.notifier).set(8);
     await tester.pumpAndSettle();

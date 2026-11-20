@@ -406,13 +406,13 @@ class PoolGallerySliver extends StatelessWidget {
           gridDelegate: columns > 0
               ? SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: columns,
-                  childAspectRatio: 63 / 88,
+                  childAspectRatio: items.isEmpty ? 63 / 88 : cardAspectRatio(items.first.card),
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                 )
-              : const SliverGridDelegateWithMaxCrossAxisExtent(
+              : SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 160,
-                  childAspectRatio: 63 / 88,
+                  childAspectRatio: items.isEmpty ? 63 / 88 : cardAspectRatio(items.first.card),
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                 ),

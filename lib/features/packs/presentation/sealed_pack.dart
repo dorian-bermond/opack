@@ -43,7 +43,11 @@ class SealedPack extends StatefulWidget {
     this.enabled = true,
     this.controller,
     this.onTear,
+    this.cardAspect = 63 / 88,
   });
+
+  /// Width over height of the cards inside (the game's).
+  final double cardAspect;
 
   final Widget child;
   final double width;
@@ -203,7 +207,7 @@ class _SealedPackState extends State<SealedPack> with SingleTickerProviderStateM
   /// bigger piece.
   Widget _insideCard(Offset shift) {
     final cardWidth = widget.width * 0.94;
-    final cardHeight = cardWidth * 88 / 63;
+    final cardHeight = cardWidth / widget.cardAspect;
     return Positioned(
       left: (widget.width - cardWidth) / 2 + shift.dx,
       top: (widget.height - cardHeight) / 2 + shift.dy,
