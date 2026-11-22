@@ -926,6 +926,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rarityMarkerSetting => 'Marque de rareté';
 
   @override
+  String get rarityMarkerNone => 'Aucune';
+
+  @override
   String get rarityMarkerBorder => 'Bordure colorée';
 
   @override
@@ -1350,4 +1353,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String artworkLoadFailed(String error) {
     return 'Impossible de charger les illustrations : $error';
   }
+
+  @override
+  String get selectionCopies => 'Définir les exemplaires…';
+
+  @override
+  String get selectionTags => 'Modifier les étiquettes…';
+
+  @override
+  String get selectionDetails => 'Détails de la carte';
+
+  @override
+  String get selectionAll => 'Sélectionner toutes les cartes affichées';
+
+  @override
+  String get selectionClear => 'Effacer la sélection';
+
+  @override
+  String get batchTabList => 'Liste';
+
+  @override
+  String get batchTabOptions => 'Options';
+
+  @override
+  String get batchQualities => 'Qualités pour tout le lot';
+
+  @override
+  String get batchQualitiesHint =>
+      'Chaque carte importée prend la valeur choisie pour une qualité, à la place de celle qu\'elle avait ; sans choix, la qualité n\'est pas touchée.';
+
+  @override
+  String get batchRarities => 'Importer les raretés';
+
+  @override
+  String get batchRaritiesHint =>
+      'Chaque carte rejoint l\'étiquette de sa rareté, pour que les boosters construits sur les raretés la distribuent. Désactivé, les cartes n\'arrivent qu\'avec les étiquettes et valeurs ci-dessus.';
 }

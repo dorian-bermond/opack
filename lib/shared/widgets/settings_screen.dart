@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,7 @@ import '../../features/card_text/domain/card_text.dart';
 import '../../features/packs/presentation/opening_mode.dart';
 import '../../features/catalog/domain/models.dart';
 import '../../l10n/app_localizations.dart';
+import '../../features/pools/data/artwork_language.dart';
 import '../../features/pools/presentation/pool_widgets.dart';
 import '../images/artwork_picker.dart';
 import '../images/card_image_cache.dart';
@@ -62,7 +65,13 @@ class SettingsScreen extends ConsumerWidget {
                     key: const Key('setting-pictureLanguage'),
                     title: l10n.pictureLanguage,
                     value: cardLanguages.picture,
-                    onChanged: languagesSetting.selectPicture,
+                    onChanged: (code) {
+                      // The artworks chosen in the previous language follow.
+                      final system = Localizations.localeOf(context).languageCode;
+                      final from = cardLanguages.picture ?? system;
+                      languagesSetting.selectPicture(code);
+                      unawaited(ref.read(artworkLanguageSwitchProvider).run(from: from, to: code ?? system));
+                    },
                   ),
                   _LanguageRow(
                     key: const Key('setting-dataLanguage'),
@@ -106,7 +115,11 @@ class SettingsScreen extends ConsumerWidget {
               _Choice<RarityMarker>(
                 title: l10n.rarityMarkerSetting,
                 value: marker,
-                choices: [(RarityMarker.border, l10n.rarityMarkerBorder), (RarityMarker.dot, l10n.rarityMarkerDot)],
+                choices: [
+                  (RarityMarker.none, l10n.rarityMarkerNone),
+                  (RarityMarker.border, l10n.rarityMarkerBorder),
+                  (RarityMarker.dot, l10n.rarityMarkerDot),
+                ],
                 onChanged: (m) => ref.read(rarityMarkerProvider.notifier).select(m!),
               ),
               _Section(

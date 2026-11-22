@@ -92,7 +92,7 @@ class GalleryColumnsControl extends ConsumerWidget {
 
 /// The column a card falls in when stacked by [sort]: its mana value, color,
 /// level, first letter… `?` when the card has no such value.
-String stackLabel(CardSort sort, CardWithInfo item, String language) {
+String stackLabel(CardSort sort, CardWithInfo item, String language, {String Function(CardData card)? nameOf}) {
   final info = item.info;
   final mtg = info is MtgCardInfo ? info : null;
   final ygo = info is YgoCardInfo ? info : null;
@@ -106,7 +106,7 @@ String stackLabel(CardSort sort, CardWithInfo item, String language) {
         _ => '3000+',
       };
   return switch (sort) {
-    CardSort.name => item.card.nameFor(language).characters.first.toUpperCase(),
+    CardSort.name => nameSortKey(nameOf?.call(item.card) ?? item.card.nameFor(language)).characters.firstOrNull?.toUpperCase() ?? '?',
     CardSort.rarity => item.card.rarity.name,
     CardSort.manaValue => switch (mtg?.manaValue) {
         null => '?',
@@ -240,6 +240,9 @@ class PoolCardActions {
     this.onTap,
     this.trailing,
     this.draggable = false,
+    this.selected,
+    this.onSelect,
+    this.onMenu,
   });
 
   final int? Function(CardData card) copiesOf;
@@ -265,6 +268,14 @@ class PoolCardActions {
 
   /// Whether cards can be dragged (onto tag baskets).
   final bool draggable;
+
+  /// The gallery's selection: whether a card is in it, a tap putting it in
+  /// or taking it out ([onSelect]), and a right-click or long-press opening
+  /// the operations on the selected cards at that position ([onMenu]).
+  /// Without them a tap asks for the copies.
+  final bool Function(CardData card)? selected;
+  final void Function(CardData card)? onSelect;
+  final void Function(CardData card, Offset position)? onMenu;
 }
 
 /// [child] showing [card], dragged as a small picture of it when
@@ -341,16 +352,24 @@ class _CopiesBadge extends StatelessWidget {
   }
 }
 
-/// A card picture with its copies badge; tapping asks for the copies.
+/// A card picture with its copies badge; tapping asks for the copies, or,
+/// when [selectable] and the actions hold a selection, selects the card.
 class _PictureCard extends StatelessWidget {
-  const _PictureCard({required this.card, required this.actions});
+  const _PictureCard({required this.card, required this.actions, this.selectable = false});
 
   final CardData card;
   final PoolCardActions actions;
+  final bool selectable;
 
   @override
   Widget build(BuildContext context) {
     final tint = actions.tint(card);
+    final theme = Theme.of(context);
+    // Bulk tagging keeps the tap for itself.
+    final selecting = selectable && actions.onTap == null;
+    final onSelect = selecting ? actions.onSelect : null;
+    final onMenu = selecting ? actions.onMenu : null;
+    final selected = selecting && (actions.selected?.call(card) ?? false);
     return DraggableCard(
       card: card,
       enabled: actions.draggable,
@@ -360,10 +379,37 @@ class _PictureCard extends StatelessWidget {
           card: card,
           onTap: () async {
             if (actions.onTap case final onTap?) return onTap(card);
+            if (onSelect != null) return onSelect(card);
             final picked = await pickCopies(context, actions.copiesOf(card));
             if (picked != null) actions.setCopies(card, picked.copies);
           },
+          onMenu: onMenu == null ? null : (position) => onMenu(card, position),
         ),
+        if (selected) ...[
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                key: ValueKey('selected-${card.id}'),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: theme.colorScheme.primary, width: 4),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 8,
+            top: 8,
+            child: IgnorePointer(
+              child: CircleAvatar(
+                radius: 11,
+                backgroundColor: theme.colorScheme.primary,
+                child: Icon(Icons.check, size: 16, color: theme.colorScheme.onPrimary),
+              ),
+            ),
+          ),
+        ],
         if (tint != null)
           Positioned.fill(
             child: IgnorePointer(
@@ -391,7 +437,8 @@ class _PictureCard extends StatelessWidget {
 }
 
 /// Pictures in a grid, [columns] per row (as many 160 px ones as fit
-/// when 0).
+/// when 0). With a selection in [actions], a tap selects a card and a
+/// right-click or long-press opens the operations on the selected ones.
 class PoolGallerySliver extends StatelessWidget {
   const PoolGallerySliver({super.key, required this.items, required this.actions, this.columns = 0});
 
@@ -417,7 +464,7 @@ class PoolGallerySliver extends StatelessWidget {
                   crossAxisSpacing: 8,
                 ),
           itemCount: items.length,
-          itemBuilder: (context, i) => _PictureCard(card: items[i].card, actions: actions),
+          itemBuilder: (context, i) => _PictureCard(card: items[i].card, actions: actions, selectable: true),
         ),
       );
 }
@@ -517,7 +564,7 @@ class PoolStacksSliver extends StatelessWidget {
 }
 
 /// Each card with its picture, name, details and full text.
-class PoolSpoilerSliver extends StatelessWidget {
+class PoolSpoilerSliver extends ConsumerWidget {
   const PoolSpoilerSliver({
     super.key,
     required this.items,
@@ -530,7 +577,7 @@ class PoolSpoilerSliver extends StatelessWidget {
   final String language;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return SliverList.builder(
@@ -569,7 +616,7 @@ class PoolSpoilerSliver extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      card.nameFor(language),
+                      shownName(ref, card, language),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: actions.changed(card) ? FontWeight.bold : null,
                       ),
@@ -624,7 +671,7 @@ class PoolSpoilerSliver extends StatelessWidget {
 }
 
 /// Compact rows: name, code, rarity, tags and the card's details line.
-class PoolListSliver extends StatelessWidget {
+class PoolListSliver extends ConsumerWidget {
   const PoolListSliver({super.key, required this.items, required this.actions, required this.language});
 
   final List<CardWithInfo> items;
@@ -632,7 +679,7 @@ class PoolListSliver extends StatelessWidget {
   final String language;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return SliverList.builder(
       itemCount: items.length,
@@ -649,7 +696,7 @@ class PoolListSliver extends StatelessWidget {
           onTap: actions.onTap == null ? null : () => actions.onTap!(card),
           onLongPress: () => showCardDetails(context, card, poolId: PoolScope.of(context)),
           title: Text(
-            card.nameFor(language),
+            shownName(ref, card, language),
             style: actions.changed(card) ? const TextStyle(fontWeight: FontWeight.bold) : null,
           ),
           subtitle: Text([

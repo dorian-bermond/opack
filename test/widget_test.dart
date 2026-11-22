@@ -365,6 +365,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('1 card found · 1 line unmatched'), findsOneWidget, reason: 'the decoy loses, duplicates merge');
     expect(find.text('Nope Card'), findsOneWidget);
+    // Looked up: the options tab opened, the list one still a tap away.
+    expect(find.byKey(const Key('batchList')), findsNothing);
+    expect(find.byKey(const Key('batchRarities')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('batchTabList')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('batchList')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('batchNext')));
+    await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('batchNewTag')), 'imported');
     await tester.tap(find.byKey(const Key('batchAddTag')));
     await tester.pumpAndSettle();

@@ -1060,17 +1060,22 @@ class Pool {
   /// all-cards tag when the pool has one, the sheet tags holding their
   /// rarity (given [existing], the cards already in the pool) and, for a
   /// set with [set] given, the tags named like its own sheets with the
-  /// sheet weights.
+  /// sheet weights. Without [rarities] the cards keep out of the rarity
+  /// tags and of the sheets holding their rarity (an imported list whose
+  /// cards are tagged by hand).
   Pool withSource(
     PoolSource source, {
     Iterable<CardData> cards = const [],
     Iterable<CardData> existing = const [],
     CardSet? set,
+    bool rarities = true,
   }) {
     if (sources.contains(source)) return this;
     var tags = {...this.tags};
-    for (final MapEntry(key: tag, value: def) in rarityTags(cards).entries) {
-      tags[tag] = (tags[tag] ?? const TagDef([])).plus(def.cards);
+    if (rarities) {
+      for (final MapEntry(key: tag, value: def) in rarityTags(cards).entries) {
+        tags[tag] = (tags[tag] ?? const TagDef([])).plus(def.cards);
+      }
     }
     if (tags[allCardsTag] case final all?) {
       tags[allCardsTag] = all.plus(cards.map((c) => c.id));
@@ -1084,7 +1089,7 @@ class Pool {
         }
       }
     }
-    tags = withCardsByRarity((tags: tags, slots: slots), [...existing, ...cards]).tags;
+    if (rarities) tags = withCardsByRarity((tags: tags, slots: slots), [...existing, ...cards]).tags;
     return copyWith(sources: [...sources, source], tags: tags);
   }
 

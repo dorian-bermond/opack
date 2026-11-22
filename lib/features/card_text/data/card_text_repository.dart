@@ -7,7 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/card_text.dart';
 
-/// All Yu-Gi-Oh! text versions, keyed by passcode. Loaded once, on first use.
+/// A passcode as the texts are keyed: without its leading zeros, since a set
+/// prints `02204140` where a search or an imported list gives `2204140`.
+String textKey(String passcode) => passcode.replaceFirst(RegExp(r'^0+(?=.)'), '');
+
+/// All Yu-Gi-Oh! text versions, keyed by [textKey]. Loaded once, on first use.
 final cardTextsProvider = FutureProvider<Map<String, CardTexts>>((ref) async {
   final json = await compute(
     _parse,
@@ -19,7 +23,7 @@ final cardTextsProvider = FutureProvider<Map<String, CardTexts>>((ref) async {
 Map<String, CardTexts> _parse(String text) => {
       for (final MapEntry(key: passcode, value: languages)
           in (jsonDecode(text) as Map<String, dynamic>).entries)
-        passcode: {
+        textKey(passcode): {
           for (final MapEntry(key: lang, value: versions)
               in (languages as Map<String, dynamic>).entries)
             lang: [
@@ -38,10 +42,11 @@ class TextPreferences {
 
   final TextVersionMode mode;
 
-  /// User picks: `"<passcode>|<lang>"` -> version index.
+  /// User picks: `"<passcode>|<lang>"` -> version index, the passcode as
+  /// its [textKey].
   final Map<String, int> overrides;
 
-  int? overrideFor(String passcode, String lang) => overrides['$passcode|$lang'];
+  int? overrideFor(String passcode, String lang) => overrides['${textKey(passcode)}|$lang'];
 }
 
 final textPreferencesProvider =
@@ -62,7 +67,10 @@ class TextPreferencesController extends Notifier<TextPreferences> {
     final raw = _prefs.getString(_overridesKey);
     final overrides = raw == null
         ? <String, int>{}
-        : (jsonDecode(raw) as Map<String, dynamic>).cast<String, int>();
+        : {
+            for (final MapEntry(:key, :value) in (jsonDecode(raw) as Map<String, dynamic>).entries)
+              textKey(key): value as int,
+          };
     return TextPreferences(mode: mode, overrides: overrides);
   }
 
@@ -75,9 +83,9 @@ class TextPreferencesController extends Notifier<TextPreferences> {
   void choose(String passcode, String lang, int? index) {
     final overrides = {...state.overrides};
     if (index == null) {
-      overrides.remove('$passcode|$lang');
+      overrides.remove('${textKey(passcode)}|$lang');
     } else {
-      overrides['$passcode|$lang'] = index;
+      overrides['${textKey(passcode)}|$lang'] = index;
     }
     _prefs.setString(_overridesKey, jsonEncode(overrides));
     state = TextPreferences(mode: state.mode, overrides: overrides);

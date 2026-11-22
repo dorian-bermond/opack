@@ -156,6 +156,20 @@ class CardFilter {
       );
 }
 
+/// What a card name sorts by: lowercase, without accents, and from its first
+/// letter or digit, so `"A" Cell Incubator` files under A and `Épée` under E.
+String nameSortKey(String name) {
+  const accents = {
+    'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'ã': 'a', 'å': 'a', 'æ': 'ae', 'ç': 'c',
+    'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',
+    'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'ö': 'o', 'õ': 'o', 'ø': 'o', 'œ': 'oe',
+    'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u', 'ý': 'y', 'ÿ': 'y', 'ß': 'ss',
+  };
+  final folded = name.toLowerCase().replaceAllMapped(RegExp('[à-ÿœ]'), (m) => accents[m[0]] ?? m[0]!);
+  final key = folded.replaceFirst(RegExp(r'^[^a-z0-9]+'), '');
+  return key.isEmpty ? folded : key;
+}
+
 /// Orders of a pool's card list.
 enum CardSort {
   name,
@@ -182,9 +196,12 @@ enum CardSort {
       };
 
   /// Compares two cards; ties fall back to rarity (highest first) then name.
-  int compare(CardWithInfo a, CardWithInfo b, String language) {
+  /// By [name] the order is the names' alone. [nameOf] gives the name a card
+  /// is shown under when it is not its own in [language].
+  int compare(CardWithInfo a, CardWithInfo b, String language, {String Function(CardData card)? nameOf}) {
+    String name(CardData card) => nameOf?.call(card) ?? card.nameFor(language);
     final primary = switch (this) {
-      name => 0,
+      CardSort.name => 0,
       rarity => _desc(a.card.rarity.index, b.card.rarity.index),
       manaValue => _num(_mtg(a)?.manaValue, _mtg(b)?.manaValue),
       color => _text(_colorKey(_mtg(a)) ?? _opcColorKey(_opc(a)), _colorKey(_mtg(b)) ?? _opcColorKey(_opc(b))),
@@ -202,11 +219,12 @@ enum CardSort {
       archetype => _text(_ygo(a)?.archetype, _ygo(b)?.archetype),
     };
     if (primary != 0) return primary;
-    if (this != rarity) {
+    if (this != rarity && this != CardSort.name) {
       final byRarity = b.card.rarity.index.compareTo(a.card.rarity.index);
       if (byRarity != 0) return byRarity;
     }
-    return a.card.nameFor(language).toLowerCase().compareTo(b.card.nameFor(language).toLowerCase());
+    final byName = nameSortKey(name(a.card)).compareTo(nameSortKey(name(b.card)));
+    return byName != 0 ? byName : a.card.id.compareTo(b.card.id);
   }
 
   static MtgCardInfo? _mtg(CardWithInfo item) => item.info is MtgCardInfo ? item.info as MtgCardInfo : null;

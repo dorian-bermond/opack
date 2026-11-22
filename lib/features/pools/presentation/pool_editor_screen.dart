@@ -17,6 +17,7 @@ import '../../card_info/presentation/filter_sheet.dart';
 import '../../card_info/presentation/labels.dart';
 import '../../card_info/presentation/metrics_sheet.dart';
 import '../../card_info/presentation/search_panel.dart';
+import '../../card_text/presentation/card_details_sheet.dart';
 import '../../catalog/domain/models.dart';
 import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
@@ -207,7 +208,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   }
 
   /// Adds every card of [batch] as picked cards, with their details, and
-  /// gives them all the batch's tags (created when new).
+  /// gives them all the batch's tags (created when new) and quality values
+  /// (a card leaving the other values of that quality); they join the
+  /// rarity tags only when the batch imports rarities.
   Future<void> _addBatch(BatchImport batch) async {
     final pool = _pool;
     final picked = pool.sources.whereType<CardsSource>().firstOrNull ?? const CardsSource([]);
@@ -217,10 +220,20 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       picked.plus(cards),
       cards: cards,
       existing: widget.pool.entries.map((e) => e.card),
+      rarities: batch.rarities,
     );
+    final added = {for (final c in cards) c.id};
     for (final tag in batch.tags) {
-      final ids = {for (final c in widget.pool.tagCards[tag] ?? const <CardData>[]) c.id, for (final c in cards) c.id};
-      updated = updated.withTag(tag, ids);
+      // A quality holds one value per card: out of the other ones.
+      if (Pool.qualityOf(tag) case final quality?) {
+        for (final other in updated.valuesOf(quality)) {
+          final held = updated.tags[other]!.cards;
+          if (other != tag && held.any(added.contains)) {
+            updated = updated.withTag(other, [for (final id in held) if (!added.contains(id)) id]);
+          }
+        }
+      }
+      updated = updated.withTag(tag, {...?updated.tags[tag]?.cards, ...added});
     }
     _save(updated);
     await ref.read(poolCardInfoProvider(pool.id).notifier).addInfos({for (final f in batch.found) f.card.id: f.info});
@@ -290,8 +303,95 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     };
   }
 
+  /// The gallery's selected cards, by id.
+  final Set<String> _selected = {};
+
+  /// The cards the pool shows now (searched and filtered), for "select all".
+  List<CardData> _shown = const [];
+
+  void _toggleSelected(CardData card) => setState(() {
+        _selected.contains(card.id) ? _selected.remove(card.id) : _selected.add(card.id);
+      });
+
+  /// Opens, at [position], the operations on the selected cards. A card
+  /// outside the selection becomes the selection first.
+  Future<void> _selectionMenu(CardData card, Offset position) async {
+    final l10n = AppLocalizations.of(context);
+    if (!_selected.contains(card.id)) {
+      setState(() => _selected
+        ..clear()
+        ..add(card.id));
+    }
+    final play = widget.pool;
+    final cards = [for (final e in play.entries) if (_selected.contains(e.card.id)) e.card];
+    if (cards.isEmpty) return;
+    final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final operation = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(position & Size.zero, Offset.zero & overlay.size),
+      items: [
+        PopupMenuItem(enabled: false, height: 32, child: Text(l10n.selectedCount(cards.length))),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          key: const Key('selectionCopies'),
+          value: 'copies',
+          child: ListTile(leading: const Icon(Icons.filter_none), title: Text(l10n.selectionCopies)),
+        ),
+        PopupMenuItem(
+          key: const Key('selectionTags'),
+          value: 'tags',
+          child: ListTile(leading: const Icon(Icons.label_outline), title: Text(l10n.selectionTags)),
+        ),
+        if (cards.length == 1)
+          PopupMenuItem(
+            key: const Key('selectionDetails'),
+            value: 'details',
+            child: ListTile(leading: const Icon(Icons.info_outline), title: Text(l10n.selectionDetails)),
+          ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          key: const Key('selectionAll'),
+          value: 'all',
+          child: ListTile(leading: const Icon(Icons.select_all), title: Text(l10n.selectionAll)),
+        ),
+        PopupMenuItem(
+          key: const Key('selectionClear'),
+          value: 'clear',
+          child: ListTile(leading: const Icon(Icons.deselect), title: Text(l10n.selectionClear)),
+        ),
+      ],
+    );
+    if (!mounted) return;
+    switch (operation) {
+      case 'copies':
+        final listed = {for (final e in play.entries) e.card.id: e.listed};
+        final picked =
+            await pickCopies(context, _pool.copiesOf(cards.first.id, listed: listed[cards.first.id] ?? 1));
+        if (picked == null) return;
+        // Every card in one save, on the pool as it is now.
+        var config = _pool.config;
+        for (final c in cards) {
+          config = config.withCard(c.id, picked.copies, listed: listed[c.id] ?? 1);
+        }
+        _save(_pool.copyWith(config: config));
+      case 'tags':
+        await _editCardsTags(cards);
+      case 'details':
+        await showCardDetails(context, cards.single, poolId: _pool.id);
+      case 'all':
+        setState(() => _selected.addAll(_shown.map((c) => c.id)));
+      case 'clear':
+        setState(_selected.clear);
+    }
+  }
+
   /// Picks the user tags of one card with checkboxes.
-  Future<void> _editCardTags(CardData card) async {
+  Future<void> _editCardTags(CardData card) => _editCardsTags([card]);
+
+  /// Picks the user tags of [cards] with checkboxes: checked are the tags
+  /// they all have, and only the tags whose box changed are given to or
+  /// taken from every one of them.
+  Future<void> _editCardsTags(List<CardData> cards) async {
     final l10n = AppLocalizations.of(context);
     final pool = _pool;
     if (pool.tags.isEmpty) {
@@ -300,16 +400,17 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     }
     final play = widget.pool;
     final all = _visibleTags(play);
+    final cardIds = {for (final c in cards) c.id};
     final chosen = {
       for (final tag in all)
-        if ((play.tagCards[tag] ?? const []).any((c) => c.id == card.id)) tag,
+        if ({for (final c in play.tagCards[tag] ?? const <CardData>[]) c.id}.containsAll(cardIds)) tag,
     };
     final before = {...chosen};
     final result = await showDialog<Set<String>>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(l10n.cardTags),
+          title: Text(cards.length == 1 ? l10n.cardTags : '${l10n.poolTags} · ${l10n.selectedCount(cards.length)}'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -369,7 +470,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     for (final tag in all) {
       if (result.contains(tag) == before.contains(tag)) continue;
       final ids = {for (final c in play.tagCards[tag] ?? const <CardData>[]) c.id};
-      result.contains(tag) ? ids.add(card.id) : ids.remove(card.id);
+      result.contains(tag) ? ids.addAll(cardIds) : ids.removeAll(cardIds);
       updated = _withTagCards(updated, tag, ids);
     }
     _save(updated);
@@ -395,15 +496,19 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       for (final e in play.entries)
         (card: e.card, info: infos[e.card.id], tags: play.tagsOfCard(e.card.id)),
     ];
+    final shownNames = {for (final e in play.entries) e.card.id: shownName(ref, e.card, language)};
+    String nameOf(CardData card) => shownNames[card.id] ?? card.nameFor(language);
     final items = allItems
         .where((item) =>
             query.isEmpty ||
             item.card.id.toLowerCase().contains(query) ||
             item.card.names.values.any((n) => n.toLowerCase().contains(query)) ||
+            nameOf(item.card).toLowerCase().contains(query) ||
             (item.info?.name.toLowerCase().contains(query) ?? false))
         .where(_filter.matches)
         .toList()
-      ..sort((a, b) => _sort.compare(a, b, language));
+      ..sort((a, b) => _sort.compare(a, b, language, nameOf: nameOf));
+    _shown = [for (final item in items) item.card];
     final listed = {for (final e in play.entries) e.card.id: e.listed};
     final view = ref.watch(poolViewProvider);
     final tagging = _taggingTag != null;
@@ -417,6 +522,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       onTap: tagging ? _toggleTagging : null,
       draggable: _baskets,
       onTags: _editCardTags,
+      selected: (card) => _selected.contains(card.id),
+      onSelect: _toggleSelected,
+      onMenu: _selectionMenu,
       tagsOf: (card) => [
         for (final tag in play.tagsOfCard(card.id))
           if (!tag.startsWith('rarity:')) tagLabel(l10n, tag),
@@ -620,7 +728,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               items: items,
               actions: actions,
               labelOf: (item) => _groupBy == GroupBy.none
-                  ? [stackLabel(_sort, item, language)]
+                  ? [stackLabel(_sort, item, language, nameOf: nameOf)]
                   : _groupBy.labelsOf(item, language, quality: _groupQuality),
               header: (label) => _groupBy == GroupBy.none
                   ? valueLabel(l10n, label)

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../card_text/presentation/card_details_sheet.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../../cube/data/cube_repository.dart';
@@ -120,10 +121,14 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
     final view = ref.watch(poolViewProvider);
     final results = _results;
 
+    final shownNames = {
+      for (final found in results ?? const <FoundCard>[]) found.card.id: shownName(ref, found.card, language),
+    };
+    String nameOf(CardData card) => shownNames[card.id] ?? card.nameFor(language);
     final items = [
       for (final found in results ?? const <FoundCard>[])
         (card: found.card, info: found.info, tags: const <String>{}),
-    ]..sort((a, b) => _sort.compare(a, b, language));
+    ]..sort((a, b) => _sort.compare(a, b, language, nameOf: nameOf));
 
     final actions = PoolCardActions(
       copiesOf: (_) => null,
@@ -270,7 +275,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                   PoolView.stacks => PoolStacksSliver(
                       items: items,
                       actions: actions,
-                      labelOf: (item) => [stackLabel(_sort, item, language)],
+                      labelOf: (item) => [stackLabel(_sort, item, language, nameOf: nameOf)],
                       header: (label) => valueLabel(l10n, label),
                     ),
                   PoolView.spoiler => PoolSpoilerSliver(items: items, actions: actions, language: language),

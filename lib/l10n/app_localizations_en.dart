@@ -923,6 +923,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rarityMarkerSetting => 'Rarity marker';
 
   @override
+  String get rarityMarkerNone => 'None';
+
+  @override
   String get rarityMarkerBorder => 'Colored border';
 
   @override
@@ -1345,4 +1348,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String artworkLoadFailed(String error) {
     return 'Could not load the artworks: $error';
   }
+
+  @override
+  String get selectionCopies => 'Set the copies…';
+
+  @override
+  String get selectionTags => 'Edit the tags…';
+
+  @override
+  String get selectionDetails => 'Card details';
+
+  @override
+  String get selectionAll => 'Select every card shown';
+
+  @override
+  String get selectionClear => 'Clear the selection';
+
+  @override
+  String get batchTabList => 'List';
+
+  @override
+  String get batchTabOptions => 'Options';
+
+  @override
+  String get batchQualities => 'Qualities for the whole batch';
+
+  @override
+  String get batchQualitiesHint =>
+      'Every imported card takes the value picked for a quality, in place of the one it had; none picked leaves the quality alone.';
+
+  @override
+  String get batchRarities => 'Import the rarities';
+
+  @override
+  String get batchRaritiesHint =>
+      'Each card joins the tag of its rarity, so the boosters built on rarities deal it. Off, the cards come in with only the tags and values above.';
 }

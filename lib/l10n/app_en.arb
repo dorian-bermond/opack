@@ -373,6 +373,7 @@
   "orderDescending": "Best first",
   "orderAscending": "Lowest first",
   "rarityMarkerSetting": "Rarity marker",
+  "rarityMarkerNone": "None",
   "rarityMarkerBorder": "Colored border",
   "rarityMarkerDot": "Small dot at the bottom",
   "tagsHint": "A tag is a yes/no trait, like having facial hair: a card carries any number of tags.",
@@ -579,5 +580,16 @@
   "artworkChosen": "Chosen",
   "noOtherArtwork": "No other artwork found for this card.",
   "artworkLoadFailed": "Could not load the artworks: {error}",
-  "@artworkLoadFailed": { "placeholders": { "error": { "type": "String" } } }
+  "@artworkLoadFailed": { "placeholders": { "error": { "type": "String" } } },
+  "selectionCopies": "Set the copies…",
+  "selectionTags": "Edit the tags…",
+  "selectionDetails": "Card details",
+  "selectionAll": "Select every card shown",
+  "selectionClear": "Clear the selection",
+  "batchTabList": "List",
+  "batchTabOptions": "Options",
+  "batchQualities": "Qualities for the whole batch",
+  "batchQualitiesHint": "Every imported card takes the value picked for a quality, in place of the one it had; none picked leaves the quality alone.",
+  "batchRarities": "Import the rarities",
+  "batchRaritiesHint": "Each card joins the tag of its rarity, so the boosters built on rarities deal it. Off, the cards come in with only the tags and values above."
 }

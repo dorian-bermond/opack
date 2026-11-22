@@ -159,6 +159,23 @@ void main() {
           ['DMC-66', 'MID-4', 'MID-12']);
     });
 
+    test('by name ignores rarity, quotes, case and accents', () {
+      CardWithInfo named(String name, Rarity rarity) => (
+            card: CardData(id: name, names: {'en': name}, rarity: rarity),
+            info: null,
+            tags: const <String>{},
+          );
+      final items = [
+        named('Zombyra the Dark', Rarity.ultraRare),
+        named('"A" Cell Incubator', Rarity.common),
+        named('Épée', Rarity.rare),
+        named('blue-Eyes', Rarity.secretRare),
+        named('Dark Magician', Rarity.common),
+      ]..sort((a, b) => CardSort.name.compare(a, b, 'en'));
+      expect([for (final i in items) i.card.id],
+          ['"A" Cell Incubator', 'blue-Eyes', 'Dark Magician', 'Épée', 'Zombyra the Dark']);
+    });
+
     test('metrics count colors, curve, types and creature sizes', () {
       final sections = {for (final s in poolMetrics(Game.mtg, [creature, dfc, unknown])) s.metric: s};
       expect(sections[Metric.manaCurve]!.rows, [('3', 2)]);

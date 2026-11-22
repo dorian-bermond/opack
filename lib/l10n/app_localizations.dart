@@ -1592,6 +1592,12 @@ abstract class AppLocalizations {
   /// **'Rarity marker'**
   String get rarityMarkerSetting;
 
+  /// No description provided for @rarityMarkerNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get rarityMarkerNone;
+
   /// No description provided for @rarityMarkerBorder.
   ///
   /// In en, this message translates to:
@@ -2311,6 +2317,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not load the artworks: {error}'**
   String artworkLoadFailed(String error);
+
+  /// No description provided for @selectionCopies.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the copies…'**
+  String get selectionCopies;
+
+  /// No description provided for @selectionTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the tags…'**
+  String get selectionTags;
+
+  /// No description provided for @selectionDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Card details'**
+  String get selectionDetails;
+
+  /// No description provided for @selectionAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select every card shown'**
+  String get selectionAll;
+
+  /// No description provided for @selectionClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the selection'**
+  String get selectionClear;
+
+  /// No description provided for @batchTabList.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get batchTabList;
+
+  /// No description provided for @batchTabOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Options'**
+  String get batchTabOptions;
+
+  /// No description provided for @batchQualities.
+  ///
+  /// In en, this message translates to:
+  /// **'Qualities for the whole batch'**
+  String get batchQualities;
+
+  /// No description provided for @batchQualitiesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every imported card takes the value picked for a quality, in place of the one it had; none picked leaves the quality alone.'**
+  String get batchQualitiesHint;
+
+  /// No description provided for @batchRarities.
+  ///
+  /// In en, this message translates to:
+  /// **'Import the rarities'**
+  String get batchRarities;
+
+  /// No description provided for @batchRaritiesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Each card joins the tag of its rarity, so the boosters built on rarities deal it. Off, the cards come in with only the tags and values above.'**
+  String get batchRaritiesHint;
 }
 
 class _AppLocalizationsDelegate

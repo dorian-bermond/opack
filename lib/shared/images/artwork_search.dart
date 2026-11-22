@@ -197,6 +197,26 @@ class ArtworkSearch {
   }
 }
 
+/// [chosen] as printed in [language], among [found]: the same MtG print (set
+/// and number), or a Yu-Gi-Oh! scan of the same set, of the same rarity and
+/// edition when there is one. `null` when that print has none in [language].
+Artwork? artworkIn(List<Artwork> found, Artwork chosen, String language) {
+  // `DMU 1 · FR · Dominaria United` or, for a scan, `CIBR-FR · C · 1E`.
+  (String, String) parts(Artwork a) {
+    final [first, ...rest] = a.label.split(' · ');
+    final print = a.key.startsWith('http') ? first.split('-').first : first;
+    return (print, rest.join(' · '));
+  }
+
+  final (print, details) = parts(chosen);
+  final same = [
+    for (final a in found)
+      if (a.language == language && a.key.startsWith('http') == chosen.key.startsWith('http') && parts(a).$1 == print)
+        a,
+  ];
+  return same.where((a) => parts(a).$2 == details).firstOrNull ?? same.firstOrNull;
+}
+
 /// `null` disables artwork swapping (tests).
 final artworkSearchProvider = Provider<ArtworkSearch?>((ref) => ArtworkSearch());
 

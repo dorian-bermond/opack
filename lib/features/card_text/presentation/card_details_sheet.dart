@@ -28,7 +28,7 @@ Future<void> showCardDetails(BuildContext context, CardData card, {String? poolI
 TextVersion? shownVersion(WidgetRef ref, CardData card, String lang) {
   final passcode = card.passcode;
   if (passcode == null) return null;
-  final versions = ref.watch(cardTextsProvider).value?[passcode]?[lang];
+  final versions = ref.watch(cardTextsProvider).value?[textKey(passcode)]?[lang];
   if (versions == null || versions.isEmpty) return null;
   final prefs = ref.watch(textPreferencesProvider);
   return versions[chooseVersion(
@@ -38,6 +38,11 @@ TextVersion? shownVersion(WidgetRef ref, CardData card, String lang) {
     override: prefs.overrideFor(passcode, lang),
   )];
 }
+
+/// The name [card] is shown under for [lang]: its shown text version's, which
+/// knows translations the card itself may lack, else the card's own.
+String shownName(WidgetRef ref, CardData card, String lang) =>
+    shownVersion(ref, card, lang)?.name ?? card.nameFor(lang);
 
 /// The card's picture as tall as the sheet on the left; on the right its
 /// name, then its text: every text version per language for Yu-Gi-Oh!
@@ -64,7 +69,7 @@ class CardDetailsSheet extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(shownVersion(ref, card, uiLang)?.name ?? card.nameFor(uiLang),
+          Text(shownName(ref, card, uiLang),
               style: theme.textTheme.titleLarge),
           Text('${card.id} · ${card.rarity.label(l10n)}${card.foil ? ' · ${l10n.foil}' : ''}',
               style: theme.textTheme.bodySmall),
@@ -186,7 +191,7 @@ class _YgoTexts extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final passcode = card.passcode!;
     final texts = ref.watch(cardTextsProvider);
-    final cardTexts = texts.value?[passcode];
+    final cardTexts = texts.value?[textKey(passcode)];
     final languages = [
       uiLang,
       ...?cardTexts?.keys.where((lang) => lang != uiLang),

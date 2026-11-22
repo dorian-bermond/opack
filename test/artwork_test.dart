@@ -1,14 +1,20 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:opack/features/catalog/domain/models.dart';
+import 'package:opack/features/cube/data/cube_repository.dart';
+import 'package:opack/features/pools/data/artwork_language.dart';
+import 'package:opack/features/pools/data/pool_repository.dart';
 import 'package:opack/features/pools/domain/play_pool.dart';
 import 'package:opack/features/pools/domain/pool.dart';
 import 'package:opack/shared/images/artwork_picker.dart';
 import 'package:opack/shared/images/artwork_search.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
+
+import 'widget_test.dart' show MemoryCubeStore, MemoryPoolStore;
 
 void main() {
   const mtg = CardData(id: 'DMU-1', names: {'en': 'A'}, rarity: Rarity.rare, scryfallId: 'abc');
@@ -197,4 +203,78 @@ void main() {
     expect(await search.alternatives(mtg), isEmpty);
     expect(await search.alternatives(ygo), isEmpty);
   });
+
+  group('artworks follow the pictures language', () {
+    Artwork art(String key, String label, String? language, {bool own = false}) =>
+        (key: key, label: label, own: own, language: language, samePrint: own);
+    final prints = [
+      art('abc', 'DMU 1 · Dominaria United', 'en', own: true),
+      art('abcfr', 'DMU 1 · FR · Dominaria United', 'fr'),
+      art('old', 'LEA 1 · Alpha', 'en'),
+    ];
+    final scans = [
+      art('https://w/CIBR-FR-C-1E.png', 'CIBR-FR · C · 1E', 'fr', own: true),
+      art('https://w/CIBR-EN-C-UE.png', 'CIBR-EN · C · UE', 'en'),
+      art('https://w/CIBR-EN-C-1E.png', 'CIBR-EN · C · 1E', 'en'),
+      art('https://w/PSV-EN-C-1E.png', 'PSV-EN · C · 1E', 'en'),
+      art('https://w/PSV-FR-C.png', 'PSV-FR · C', 'fr'),
+      art('423705', 'YGOPRODeck #1', 'en'),
+    ];
+
+    test('the same print in the other language, the same rarity and edition first', () {
+      expect(artworkIn(prints, prints[0], 'fr')!.key, 'abcfr');
+      expect(artworkIn(prints, prints[1], 'en')!.key, 'abc');
+      expect(artworkIn(prints, prints[2], 'fr'), isNull, reason: 'Alpha has no French print');
+      expect(artworkIn(scans, scans[0], 'en')!.key, 'https://w/CIBR-EN-C-1E.png');
+      expect(artworkIn(scans, scans[3], 'fr')!.key, 'https://w/PSV-FR-C.png', reason: 'the set, whatever the edition');
+      expect(artworkIn(scans, scans[5], 'fr'), isNull, reason: 'a YGOPRODeck picture has no language');
+      expect(artworkIn(scans, scans[0], 'de'), isNull);
+    });
+
+    test('changing the language swaps the artworks of the previous one, in every pool', () async {
+      const other = CardData(id: 'DMU-2', names: {'en': 'B'}, rarity: Rarity.rare, scryfallId: 'xyz');
+      final store = MemoryPoolStore();
+      final container = ProviderContainer(overrides: [
+        poolStoreProvider.overrideWithValue(store),
+        cubeStoreProvider.overrideWithValue(MemoryCubeStore()),
+        poolSetsProvider.overrideWith((ref, key) async => const {}),
+        artworkSearchProvider.overrideWithValue(_FakeSearch({mtg.id: prints})),
+      ]);
+      addTearDown(container.dispose);
+      final pools = container.read(poolsProvider.notifier);
+      await pools.save(Pool.empty(Game.mtg, name: 'p', id: 'p')
+          .withSource(const CardsSource([mtg, other]), cards: [mtg, other])
+          .withArtwork(mtg.id, 'abcfr')
+          .withArtwork(other.id, 'zzz'));
+      await pools.save(Pool.empty(Game.mtg, name: 'q', id: 'q')
+          .withSource(const CardsSource([mtg]), cards: [mtg])
+          .withArtwork(mtg.id, 'old'));
+      Future<Map<String, String>> artworksOf(String id) async =>
+          (await container.read(poolsProvider.future)).firstWhere((p) => p.id == id).artworks;
+      final languages = container.read(artworkLanguageSwitchProvider);
+
+      // French to English: the own print again, so no choice is left; the
+      // card whose prints cannot be fetched keeps its artwork.
+      expect(await languages.run(from: 'fr', to: 'en'), 1);
+      expect(await artworksOf('p'), {'DMU-2': 'zzz'});
+      expect(await artworksOf('q'), {'DMU-1': 'old'}, reason: 'not a French artwork');
+
+      // English to French: Alpha has no French print and stays.
+      expect(await languages.run(from: 'en', to: 'fr'), 0);
+      expect(await artworksOf('q'), {'DMU-1': 'old'});
+      expect(await languages.run(from: 'fr', to: 'fr'), 0);
+    });
+  });
+}
+
+/// Answers the scans it was given, and fails like a refused request for
+/// any other card.
+class _FakeSearch extends ArtworkSearch {
+  _FakeSearch(this.found);
+
+  final Map<String, List<Artwork>> found;
+
+  @override
+  Future<List<Artwork>> alternatives(CardData card) async =>
+      found[card.id] ?? (throw const FormatException('refused'));
 }

@@ -88,7 +88,7 @@ void main() {
     expect(find.byKey(const Key('cardPreview')), findsNothing);
   });
 
-  testWidgets('the rarity shows as a colored border, or as a dot by the setting', (tester) async {
+  testWidgets('the rarity shows by the setting: not at first, as a colored border or as a dot', (tester) async {
     final image = File('${Directory.systemTemp.path}/opack-dot-${DateTime.now().microsecondsSinceEpoch}.png');
     await tester.runAsync(() => image.writeAsBytes(_png));
     addTearDown(image.deleteSync);
@@ -101,6 +101,13 @@ void main() {
     await tester.pump();
 
     BorderSide side() => (tester.widget<Card>(find.byType(Card)).shape! as RoundedRectangleBorder).side;
+    // No marker until one is chosen.
+    expect(side().width, 1);
+    expect(side().color, isNot(Rarity.rare.color));
+    expect(find.byKey(const Key('rarityDot')), findsNothing);
+
+    container.read(rarityMarkerProvider.notifier).select(RarityMarker.border);
+    await tester.pump();
     expect(side().color, Rarity.rare.color);
     expect(side().width, 3);
     expect(find.byKey(const Key('rarityDot')), findsNothing);

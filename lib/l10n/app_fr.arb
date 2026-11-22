@@ -315,6 +315,7 @@
   "orderDescending": "Meilleure en premier",
   "orderAscending": "Plus basse en premier",
   "rarityMarkerSetting": "Marque de rareté",
+  "rarityMarkerNone": "Aucune",
   "rarityMarkerBorder": "Bordure colorée",
   "rarityMarkerDot": "Petit point en bas",
   "tagsHint": "Un tag est un trait oui/non, comme porter la barbe : une carte porte autant de tags qu'elle veut.",
@@ -514,5 +515,16 @@
   "artworkOwn": "Illustration d'origine",
   "artworkChosen": "Choisie",
   "noOtherArtwork": "Aucune autre illustration trouvée pour cette carte.",
-  "artworkLoadFailed": "Impossible de charger les illustrations : {error}"
+  "artworkLoadFailed": "Impossible de charger les illustrations : {error}",
+  "selectionCopies": "Définir les exemplaires…",
+  "selectionTags": "Modifier les étiquettes…",
+  "selectionDetails": "Détails de la carte",
+  "selectionAll": "Sélectionner toutes les cartes affichées",
+  "selectionClear": "Effacer la sélection",
+  "batchTabList": "Liste",
+  "batchTabOptions": "Options",
+  "batchQualities": "Qualités pour tout le lot",
+  "batchQualitiesHint": "Chaque carte importée prend la valeur choisie pour une qualité, à la place de celle qu'elle avait ; sans choix, la qualité n'est pas touchée.",
+  "batchRarities": "Importer les raretés",
+  "batchRaritiesHint": "Chaque carte rejoint l'étiquette de sa rareté, pour que les boosters construits sur les raretés la distribuent. Désactivé, les cartes n'arrivent qu'avec les étiquettes et valeurs ci-dessus."
 }

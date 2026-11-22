@@ -93,9 +93,9 @@ extension BoosterTypePresentation on BoosterType {
       };
 }
 
-/// How a revealed card shows its rarity: a colored border around it, or a
-/// small colored dot at its bottom center.
-enum RarityMarker { border, dot }
+/// How a revealed card shows its rarity: not at all (the default), a
+/// colored border around it, or a small colored dot at its bottom center.
+enum RarityMarker { none, border, dot }
 
 /// The chosen [RarityMarker], saved across launches.
 final rarityMarkerProvider = NotifierProvider<RarityMarkerSetting, RarityMarker>(RarityMarkerSetting.new);
@@ -105,7 +105,7 @@ class RarityMarkerSetting extends Notifier<RarityMarker> {
 
   @override
   RarityMarker build() =>
-      RarityMarker.values.asNameMap()[ref.read(sharedPreferencesProvider).getString(_key)] ?? RarityMarker.border;
+      RarityMarker.values.asNameMap()[ref.read(sharedPreferencesProvider).getString(_key)] ?? RarityMarker.none;
 
   void select(RarityMarker marker) {
     ref.read(sharedPreferencesProvider).setString(_key, marker.name);
@@ -122,19 +122,24 @@ double gameCardAspect(Game game) => game == Game.ygo ? 59 / 86 : 63 / 88;
 
 /// A card face (its picture once downloaded, else name and rarity), or its
 /// back while [revealed] is false. Long-press or right-click a revealed card
-/// for its text and text versions.
+/// for its text and text versions, or for [onMenu] when given.
 class CardTile extends ConsumerWidget {
   const CardTile({
     super.key,
     required this.card,
     this.revealed = true,
     this.onTap,
+    this.onMenu,
     this.hideRarity = false,
   });
 
   final CardData card;
   final bool revealed;
   final VoidCallback? onTap;
+
+  /// Replaces the card's details on a right-click (at the pointer) or a
+  /// long-press (at the card's center): opens a menu at that global position.
+  final void Function(Offset position)? onMenu;
 
   /// Leaves the rarity marker out (in a tierlist, the tier says it all).
   final bool hideRarity;
@@ -144,7 +149,7 @@ class CardTile extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final language = dataLanguage(ref, context);
-    final name = shownVersion(ref, card, language)?.name ?? card.nameFor(language);
+    final name = shownName(ref, card, language);
     void details() => showCardDetails(context, card, poolId: PoolScope.of(context));
     final source = cardImageSource(card, language: pictureLanguage(ref, context));
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
@@ -174,8 +179,17 @@ class CardTile extends ConsumerWidget {
         ),
         child: InkWell(
           onTap: onTap,
-          onLongPress: revealed ? details : null,
-          onSecondaryTap: revealed ? details : null,
+          onLongPress: !revealed
+              ? null
+              : switch (onMenu) {
+                  null => details,
+                  final menu => () {
+                      final box = context.findRenderObject()! as RenderBox;
+                      menu(box.localToGlobal(box.size.center(Offset.zero)));
+                    },
+                },
+          onSecondaryTap: revealed && onMenu == null ? details : null,
+          onSecondaryTapUp: revealed && onMenu != null ? (tap) => onMenu!(tap.globalPosition) : null,
           child: Stack(
             fit: StackFit.expand,
             children: [
