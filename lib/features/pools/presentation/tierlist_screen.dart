@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -743,6 +744,58 @@ class _RankedCard extends StatelessWidget {
 /// The cards of the group without a value yet, scrolled sideways, as tall
 /// as the zone the user resized by its top edge, or folded to its header;
 /// a drop target that takes a card's value away.
+/// The feed's cards in a row, with a scrollbar always shown and the mouse
+/// wheel scrolling it sideways (a wheel only moves a vertical list).
+class _FeedStrip extends StatefulWidget {
+  const _FeedStrip({required this.cards, required this.cardWidth});
+
+  final List<CardData> cards;
+  final double cardWidth;
+
+  @override
+  State<_FeedStrip> createState() => _FeedStripState();
+}
+
+class _FeedStripState extends State<_FeedStrip> {
+  final _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _wheel(PointerSignalEvent event) {
+    if (event is! PointerScrollEvent || !_controller.hasClients) return;
+    final delta = event.scrollDelta.dy != 0 ? event.scrollDelta.dy : event.scrollDelta.dx;
+    if (delta == 0) return;
+    final position = _controller.position;
+    final target = (position.pixels + delta).clamp(position.minScrollExtent, position.maxScrollExtent);
+    if (target != position.pixels) _controller.jumpTo(target);
+  }
+
+  @override
+  Widget build(BuildContext context) => Listener(
+        key: const Key('feedStrip'),
+        onPointerSignal: _wheel,
+        child: Scrollbar(
+          controller: _controller,
+          thumbVisibility: true,
+          child: ListView.separated(
+            controller: _controller,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 14),
+            itemCount: widget.cards.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (context, i) => SizedBox(
+              width: widget.cardWidth,
+              child: DraggableCard(card: widget.cards[i], enabled: true, child: CardTile(card: widget.cards[i])),
+            ),
+          ),
+        ),
+      );
+}
+
 class _Feed extends StatelessWidget {
   const _Feed({
     required this.cards,
@@ -829,16 +882,7 @@ class _Feed extends StatelessWidget {
                 if (!collapsed)
                 SizedBox(
                   height: height,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.all(8),
-                    itemCount: cards.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, i) => SizedBox(
-                      width: cardWidth,
-                      child: DraggableCard(card: cards[i], enabled: true, child: CardTile(card: cards[i])),
-                    ),
-                  ),
+                  child: _FeedStrip(cards: cards, cardWidth: cardWidth),
                 ),
               ],
             ),

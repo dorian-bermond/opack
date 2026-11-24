@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -624,6 +625,20 @@ void main() {
     await tester.drag(find.byKey(const Key('feedResizer')), const Offset(0, -100));
     await tester.pumpAndSettle();
     expect(tester.getSize(feedZone).height, greaterThan(feedBefore + 60));
+
+    // The feed has a scrollbar, and the mouse wheel scrolls it sideways.
+    final strip = find.byKey(const Key('feedStrip'));
+    expect(find.descendant(of: strip, matching: find.byType(Scrollbar)), findsOneWidget);
+    final firstFeedCard = find.descendant(of: strip, matching: find.byType(CardTile)).first;
+    final leftBefore = tester.getTopLeft(firstFeedCard).dx;
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    pointer.hover(tester.getCenter(strip));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 150)));
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(firstFeedCard).dx, leftBefore - 150, reason: 'a vertical wheel turn moves the strip');
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, -500)));
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(firstFeedCard).dx, leftBefore, reason: 'clamped at the start');
 
     // Back in the editor, grouping by quality asks which one now that
     // the pool has two.
