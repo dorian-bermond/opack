@@ -80,6 +80,34 @@ void main() {
     await tester.pump();
     expect(find.byKey(const Key('cardPreview')), findsNothing);
 
+    // By the setting the preview is larger, never taller than the window...
+    container.read(cardHoverPreviewSizeProvider.notifier).select(HoverPreviewSize.large);
+    await tester.pump();
+    await mouse.moveTo(const Offset(60, 85));
+    await tester.pump(const Duration(milliseconds: 600));
+    final large = tester.getSize(find.byKey(const Key('cardPreview')));
+    expect(large.width, inExclusiveRange(360, 540.1));
+    expect(large.height, lessThanOrEqualTo(600 - 16));
+    expect(find.byKey(const Key('cardPreviewScrim')), findsNothing);
+
+    // ...or fills the window, the rest dimmed; changing the size closes it.
+    container.read(cardHoverPreviewSizeProvider.notifier).select(HoverPreviewSize.fullscreen);
+    await tester.pump();
+    await tester.pump(); // it goes once the frame is done
+    expect(find.byKey(const Key('cardPreview')), findsNothing);
+    await mouse.moveTo(const Offset(500, 500));
+    await tester.pump();
+    await mouse.moveTo(const Offset(60, 85));
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byKey(const Key('cardPreviewScrim')), findsOneWidget);
+    expect(tester.getSize(find.byKey(const Key('cardPreview'))).height, closeTo(600 - 16, 0.01));
+    expect(tester.getCenter(find.byKey(const Key('cardPreview'))), const Offset(400, 300));
+    await mouse.moveTo(const Offset(500, 500));
+    await tester.pump();
+    expect(find.byKey(const Key('cardPreview')), findsNothing);
+    container.read(cardHoverPreviewSizeProvider.notifier).select(HoverPreviewSize.normal);
+    await tester.pump();
+
     // Off by the setting, hovering shows nothing.
     container.read(cardHoverPreviewProvider.notifier).set(false);
     await tester.pump();

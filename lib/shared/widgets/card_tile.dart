@@ -163,6 +163,7 @@ class CardTile extends ConsumerWidget {
       aspectRatio: cardAspectRatio(card),
       child: _HoverPreview(
         enabled: preview,
+        size: ref.watch(cardHoverPreviewSizeProvider),
         image: image,
         ratio: cardAspectRatio(card),
         child: _RarityGlow(
@@ -287,9 +288,16 @@ class CardTile extends ConsumerWidget {
 /// for a moment, until it leaves; nothing on touch screens, where there is
 /// no hover.
 class _HoverPreview extends StatefulWidget {
-  const _HoverPreview({required this.enabled, required this.image, required this.ratio, required this.child});
+  const _HoverPreview({
+    required this.enabled,
+    required this.size,
+    required this.image,
+    required this.ratio,
+    required this.child,
+  });
 
   final bool enabled;
+  final HoverPreviewSize size;
   final File? image;
 
   /// Width over height of the card, so the preview has no bars.
@@ -301,6 +309,12 @@ class _HoverPreview extends StatefulWidget {
 
   /// The preview's width; the card's text reads at this size.
   static const width = 360.0;
+
+  /// The width of the large preview.
+  static const largeWidth = 540.0;
+
+  /// The room kept around a preview at the window's edges.
+  static const margin = 8.0;
 
   @override
   State<_HoverPreview> createState() => _HoverPreviewState();
@@ -314,7 +328,7 @@ class _HoverPreviewState extends State<_HoverPreview> {
   @override
   void didUpdateWidget(_HoverPreview oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!widget.enabled || widget.image != oldWidget.image) _hide();
+    if (!widget.enabled || widget.image != oldWidget.image || widget.size != oldWidget.size) _hide();
   }
 
   @override
@@ -361,28 +375,48 @@ class _HoverPreviewState extends State<_HoverPreview> {
     final overlay = Overlay.of(context);
     _entry = OverlayEntry(builder: (context) {
       final size = MediaQuery.sizeOf(context);
-      const width = _HoverPreview.width;
-      final height = width / widget.ratio;
-      // Beside the pointer, flipped to the left or clamped when short on room.
-      var left = _pointer.dx + 24;
-      if (left + width > size.width) left = _pointer.dx - 24 - width;
-      final top = (_pointer.dy - height / 2).clamp(8.0, (size.height - height - 8).clamp(8.0, double.infinity));
-      return Positioned(
-        left: left.clamp(8.0, (size.width - width - 8).clamp(8.0, double.infinity)),
-        top: top,
-        child: IgnorePointer(
-          child: Material(
+      const margin = _HoverPreview.margin;
+      // The largest card the window holds.
+      final roomHeight = (size.height - 2 * margin).clamp(1.0, double.infinity);
+      final roomWidth = (size.width - 2 * margin).clamp(1.0, double.infinity);
+      final fitWidth = roomHeight * widget.ratio < roomWidth ? roomHeight * widget.ratio : roomWidth;
+      Widget picture(double width) => Material(
             key: const Key('cardPreview'),
             elevation: 12,
             borderRadius: BorderRadius.circular(width / 22),
             clipBehavior: Clip.antiAlias,
             child: SizedBox(
               width: width,
-              height: height,
+              height: width / widget.ratio,
               child: Image.file(image, fit: BoxFit.cover),
             ),
+          );
+      if (widget.size == HoverPreviewSize.fullscreen) {
+        // Alone in the middle, the rest of the window dimmed.
+        return Positioned.fill(
+          child: IgnorePointer(
+            child: ColoredBox(
+              key: const Key('cardPreviewScrim'),
+              color: Colors.black.withValues(alpha: 0.6),
+              child: Center(child: picture(fitWidth)),
+            ),
           ),
-        ),
+        );
+      }
+      // The large one never taller than the window.
+      final width = widget.size == HoverPreviewSize.large
+          ? (_HoverPreview.largeWidth < fitWidth ? _HoverPreview.largeWidth : fitWidth)
+          : _HoverPreview.width;
+      final height = width / widget.ratio;
+      // Beside the pointer, flipped to the left or clamped when short on room.
+      var left = _pointer.dx + 24;
+      if (left + width > size.width) left = _pointer.dx - 24 - width;
+      final top =
+          (_pointer.dy - height / 2).clamp(margin, (size.height - height - margin).clamp(margin, double.infinity));
+      return Positioned(
+        left: left.clamp(margin, (size.width - width - margin).clamp(margin, double.infinity)),
+        top: top,
+        child: IgnorePointer(child: picture(width)),
       );
     });
     overlay.insert(_entry!);

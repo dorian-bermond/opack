@@ -1,3 +1,4 @@
+import '../../../shared/widgets/update_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,7 +27,12 @@ class PoolsScreen extends StatelessWidget {
           const SettingsMenu(),
         ],
       ),
-      body: const PoolList(),
+      body: const Column(
+        children: [
+          UpdateBanner(),
+          Expanded(child: PoolList()),
+        ],
+      ),
     );
   }
 }

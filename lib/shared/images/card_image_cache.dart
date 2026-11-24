@@ -540,6 +540,29 @@ class CardHoverPreviewSetting extends Notifier<bool> {
   }
 }
 
+/// How large the hover preview shows a card: beside the pointer at a size
+/// its text reads at ([normal]), the same but bigger ([large]), or alone
+/// in the middle of the window, as large as it fits ([fullscreen]).
+enum HoverPreviewSize { normal, large, fullscreen }
+
+/// The chosen [HoverPreviewSize], saved across launches.
+final cardHoverPreviewSizeProvider =
+    NotifierProvider<CardHoverPreviewSizeSetting, HoverPreviewSize>(CardHoverPreviewSizeSetting.new);
+
+class CardHoverPreviewSizeSetting extends Notifier<HoverPreviewSize> {
+  static const _key = 'cardHoverPreviewSize';
+
+  @override
+  HoverPreviewSize build() =>
+      HoverPreviewSize.values.asNameMap()[ref.read(sharedPreferencesProvider).getString(_key)] ??
+      HoverPreviewSize.normal;
+
+  void select(HoverPreviewSize size) {
+    ref.read(sharedPreferencesProvider).setString(_key, size.name);
+    state = size;
+  }
+}
+
 /// The picture at a [cardImageSource], or `null` when disabled or unreachable.
 final cardImageProvider = FutureProvider.family<File?, ImageSource>((ref, source) async {
   final cache = ref.watch(cardImageCacheProvider);

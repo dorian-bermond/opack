@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:opack/core/update/app_update.dart';
 import 'package:opack/app.dart';
 import 'package:opack/core/router.dart';
 import 'package:opack/core/settings/locale_controller.dart';
@@ -52,6 +53,7 @@ Future<ProviderContainer> startApp(WidgetTester tester, {Locale? locale, CardSea
       cardInfoStoreProvider.overrideWithValue(MemoryCardInfoStore()),
       cardSearchProvider.overrideWithValue(cardSearch),
       artworkSearchProvider.overrideWithValue(null),
+      updateCheckerProvider.overrideWithValue(null),
     ],
   );
   addTearDown(container.dispose);

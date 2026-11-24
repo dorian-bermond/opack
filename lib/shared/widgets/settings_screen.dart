@@ -15,6 +15,7 @@ import '../../features/pools/presentation/pool_widgets.dart';
 import '../images/artwork_picker.dart';
 import '../images/card_image_cache.dart';
 import 'card_tile.dart';
+import 'update_banner.dart';
 
 /// The settings in three tabs: General (languages, card text), Cards
 /// (pictures, rarity marker and colors) and Opening (pack opening, sealed
@@ -30,6 +31,7 @@ class SettingsScreen extends ConsumerWidget {
     final mode = ref.watch(textPreferencesProvider).mode;
     final images = ref.watch(cardImagesEnabledProvider);
     final hoverPreview = ref.watch(cardHoverPreviewProvider);
+    final hoverSize = ref.watch(cardHoverPreviewSizeProvider);
     final marker = ref.watch(rarityMarkerProvider);
     final opening = ref.watch(openingModeProvider);
     final sealedOrder = ref.watch(sealedOrderProvider);
@@ -90,6 +92,7 @@ class SettingsScreen extends ConsumerWidget {
                 ],
                 onChanged: (m) => ref.read(textPreferencesProvider.notifier).setMode(m!),
               ),
+              _Section(title: l10n.updatesSection, children: const [UpdateSettings()]),
             ],
           ),
           ListView(
@@ -111,6 +114,16 @@ class SettingsScreen extends ConsumerWidget {
                     onChanged: ref.read(cardHoverPreviewProvider.notifier).set,
                   ),
                 ],
+              ),
+              _Choice<HoverPreviewSize>(
+                title: l10n.hoverPreviewSizeSetting,
+                value: hoverSize,
+                choices: [
+                  (HoverPreviewSize.normal, l10n.hoverPreviewNormal),
+                  (HoverPreviewSize.large, l10n.hoverPreviewLarge),
+                  (HoverPreviewSize.fullscreen, l10n.hoverPreviewFullscreen),
+                ],
+                onChanged: (s) => ref.read(cardHoverPreviewSizeProvider.notifier).select(s!),
               ),
               _Choice<RarityMarker>(
                 title: l10n.rarityMarkerSetting,

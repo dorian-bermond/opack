@@ -958,6 +958,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get cardHoverPreview => 'Grand aperçu au survol d\'une carte';
 
   @override
+  String get hoverPreviewSizeSetting => 'Taille de l\'aperçu au survol';
+
+  @override
+  String get hoverPreviewNormal => 'À côté du pointeur';
+
+  @override
+  String get hoverPreviewLarge => 'À côté du pointeur, plus grand';
+
+  @override
+  String get hoverPreviewFullscreen => 'Plein écran';
+
+  @override
   String get collapse => 'Replier';
 
   @override
@@ -1388,4 +1400,64 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get batchRaritiesHint =>
       'Chaque carte rejoint l\'étiquette de sa rareté, pour que les boosters construits sur les raretés la distribuent. Désactivé, les cartes n\'arrivent qu\'avec les étiquettes et valeurs ci-dessus.';
+
+  @override
+  String get updatesSection => 'Mises à jour';
+
+  @override
+  String updateCurrentVersion(String version) {
+    return 'Opack $version';
+  }
+
+  @override
+  String updateAvailable(String version) {
+    return 'La version $version est disponible';
+  }
+
+  @override
+  String get updateUpToDate => 'C\'est la dernière version';
+
+  @override
+  String get updateChecking => 'Vérification…';
+
+  @override
+  String updateCheckFailed(String error) {
+    return 'Impossible de vérifier les mises à jour : $error';
+  }
+
+  @override
+  String get updateCheckNow => 'Vérifier';
+
+  @override
+  String get updateCheckAtLaunch => 'Vérifier les mises à jour au démarrage';
+
+  @override
+  String get updateDownload => 'Télécharger';
+
+  @override
+  String get updateSkip => 'Ignorer cette version';
+
+  @override
+  String updateOpenFailed(String url) {
+    return 'Impossible d\'ouvrir $url';
+  }
+
+  @override
+  String get updateInstall => 'Installer et redémarrer';
+
+  @override
+  String updateInstalling(String version) {
+    return 'Mise à jour vers $version';
+  }
+
+  @override
+  String get updateDownloading => 'Téléchargement de la mise à jour…';
+
+  @override
+  String get updateRestarting => 'Redémarrage de l\'application…';
+
+  @override
+  String updateInstallFailed(String error) {
+    return 'La mise à jour n\'a pas pu être installée : $error. Vous pouvez la télécharger et remplacer l\'application à la main.';
+  }
 }

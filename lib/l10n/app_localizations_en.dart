@@ -955,6 +955,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cardHoverPreview => 'Large preview when hovering a card';
 
   @override
+  String get hoverPreviewSizeSetting => 'Hover preview size';
+
+  @override
+  String get hoverPreviewNormal => 'Beside the pointer';
+
+  @override
+  String get hoverPreviewLarge => 'Beside the pointer, larger';
+
+  @override
+  String get hoverPreviewFullscreen => 'Full window';
+
+  @override
   String get collapse => 'Collapse';
 
   @override
@@ -1383,4 +1395,64 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get batchRaritiesHint =>
       'Each card joins the tag of its rarity, so the boosters built on rarities deal it. Off, the cards come in with only the tags and values above.';
+
+  @override
+  String get updatesSection => 'Updates';
+
+  @override
+  String updateCurrentVersion(String version) {
+    return 'Opack $version';
+  }
+
+  @override
+  String updateAvailable(String version) {
+    return 'Version $version is available';
+  }
+
+  @override
+  String get updateUpToDate => 'This is the latest version';
+
+  @override
+  String get updateChecking => 'Checking…';
+
+  @override
+  String updateCheckFailed(String error) {
+    return 'Could not check for updates: $error';
+  }
+
+  @override
+  String get updateCheckNow => 'Check now';
+
+  @override
+  String get updateCheckAtLaunch => 'Check for updates when the app starts';
+
+  @override
+  String get updateDownload => 'Download';
+
+  @override
+  String get updateSkip => 'Skip this version';
+
+  @override
+  String updateOpenFailed(String url) {
+    return 'Could not open $url';
+  }
+
+  @override
+  String get updateInstall => 'Install and restart';
+
+  @override
+  String updateInstalling(String version) {
+    return 'Updating to $version';
+  }
+
+  @override
+  String get updateDownloading => 'Downloading the update…';
+
+  @override
+  String get updateRestarting => 'Restarting the app…';
+
+  @override
+  String updateInstallFailed(String error) {
+    return 'The update could not be installed: $error. You can download it and replace the app by hand.';
+  }
 }

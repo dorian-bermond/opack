@@ -10,6 +10,7 @@ import '../../card_text/data/card_text_repository.dart';
 import '../../card_text/presentation/card_details_sheet.dart';
 import '../../catalog/domain/models.dart';
 import '../domain/pool.dart';
+import 'marquee_selection.dart';
 import 'pool_loader.dart';
 import 'pool_widgets.dart';
 
@@ -364,12 +365,24 @@ class _PictureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tint = actions.tint(card);
-    final theme = Theme.of(context);
     // Bulk tagging keeps the tap for itself.
     final selecting = selectable && actions.onTap == null;
     final onSelect = selecting ? actions.onSelect : null;
     final onMenu = selecting ? actions.onMenu : null;
     final selected = selecting && (actions.selected?.call(card) ?? false);
+    final picture = _picture(context, tint: tint, onSelect: onSelect, onMenu: onMenu, selected: selected);
+    // A selectable card is caught by the editor's selection rectangle.
+    return onSelect == null ? picture : MarqueeTarget(id: card.id, child: picture);
+  }
+
+  Widget _picture(
+    BuildContext context, {
+    required Color? tint,
+    required void Function(CardData card)? onSelect,
+    required void Function(CardData card, Offset position)? onMenu,
+    required bool selected,
+  }) {
+    final theme = Theme.of(context);
     return DraggableCard(
       card: card,
       enabled: actions.draggable,

@@ -1652,6 +1652,30 @@ abstract class AppLocalizations {
   /// **'Large preview when hovering a card'**
   String get cardHoverPreview;
 
+  /// No description provided for @hoverPreviewSizeSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hover preview size'**
+  String get hoverPreviewSizeSetting;
+
+  /// No description provided for @hoverPreviewNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Beside the pointer'**
+  String get hoverPreviewNormal;
+
+  /// No description provided for @hoverPreviewLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Beside the pointer, larger'**
+  String get hoverPreviewLarge;
+
+  /// No description provided for @hoverPreviewFullscreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Full window'**
+  String get hoverPreviewFullscreen;
+
   /// No description provided for @collapse.
   ///
   /// In en, this message translates to:
@@ -2383,6 +2407,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Each card joins the tag of its rarity, so the boosters built on rarities deal it. Off, the cards come in with only the tags and values above.'**
   String get batchRaritiesHint;
+
+  /// No description provided for @updatesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get updatesSection;
+
+  /// No description provided for @updateCurrentVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Opack {version}'**
+  String updateCurrentVersion(String version);
+
+  /// No description provided for @updateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is available'**
+  String updateAvailable(String version);
+
+  /// No description provided for @updateUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the latest version'**
+  String get updateUpToDate;
+
+  /// No description provided for @updateChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get updateChecking;
+
+  /// No description provided for @updateCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check for updates: {error}'**
+  String updateCheckFailed(String error);
+
+  /// No description provided for @updateCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check now'**
+  String get updateCheckNow;
+
+  /// No description provided for @updateCheckAtLaunch.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates when the app starts'**
+  String get updateCheckAtLaunch;
+
+  /// No description provided for @updateDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get updateDownload;
+
+  /// No description provided for @updateSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip this version'**
+  String get updateSkip;
+
+  /// No description provided for @updateOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open {url}'**
+  String updateOpenFailed(String url);
+
+  /// No description provided for @updateInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Install and restart'**
+  String get updateInstall;
+
+  /// No description provided for @updateInstalling.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating to {version}'**
+  String updateInstalling(String version);
+
+  /// No description provided for @updateDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading the update…'**
+  String get updateDownloading;
+
+  /// No description provided for @updateRestarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Restarting the app…'**
+  String get updateRestarting;
+
+  /// No description provided for @updateInstallFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The update could not be installed: {error}. You can download it and replace the app by hand.'**
+  String updateInstallFailed(String error);
 }
 
 class _AppLocalizationsDelegate

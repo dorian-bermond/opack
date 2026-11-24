@@ -22,6 +22,7 @@ import '../../catalog/domain/models.dart';
 import '../data/pool_repository.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
+import 'marquee_selection.dart';
 import 'pool_actions.dart';
 import 'pool_loader.dart';
 import 'pool_widgets.dart';
@@ -305,6 +306,36 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
   /// The gallery's selected cards, by id.
   final Set<String> _selected = {};
+
+  /// Scrolls the card list; the selection rectangle follows it.
+  final _scroll = ScrollController();
+
+  /// The selection a rectangle adds to: the one before it with Ctrl or
+  /// Shift held, else none.
+  Set<String> _marqueeBase = const {};
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _marqueeStart(bool additive) => _marqueeBase = additive ? {..._selected} : const {};
+
+  void _marqueeHits(Set<String> ids) => setState(() => _selected
+    ..clear()
+    ..addAll(_marqueeBase)
+    ..addAll(ids));
+
+  /// A click the rectangle took: on a card it selects it or not, as a tap
+  /// does; on empty space it clears the selection.
+  void _marqueeClick(String? id) => setState(() {
+        if (id == null) {
+          _selected.clear();
+        } else {
+          _selected.contains(id) ? _selected.remove(id) : _selected.add(id);
+        }
+      });
 
   /// The cards the pool shows now (searched and filtered), for "select all".
   List<CardData> _shown = const [];
@@ -720,7 +751,15 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       ),
       body: _withSearchPanel(
         play,
-        _withBaskets(play, CustomScrollView(
+        _withBaskets(play, MarqueeSelection(
+        controller: _scroll,
+        // The gallery's selection; bulk tagging and baskets keep the mouse.
+        enabled: view == PoolView.gallery && !tagging && !_baskets,
+        onStart: _marqueeStart,
+        onHits: _marqueeHits,
+        onClick: _marqueeClick,
+        child: CustomScrollView(
+        controller: _scroll,
         slivers: [
           SliverList.list(children: header),
           if (view == PoolView.stacks && (_groupBy == GroupBy.none || _groupBy2 == GroupBy.none))
@@ -779,7 +818,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             ],
           const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
         ],
-      )),
+      ))),
       ),
     );
   }
