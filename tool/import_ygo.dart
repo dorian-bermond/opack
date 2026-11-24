@@ -72,6 +72,9 @@ final _http = CachedHttp('.cache/ygo-en', delay: const Duration(milliseconds: 25
 const _yugipedia = 'https://yugipedia.com/api.php';
 final _yugipediaHttp = CachedHttp('.cache/ygo-yugipedia', delay: const Duration(milliseconds: 500));
 
+/// Page titles of the cards taken from Yugipedia, credited in their sets.
+final _fromYugipedia = <String>{};
+
 Future<void> main(List<String> arguments) async {
   final args = [...arguments];
   final listTypes = args.remove('--types');
@@ -117,6 +120,7 @@ Future<void> main(List<String> arguments) async {
       final page = await _yugipediaCard(title);
       if (page == null) continue;
       cardPages[title] = page;
+      _fromYugipedia.add(title);
       filled++;
     }
     if (filled > 0) stdout.writeln('$filled cards taken from Yugipedia');
@@ -220,7 +224,8 @@ Future<bool> _importSet(
     'names': {'en': set, 'fr': ?frName},
     'releaseDate': releaseDate,
     'source': 'https://yugioh.fandom.com/wiki/${Uri.encodeComponent(set.replaceAll(' ', '_'))}',
-    'license': 'Yu-Gi-Oh! Wiki (Fandom), CC BY-SA 3.0. '
+    'license': 'Yu-Gi-Oh! Wiki (Fandom), CC BY-SA 3.0'
+        '${rows.any((r) => _fromYugipedia.contains(_pageTitle(r.card))) ? ', et Yugipedia, CC BY-SA' : ''}. '
         'Yu-Gi-Oh! est © Kazuki Takahashi / Konami.',
     'boosters': {'standard': _formula(cards, perPack, releaseDate)},
     'cards': cards,
