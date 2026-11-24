@@ -63,6 +63,13 @@ void main() {
     expect(stackLabel(CardSort.atk, link, 'en'), '2500-2999');
     expect(stackLabel(CardSort.def, link, 'en'), '?');
     expect(stackLabel(CardSort.attribute, link, 'en'), 'LIGHT');
+    const tuner = YgoCardInfo(
+        name: 'Junk', kind: YgoKind.monster, type: 'Pendulum Tuner Effect Monster', frameType: 'effect_pendulum',
+        race: 'Warrior', categories: ['Pendulum', 'Tuner', 'Effect']);
+    expect(tuner.types, ['Warrior', 'Pendulum', 'Tuner'], reason: 'its own type and its abilities, frames aside');
+    expect(monster.types, ['Dragon']);
+    expect(GroupBy.race.labelsOf((card: card, info: tuner, tags: const <String>{}), 'en'), ['Warrior', 'Pendulum', 'Tuner']);
+    expect(const YgoCardInfo(name: 'Pot', kind: YgoKind.spell, type: 'Spell Card', frameType: 'spell').types, isEmpty);
     expect(stackLabel(CardSort.archetype, link, 'en'), '');
 
     // The kind: monsters told apart as normal and effect while the setting is on.

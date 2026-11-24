@@ -344,6 +344,11 @@ enum GroupBy {
             for (final t in item.tags)
               if (Pool.qualityOf(t) case final q? when quality == null || q == quality) t,
           ].let((tags) => tags.isEmpty ? const [noValue] : tags),
+        // A monster sits under each of its types (Dragon, Tuner…).
+        race => switch (item.info) {
+            YgoCardInfo(kind: YgoKind.monster, :final types) when types.isNotEmpty => types,
+            _ => const ['?'],
+          },
         _ => [stackLabel(sort!, item, language)],
       };
 

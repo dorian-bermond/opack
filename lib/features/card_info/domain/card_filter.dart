@@ -39,7 +39,7 @@ enum Facet {
 
   static List<Facet> forGame(Game game) => switch (game) {
         Game.mtg => const [tag, quality, rarity, color, colorIdentity, type, subtype, keyword, manaValue, set],
-        Game.ygo => const [tag, quality, rarity, kind, category, attribute, race, property, archetype, level, linkRating, atk, def, set],
+        Game.ygo => const [tag, quality, rarity, kind, attribute, race, property, archetype, level, linkRating, atk, def, set],
         Game.opc => const [tag, quality, rarity, color, type, subtype, attribute, cost, power, counter, set],
       };
 
@@ -74,7 +74,7 @@ enum Facet {
       case Facet.attribute:
         return [?(ygo?.attribute ?? opc?.attribute)];
       case Facet.race:
-        return ygo?.kind == YgoKind.monster ? [?ygo?.race] : const [];
+        return ygo?.types ?? const [];
       case Facet.property:
         return ygo != null && ygo.kind != YgoKind.monster ? [?ygo.race] : const [];
       case Facet.archetype:

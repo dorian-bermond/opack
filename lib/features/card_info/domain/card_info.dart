@@ -381,6 +381,10 @@ const ygoCategories = [
   'Tuner', 'Flip', 'Gemini', 'Spirit', 'Toon', 'Union', 'Token',
 ];
 
+/// The categories that are abilities rather than frames: they count as
+/// types of the monster next to its own (Dragon, Tuner, Pendulum…).
+const ygoAbilities = ['Pendulum', 'Tuner', 'Flip', 'Gemini', 'Spirit', 'Toon', 'Union'];
+
 class YgoCardInfo extends CardInfo {
   const YgoCardInfo({
     required this.name,
@@ -493,6 +497,12 @@ class YgoCardInfo extends CardInfo {
   @override
   final String name;
   final YgoKind kind;
+
+  /// The types of a monster: its own (Dragon, Spellcaster…) and its
+  /// abilities (Tuner, Toon, Pendulum…); nothing for a spell or trap.
+  List<String> get types => kind != YgoKind.monster
+      ? const []
+      : [?race, for (final c in categories) if (ygoAbilities.contains(c)) c];
 
   /// A normal monster (a vanilla, a normal pendulum), by its frame or type.
   bool get isNormalMonster =>
