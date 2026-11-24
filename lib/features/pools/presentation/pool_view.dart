@@ -368,10 +368,18 @@ String groupLabel(AppLocalizations l10n, GroupBy group) => switch (group) {
       _ => sortLabel(l10n, group.sort!),
     };
 
-/// A raw group label as the user reads it.
+/// A raw group label as the user reads it: a number alone says little, so
+/// a numeric grouping names itself (`Level / Rank 8`, `ATK 2500-2999`).
 String groupHeader(AppLocalizations l10n, GroupBy group, String label) => switch (group) {
       GroupBy.tag => label.isEmpty ? l10n.noTagGroup : tagLabel(l10n, label),
       GroupBy.quality => label == GroupBy.noValue ? GroupBy.noValue : tagLabel(l10n, label),
+      GroupBy.manaValue ||
+      GroupBy.level ||
+      GroupBy.atk ||
+      GroupBy.def ||
+      GroupBy.cost ||
+      GroupBy.collector =>
+        '${groupLabel(l10n, group)} ${valueLabel(l10n, label)}',
       _ => valueLabel(l10n, label),
     };
 

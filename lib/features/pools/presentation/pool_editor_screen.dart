@@ -346,14 +346,15 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// The cards the pool shows now (searched and filtered), for "select all".
   List<CardData> _shown = const [];
 
-  /// What the View chip reads: the sort, the grouping and the filters on.
+  /// What the View chip reads: the sort, the grouping and the filters on,
+  /// each named ("Sort by Name · Group by Level / Rank, then ATK").
   String _viewSummary(AppLocalizations l10n) => [
-        sortLabel(l10n, _sort),
+        '${l10n.sortBy} ${sortLabel(l10n, _sort)}',
         if (_groupBy != GroupBy.none)
           [
-            _groupName(l10n, _groupBy, _groupQuality),
-            if (_groupBy2 != GroupBy.none) _groupName(l10n, _groupBy2, _groupQuality2),
-          ].join(' › '),
+            '${l10n.groupBy} ${_groupName(l10n, _groupBy, _groupQuality)}',
+            if (_groupBy2 != GroupBy.none) '${l10n.thenBy.toLowerCase()} ${_groupName(l10n, _groupBy2, _groupQuality2)}',
+          ].join(', '),
         if (!_filter.isEmpty) l10n.filtersCount(_filter.activeCount),
       ].join(' · ');
 
