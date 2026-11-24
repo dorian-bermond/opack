@@ -103,6 +103,12 @@ class UpdateChecker {
 /// `null` disables update checks (tests).
 final updateCheckerProvider = Provider<UpdateChecker?>((ref) => UpdateChecker());
 
+/// Whether this build looks for updates: release builds only. A debug
+/// build carries whatever version its runner was last built with (the
+/// Windows one keeps an old version resource), so it would take a
+/// release of its own code for a newer one. Tests override it.
+final updateChecksAllowedProvider = Provider<bool>((ref) => !kDebugMode);
+
 /// Opens an update's file or page outside the app (the browser downloads
 /// it); answers whether something opened.
 final updateOpenerProvider = Provider<Future<bool> Function(Uri url)>(
@@ -135,7 +141,7 @@ final appUpdateProvider = FutureProvider<AppUpdate?>((ref) async {
   final checker = ref.watch(updateCheckerProvider);
   final asked = ref.watch(updateCheckRequestsProvider) > 0;
   final atLaunch = ref.watch(updatePreferencesProvider.select((p) => p.atLaunch));
-  if (checker == null || !(asked || atLaunch)) return null;
+  if (checker == null || !ref.watch(updateChecksAllowedProvider) || !(asked || atLaunch)) return null;
   return checker.check();
 });
 

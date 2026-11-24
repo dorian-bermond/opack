@@ -1432,6 +1432,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get updateUpToDate => 'C\'est la dernière version';
 
   @override
+  String get updateDebugBuild =>
+      'Version de débogage : seules les versions publiées cherchent les mises à jour';
+
+  @override
   String get updateChecking => 'Vérification…';
 
   @override

@@ -606,6 +606,7 @@
   "updateAvailable": "Version {version} is available",
   "@updateAvailable": {"placeholders": {"version": {"type": "String"}}},
   "updateUpToDate": "This is the latest version",
+  "updateDebugBuild": "A debug build: updates are only looked for by release builds",
   "updateChecking": "Checking…",
   "updateCheckFailed": "Could not check for updates: {error}",
   "@updateCheckFailed": {"placeholders": {"error": {"type": "String"}}},

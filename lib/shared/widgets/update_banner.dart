@@ -179,7 +179,9 @@ class UpdateSettings extends ConsumerWidget {
     final preferences = ref.watch(updatePreferencesProvider);
     // Nothing to tell before a first check.
     final checked = preferences.atLaunch || ref.watch(updateCheckRequestsProvider) > 0;
+    final allowed = ref.watch(updateChecksAllowedProvider);
     final status = switch (check) {
+      _ when !allowed => l10n.updateDebugBuild,
       _ when !checked => '',
       AsyncValue(isLoading: true) => l10n.updateChecking,
       AsyncError(:final error) => l10n.updateCheckFailed('$error'),
@@ -204,11 +206,12 @@ class UpdateSettings extends ConsumerWidget {
             children: [
               if (update != null)
                 UpdateButton(update: update, prefix: 'settingUpdate'),
-              OutlinedButton(
-                key: const Key('settingUpdateCheck'),
-                onPressed: check.isLoading ? null : ref.read(updateCheckRequestsProvider.notifier).checkNow,
-                child: Text(l10n.updateCheckNow),
-              ),
+              if (allowed)
+                OutlinedButton(
+                  key: const Key('settingUpdateCheck'),
+                  onPressed: check.isLoading ? null : ref.read(updateCheckRequestsProvider.notifier).checkNow,
+                  child: Text(l10n.updateCheckNow),
+                ),
             ],
           ),
         ),

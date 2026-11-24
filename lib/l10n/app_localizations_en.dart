@@ -1425,6 +1425,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateUpToDate => 'This is the latest version';
 
   @override
+  String get updateDebugBuild =>
+      'A debug build: updates are only looked for by release builds';
+
+  @override
   String get updateChecking => 'Checking…';
 
   @override

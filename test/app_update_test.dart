@@ -75,6 +75,7 @@ void main() {
     final opened = <Uri>[];
     final container = ProviderContainer(overrides: [
       sharedPreferencesProvider.overrideWithValue(prefs),
+      updateChecksAllowedProvider.overrideWithValue(true),
       updateCheckerProvider.overrideWithValue(UpdateChecker(
         client: MockClient((_) async {
           checks++;
@@ -144,6 +145,7 @@ void main() {
     var checks = 0;
     final container = ProviderContainer(overrides: [
       sharedPreferencesProvider.overrideWithValue(prefs),
+      updateChecksAllowedProvider.overrideWithValue(true),
       updateCheckerProvider.overrideWithValue(UpdateChecker(
         client: MockClient((_) async {
           checks++;

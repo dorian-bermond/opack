@@ -2456,6 +2456,12 @@ abstract class AppLocalizations {
   /// **'This is the latest version'**
   String get updateUpToDate;
 
+  /// No description provided for @updateDebugBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'A debug build: updates are only looked for by release builds'**
+  String get updateDebugBuild;
+
   /// No description provided for @updateChecking.
   ///
   /// In en, this message translates to:

@@ -539,6 +539,7 @@
   "updateCurrentVersion": "Opack {version}",
   "updateAvailable": "La version {version} est disponible",
   "updateUpToDate": "C'est la dernière version",
+  "updateDebugBuild": "Version de débogage : seules les versions publiées cherchent les mises à jour",
   "updateChecking": "Vérification…",
   "updateCheckFailed": "Impossible de vérifier les mises à jour : {error}",
   "updateCheckNow": "Vérifier",
