@@ -635,7 +635,10 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           selected: {view},
           onSelectionChanged: (selection) => ref.read(poolViewProvider.notifier).select(selection.single),
         ),
-            if (view == PoolView.gallery) const GalleryColumnsControl(settingKey: 'pool'),
+            if (view == PoolView.gallery) ...const [
+              GalleryColumnsControl(settingKey: 'pool'),
+              GallerySizeControls(settingKey: 'pool'),
+            ],
           ],
         ),
       ),
@@ -1008,7 +1011,12 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       switch (view) {
             PoolView.list => PoolListSliver(items: items, actions: actions, language: language),
             PoolView.gallery => PoolGallerySliver(
-                items: items, actions: actions, columns: ref.watch(galleryColumnsProvider('pool'))),
+                items: items,
+                actions: actions,
+                columns: ref.watch(galleryColumnsProvider('pool')),
+                cardWidth: ref.watch(galleryCardWidthProvider('pool')),
+                spacing: ref.watch(gallerySpacingProvider('pool')),
+              ),
             // Stacks are laid out as a whole, see build.
             PoolView.stacks => const SliverToBoxAdapter(child: SizedBox.shrink()),
             PoolView.spoiler => PoolSpoilerSliver(items: items, actions: actions, language: language),

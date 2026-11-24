@@ -349,6 +349,19 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('fewerColumns-pool')));
     await tester.pumpAndSettle();
     expect(find.text('auto'), findsOneWidget);
+
+    // The pool gallery has size and spacing sliders as the tierlist: the
+    // spacing may go negative, overlapping the cards.
+    expect(find.byKey(const ValueKey('gallerySize-pool')), findsOneWidget);
+    expect(tester.widget<Slider>(find.byKey(const ValueKey('gallerySize-pool'))).onChanged, isNotNull,
+        reason: 'auto per row: the size slider sets the width');
+    container.read(galleryColumnsProvider('pool').notifier).set(2);
+    await tester.pumpAndSettle();
+    expect(tester.widget<Slider>(find.byKey(const ValueKey('gallerySize-pool'))).onChanged, isNull,
+        reason: 'a fixed number per row sets the size itself');
+    expect(find.byKey(const ValueKey('gallerySpacing-pool')), findsOneWidget);
+    container.read(galleryColumnsProvider('pool').notifier).set(0);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('List'));
     await tester.pumpAndSettle();
 

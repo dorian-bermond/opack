@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -53,6 +54,152 @@ class GalleryColumnsSetting extends Notifier<int> {
     ref.read(sharedPreferencesProvider).setInt('galleryColumns:$key', clamped);
     state = clamped;
   }
+}
+
+/// The width of a gallery card when the cards per row are "auto", saved
+/// across launches; one setting per [key].
+final galleryCardWidthProvider =
+    NotifierProvider.family<GalleryCardWidthSetting, double, String>(GalleryCardWidthSetting.new);
+
+class GalleryCardWidthSetting extends Notifier<double> {
+  GalleryCardWidthSetting(this.key);
+
+  final String key;
+  static const min = 56.0;
+  static const max = 320.0;
+
+  @override
+  double build() => ref.read(sharedPreferencesProvider).getDouble('galleryCardWidth:$key') ?? 160;
+
+  void set(double width) {
+    final clamped = width.clamp(min, max);
+    ref.read(sharedPreferencesProvider).setDouble('galleryCardWidth:$key', clamped);
+    state = clamped;
+  }
+}
+
+/// The gap between two gallery cards, saved across launches; negative
+/// gaps overlap the cards, each under its right neighbour and the lower
+/// row on top, so the top left corners stay clear.
+final gallerySpacingProvider =
+    NotifierProvider.family<GallerySpacingSetting, double, String>(GallerySpacingSetting.new);
+
+class GallerySpacingSetting extends Notifier<double> {
+  GallerySpacingSetting(this.key);
+
+  final String key;
+  static const min = -80.0;
+  static const max = 24.0;
+
+  @override
+  double build() => ref.read(sharedPreferencesProvider).getDouble('gallerySpacing:$key') ?? 8;
+
+  void set(double spacing) {
+    final clamped = spacing.clamp(min, max);
+    ref.read(sharedPreferencesProvider).setDouble('gallerySpacing:$key', clamped);
+    state = clamped;
+  }
+}
+
+/// The card size and spacing sliders of the gallery under [settingKey],
+/// as the tierlist has them.
+class GallerySizeControls extends ConsumerWidget {
+  const GallerySizeControls({super.key, required this.settingKey});
+
+  final String settingKey;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final columns = ref.watch(galleryColumnsProvider(settingKey));
+    final cardWidth = ref.watch(galleryCardWidthProvider(settingKey));
+    final spacing = ref.watch(gallerySpacingProvider(settingKey));
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 170,
+          child: Row(
+            children: [
+              const Icon(Icons.photo_size_select_small, size: 18),
+              Expanded(
+                child: Slider(
+                  key: ValueKey('gallerySize-$settingKey'),
+                  min: GalleryCardWidthSetting.min,
+                  max: GalleryCardWidthSetting.max,
+                  value: cardWidth,
+                  label: l10n.cardSize,
+                  // A fixed number per row sets the size itself.
+                  onChanged: columns == 0 ? ref.read(galleryCardWidthProvider(settingKey).notifier).set : null,
+                ),
+              ),
+              const Icon(Icons.photo_size_select_large, size: 18),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 170,
+          child: Row(
+            children: [
+              const Icon(Icons.layers, size: 18),
+              Expanded(
+                child: Slider(
+                  key: ValueKey('gallerySpacing-$settingKey'),
+                  min: GallerySpacingSetting.min,
+                  max: GallerySpacingSetting.max,
+                  value: spacing,
+                  label: l10n.cardSpacing,
+                  onChanged: ref.read(gallerySpacingProvider(settingKey).notifier).set,
+                ),
+              ),
+              const Icon(Icons.space_bar, size: 18),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// A grid of cards [columns] wide (or as many [cardWidth]-wide cards as
+/// fit with `0`), [spacing] apart; a negative spacing overlaps them, the
+/// stride never below a fifth of a card.
+class _GalleryGridDelegate extends SliverGridDelegate {
+  const _GalleryGridDelegate({
+    required this.columns,
+    required this.cardWidth,
+    required this.spacing,
+    required this.aspect,
+  });
+
+  final int columns;
+  final double cardWidth;
+  final double spacing;
+  final double aspect;
+
+  @override
+  SliverGridLayout getLayout(SliverConstraints constraints) {
+    final width = constraints.crossAxisExtent;
+    final count = columns > 0
+        ? columns
+        : (((width - cardWidth) / (cardWidth + spacing.clamp(-cardWidth * 0.8, spacing.abs()))).floor() + 1).clamp(1, 1 << 16);
+    // The cards of a row share the width with their gaps between them.
+    final gap = spacing.clamp(-cardWidth * 0.8, spacing.abs());
+    final extent = ((width - gap * (count - 1)) / count).clamp(1.0, double.infinity);
+    final height = extent / aspect;
+    return SliverGridRegularTileLayout(
+      crossAxisCount: count,
+      mainAxisStride: (height + gap).clamp(height * 0.2, double.infinity),
+      crossAxisStride: extent + gap,
+      childMainAxisExtent: height,
+      childCrossAxisExtent: extent,
+      reverseCrossAxis: axisDirectionIsReversed(constraints.crossAxisDirection),
+    );
+  }
+
+  @override
+  bool shouldRelayout(_GalleryGridDelegate old) =>
+      old.columns != columns || old.cardWidth != cardWidth || old.spacing != spacing || old.aspect != aspect;
 }
 
 /// A stepper for the cards per row of the gallery under [settingKey]:
@@ -474,29 +621,35 @@ class _PictureCard extends StatelessWidget {
 /// when 0). With a selection in [actions], a tap selects a card and a
 /// right-click or long-press opens the operations on the selected ones.
 class PoolGallerySliver extends StatelessWidget {
-  const PoolGallerySliver({super.key, required this.items, required this.actions, this.columns = 0});
+  const PoolGallerySliver({
+    super.key,
+    required this.items,
+    required this.actions,
+    this.columns = 0,
+    this.cardWidth = 160,
+    this.spacing = 8,
+  });
 
   final List<CardWithInfo> items;
   final PoolCardActions actions;
+
+  /// Cards per row; `0` for as many [cardWidth]-wide cards as fit.
   final int columns;
+  final double cardWidth;
+
+  /// The gap between cards; negative overlaps them.
+  final double spacing;
 
   @override
   Widget build(BuildContext context) => SliverPadding(
         padding: const EdgeInsets.all(12),
         sliver: SliverGrid.builder(
-          gridDelegate: columns > 0
-              ? SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: columns,
-                  childAspectRatio: items.isEmpty ? 63 / 88 : cardAspectRatio(items.first.card),
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                )
-              : SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 160,
-                  childAspectRatio: items.isEmpty ? 63 / 88 : cardAspectRatio(items.first.card),
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                ),
+          gridDelegate: _GalleryGridDelegate(
+            columns: columns,
+            cardWidth: cardWidth,
+            spacing: spacing,
+            aspect: items.isEmpty ? 63 / 88 : cardAspectRatio(items.first.card),
+          ),
           itemCount: items.length,
           itemBuilder: (context, i) => _PictureCard(card: items[i].card, actions: actions, selectable: true),
         ),

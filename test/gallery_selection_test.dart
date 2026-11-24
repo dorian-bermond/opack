@@ -8,6 +8,7 @@ import 'package:opack/features/catalog/domain/models.dart';
 import 'package:opack/features/pools/presentation/marquee_selection.dart';
 import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:opack/l10n/app_localizations.dart';
+import 'package:opack/shared/widgets/card_tile.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -93,6 +94,46 @@ void main() {
     expect(tagged, ['X-1']);
     expect(selected, {'X-2'});
     expect(find.byKey(const ValueKey('selected-X-2')), findsNothing);
+  });
+
+  testWidgets('a negative spacing overlaps the gallery cards, the lower row on top', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final cards = [for (var i = 0; i < 4; i++) CardData(id: 'X-$i', names: {'en': 'Card $i'}, rarity: Rarity.common)];
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        cardImageCacheProvider.overrideWithValue(null),
+        cardTextsProvider.overrideWith((ref) async => <String, CardTexts>{}),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: CustomScrollView(slivers: [
+            PoolGallerySliver(
+              items: [for (final card in cards) (card: card, info: null, tags: const <String>{})],
+              actions: PoolCardActions(
+                copiesOf: (_) => 1,
+                listedOf: (_) => 1,
+                changed: (_) => false,
+                setCopies: (_, _) {},
+                tint: (_) => null,
+                onTags: (_) {},
+                tagsOf: (_) => const [],
+              ),
+              columns: 3,
+              spacing: -40,
+            ),
+          ]),
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    Rect rect(int i) => tester.getRect(find.ancestor(of: find.text('Card $i'), matching: find.byType(CardTile)).first);
+    expect(rect(1).left, closeTo(rect(0).right - 40, 0.5), reason: 'the cards overlap by the gap');
+    expect(rect(3).top, closeTo(rect(0).bottom - 40, 0.5), reason: 'the rows too');
+    expect(rect(0).width, rect(1).width);
   });
 
   testWidgets('holding the mouse button draws a rectangle selecting the cards it touches', (tester) async {
