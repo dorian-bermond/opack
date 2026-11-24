@@ -69,7 +69,9 @@ void main() {
       install = await Directory('${root.path}\\My App').create();
       temp = await Directory('${root.path}\\temp').create();
       // The "program" tells it ran by writing its version beside itself.
-      await File('${install.path}\\app.cmd').writeAsString('@echo v1>"%~dp0started.txt"\r\n');
+      // The fake app ends with `exit`: started through the swap script, a
+      // `.cmd` runs in a window that would otherwise stay open.
+      await File('${install.path}\\app.cmd').writeAsString('@echo v1>"%~dp0started.txt"\r\nexit\r\n');
       await File('${install.path}\\data.txt').writeAsString('old');
       await File('${install.path}\\keep.txt').writeAsString('mine');
     });
@@ -88,7 +90,7 @@ void main() {
 
     test('downloads, unpacks, replaces the files and starts the new version', () async {
       final zip = await zipOf({
-        'app.cmd': '@echo v2>"%~dp0started.txt"\r\n',
+        'app.cmd': '@echo v2>"%~dp0started.txt"\r\nexit\r\n',
         'data.txt': 'new',
         'data\\flutter_assets\\x.txt': 'asset',
       });
