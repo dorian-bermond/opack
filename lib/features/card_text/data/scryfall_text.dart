@@ -8,14 +8,21 @@ import '../../catalog/domain/models.dart';
 /// The printed wording of an MtG card as Scryfall records it: name, type
 /// line, rules text and flavor text, one entry per face.
 class ScryfallText {
-  const ScryfallText({required this.faces});
+  const ScryfallText({required this.faces, this.lang = 'en'});
 
   factory ScryfallText.fromJson(Map<String, dynamic> json) {
     final faces = (json['card_faces'] as List?)?.cast<Map<String, dynamic>>() ?? [json];
-    return ScryfallText(faces: [for (final face in faces) ScryfallFace.fromJson(face)]);
+    return ScryfallText(
+      faces: [for (final face in faces) ScryfallFace.fromJson(face)],
+      lang: json['lang'] as String? ?? 'en',
+    );
   }
 
   final List<ScryfallFace> faces;
+
+  /// The language the texts are in: the one asked for, or English when
+  /// the print was never made in it.
+  final String lang;
 }
 
 class ScryfallFace {

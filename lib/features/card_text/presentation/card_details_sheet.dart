@@ -153,9 +153,12 @@ class _MtgText extends ConsumerWidget {
     if (faces == null || faces.isEmpty) {
       return Padding(padding: const EdgeInsets.only(right: 16), child: Text(l10n.noCardText));
     }
+    final lang = texts!.value!.lang;
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 0, 16, 24),
       children: [
+        // Not printed in the language asked for: English, flagged as such.
+        if (lang != uiLang) OtherLanguageNote(lang: lang, wanted: uiLang),
         for (final (i, face) in faces.indexed) ...[
           if (i > 0) const Divider(height: 24),
           if (faces.length > 1)
@@ -175,6 +178,37 @@ class _MtgText extends ConsumerWidget {
           ],
         ],
       ],
+    );
+  }
+}
+
+/// Tells the text is not in the language wanted but in [lang], under its
+/// flag.
+class OtherLanguageNote extends StatelessWidget {
+  const OtherLanguageNote({super.key, required this.lang, required this.wanted});
+
+  final String lang;
+  final String wanted;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Padding(
+      key: const Key('otherLanguageNote'),
+      padding: const EdgeInsets.fromLTRB(0, 0, 16, 8),
+      child: Row(
+        children: [
+          LanguageFlag(lang, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l10n.noTextInLanguage(languageName(l10n, wanted), languageName(l10n, lang)),
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -207,7 +241,14 @@ class _YgoTexts extends ConsumerWidget {
       length: languages.length,
       child: Column(
         children: [
-          TabBar(tabs: [for (final lang in languages) Tab(text: _languageName(l10n, lang))]),
+          if (!languages.contains(uiLang)) OtherLanguageNote(lang: languages.first, wanted: uiLang),
+          TabBar(tabs: [
+            for (final lang in languages)
+              Tab(
+                icon: lang == uiLang ? null : LanguageFlag(lang, size: 18),
+                text: _languageName(l10n, lang),
+              ),
+          ]),
           Expanded(
             child: TabBarView(
               children: [

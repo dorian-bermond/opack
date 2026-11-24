@@ -791,6 +791,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tabTransfer => 'Import / export';
 
   @override
+  String noTextInLanguage(String wanted, String shown) {
+    return 'Pas de texte en $wanted : celui en $shown est affiché.';
+  }
+
+  @override
   String get markerQualitySetting => 'Marque des cartes colorée selon';
 
   @override

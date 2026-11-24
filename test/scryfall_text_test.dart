@@ -26,6 +26,8 @@ void main() {
     });
     expect(twoFaced.faces.map((f) => f.name), ['Bereaved Survivor', 'Dauntless Avenger']);
     expect(twoFaced.faces.first.text, 'Quand une autre créature meurt…');
+    expect(single.lang, 'en', reason: 'English when Scryfall says nothing');
+    expect(ScryfallText.fromJson({'name': 'x', 'lang': 'fr'}).lang, 'fr');
   });
 
   test('a French request falls back to the English print', () {

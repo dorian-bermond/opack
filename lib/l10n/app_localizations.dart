@@ -1370,6 +1370,12 @@ abstract class AppLocalizations {
   /// **'Import / export'**
   String get tabTransfer;
 
+  /// No description provided for @noTextInLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'No {wanted} text: the {shown} one is shown.'**
+  String noTextInLanguage(String wanted, String shown);
+
   /// No description provided for @markerQualitySetting.
   ///
   /// In en, this message translates to:

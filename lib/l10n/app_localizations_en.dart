@@ -788,6 +788,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabTransfer => 'Import / export';
 
   @override
+  String noTextInLanguage(String wanted, String shown) {
+    return 'No $wanted text: the $shown one is shown.';
+  }
+
+  @override
   String get markerQualitySetting => 'Card marker colored by';
 
   @override
