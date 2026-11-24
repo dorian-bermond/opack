@@ -749,7 +749,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             icon: const Icon(Icons.info_outline),
             onPressed: () => context.push(poolModePath(pool.game, pool.id, 'details')),
           ),
-          IconButton(tooltip: l10n.renamePool, icon: const Icon(Icons.edit), onPressed: _rename),
           if (config.overrides.isNotEmpty)
             IconButton(
               tooltip: l10n.resetCards,
