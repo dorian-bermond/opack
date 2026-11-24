@@ -66,6 +66,12 @@ const _months = {
 
 final _http = CachedHttp('.cache/ygo-en', delay: const Duration(milliseconds: 250));
 
+/// Yugipedia, for cards whose Fandom page is an empty stub (world premiere
+/// cards of recent sets): its card table names the fields a little
+/// differently (`password`, `text`, `fr_text`).
+const _yugipedia = 'https://yugipedia.com/api.php';
+final _yugipediaHttp = CachedHttp('.cache/ygo-yugipedia', delay: const Duration(milliseconds: 500));
+
 Future<void> main(List<String> arguments) async {
   final args = [...arguments];
   final listTypes = args.remove('--types');
@@ -104,6 +110,16 @@ Future<void> main(List<String> arguments) async {
     stdout.writeln('${lists.length} French lists, ${cardTitles.length} cards');
     final cardPages = await _pages(cardTitles.keys.toSet());
     final errataPages = await _pages({for (final t in cardTitles.keys) 'Card Errata:$t'});
+    // Cards the Fandom wiki has no table for: Yugipedia fills in.
+    var filled = 0;
+    for (final title in cardTitles.keys) {
+      if (_templateFields(cardPages[title] ?? '', 'CardTable2').isNotEmpty) continue;
+      final page = await _yugipediaCard(title);
+      if (page == null) continue;
+      cardPages[title] = page;
+      filled++;
+    }
+    if (filled > 0) stdout.writeln('$filled cards taken from Yugipedia');
 
     final texts = <String, Object?>{};
     final keys = <String, String>{};
@@ -142,6 +158,7 @@ Future<void> main(List<String> arguments) async {
     await rebuildIndex();
   } finally {
     _http.close();
+    _yugipediaHttp.close();
   }
 }
 
@@ -486,6 +503,39 @@ Future<Map<String, String>> _pages(Set<String> titles) async {
     }
   }
   return result;
+}
+
+/// The card [title]'s table on Yugipedia, rewritten as a Fandom `CardTable2`
+/// (`passcode`, `lore`, `fr_name`, `fr_lore`…); `null` without one.
+Future<String?> _yugipediaCard(String title) async {
+  final uri = Uri.parse(_yugipedia).replace(queryParameters: {
+    'action': 'parse',
+    'page': title,
+    'prop': 'wikitext',
+    'redirects': '1',
+    'format': 'json',
+    'formatversion': '2',
+  });
+  final String? body;
+  try {
+    body = await _yugipediaHttp.get(uri);
+  } on HttpException {
+    return null;
+  }
+  if (body == null) return null;
+  final json = jsonDecode(body) as Map<String, dynamic>;
+  final wikitext = (json['parse'] as Map<String, dynamic>?)?['wikitext'] as String? ?? '';
+  final fields = _templateFields(wikitext, 'CardTable2');
+  if (fields.isEmpty) return null;
+  const renamed = {'password': 'passcode', 'text': 'lore'};
+  final lines = <String>['{{CardTable2'];
+  for (final MapEntry(key: name, value: value) in fields.entries) {
+    var key = renamed[name] ?? name;
+    if (name.endsWith('_text')) key = '${name.substring(0, name.length - 5)}_lore';
+    lines.add('| $key = $value');
+  }
+  lines.add('}}');
+  return lines.join('\n');
 }
 
 Future<Map<String, dynamic>> _get(Map<String, String?> params) async {
