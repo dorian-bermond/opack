@@ -346,6 +346,157 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// The cards the pool shows now (searched and filtered), for "select all".
   List<CardData> _shown = const [];
 
+  /// What the View chip reads: the sort, the grouping and the filters on.
+  String _viewSummary(AppLocalizations l10n) => [
+        sortLabel(l10n, _sort),
+        if (_groupBy != GroupBy.none)
+          [
+            _groupName(l10n, _groupBy, _groupQuality),
+            if (_groupBy2 != GroupBy.none) _groupName(l10n, _groupBy2, _groupQuality2),
+          ].join(' › '),
+        if (!_filter.isEmpty) l10n.filtersCount(_filter.activeCount),
+      ].join(' · ');
+
+  /// Sort, grouping and filters in one dialog; the page follows each
+  /// change as it is made.
+  Future<void> _showViewOptions(List<CardWithInfo> allItems) {
+    final pool = _pool;
+    return showDialog<void>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialog) {
+          final l10n = AppLocalizations.of(context);
+          void both(VoidCallback change) {
+            setState(change);
+            setDialog(() {});
+          }
+
+          Widget row(String label, Widget field) => Row(
+                children: [
+                  SizedBox(width: 96, child: Text(label)),
+                  Expanded(child: field),
+                ],
+              );
+          return AlertDialog(
+            title: Text(l10n.viewOptions),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                row(
+                  l10n.sortBy,
+                  DropdownButton<CardSort>(
+                    key: const Key('sortBy'),
+                    isExpanded: true,
+                    value: _sort,
+                    items: [
+                      for (final sort in CardSort.forGame(pool.game))
+                        DropdownMenuItem(value: sort, child: Text(sortLabel(l10n, sort))),
+                    ],
+                    onChanged: (sort) => both(() => _sort = sort!),
+                  ),
+                ),
+                row(
+                  l10n.groupBy,
+                  DropdownButton<GroupBy>(
+                    key: const Key('groupBy'),
+                    isExpanded: true,
+                    value: _groupBy,
+                    items: [
+                      for (final group in GroupBy.forGame(pool.game))
+                        DropdownMenuItem(
+                            value: group,
+                            child: Text(group == _groupBy ? _groupName(l10n, group, _groupQuality) : groupLabel(l10n, group))),
+                    ],
+                    onChanged: (group) async {
+                      await _selectGroup(group!);
+                      setDialog(() {});
+                    },
+                  ),
+                ),
+                if (_groupBy != GroupBy.none)
+                  row(
+                    l10n.thenBy,
+                    DropdownButton<GroupBy>(
+                      key: const Key('thenBy'),
+                      isExpanded: true,
+                      value: _groupBy2,
+                      items: [
+                        for (final group in GroupBy.forGame(pool.game))
+                          if (group != _groupBy)
+                            DropdownMenuItem(
+                                value: group,
+                                child: Text(
+                                    group == _groupBy2 ? _groupName(l10n, group, _groupQuality2) : groupLabel(l10n, group))),
+                      ],
+                      onChanged: (group) async {
+                        await _selectGroup2(group!);
+                        setDialog(() {});
+                      },
+                    ),
+                  ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: OutlinedButton.icon(
+                    key: const Key('viewFilters'),
+                    icon: Badge(
+                      isLabelVisible: !_filter.isEmpty,
+                      label: Text('${_filter.activeCount}'),
+                      child: const Icon(Icons.filter_list),
+                    ),
+                    label: Text(l10n.filters),
+                    onPressed: () => showFilterSheet(
+                      context,
+                      game: pool.game,
+                      items: allItems,
+                      filter: _filter,
+                      onChanged: (filter) => both(() => _filter = filter),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                key: const Key('viewClose'),
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.close),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// The cards per row and the size and spacing sliders of the gallery.
+  Future<void> _showSizeOptions() => showDialog<void>(
+        context: context,
+        builder: (context) {
+          final l10n = AppLocalizations.of(context);
+          return AlertDialog(
+            title: Text(l10n.sizeOptions),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GalleryColumnsControl(settingKey: 'pool'),
+                SizedBox(height: 8),
+                GallerySizeControls(settingKey: 'pool'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                key: const Key('sizeClose'),
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.close),
+              ),
+            ],
+          );
+        },
+      );
+
   void _toggleSelected(CardData card) => setState(() {
         _selected.contains(card.id) ? _selected.remove(card.id) : _selected.add(card.id);
       });
@@ -641,10 +792,29 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
           selected: {view},
           onSelectionChanged: (selection) => ref.read(poolViewProvider.notifier).select(selection.single),
         ),
-            if (view == PoolView.gallery) ...const [
-              GalleryColumnsControl(settingKey: 'pool'),
-              GallerySizeControls(settingKey: 'pool'),
-            ],
+            ActionChip(
+              key: const Key('viewChip'),
+              avatar: Badge(
+                isLabelVisible: !_filter.isEmpty,
+                label: Text('${_filter.activeCount}'),
+                child: const Icon(Icons.tune, size: 18),
+              ),
+              label: Text(_viewSummary(l10n)),
+              tooltip: l10n.viewOptions,
+              onPressed: () => _showViewOptions(allItems),
+            ),
+            if (view == PoolView.gallery)
+              IconButton(
+                key: const Key('sizeOptions'),
+                tooltip: l10n.sizeOptions,
+                icon: const Icon(Icons.photo_size_select_large),
+                onPressed: _showSizeOptions,
+              ),
+            IconButton(
+              tooltip: l10n.poolStats,
+              icon: const Icon(Icons.bar_chart),
+              onPressed: () => showMetricsSheet(context, game: pool.game, items: items),
+            ),
           ],
         ),
       ),
@@ -685,65 +855,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               selectedIcon: const Icon(Icons.playlist_add_check),
               onPressed: () => setState(() => _searchOpen = !_searchOpen),
             ),
-          PopupMenuButton<CardSort>(
-            tooltip: l10n.sortBy,
-            icon: const Icon(Icons.sort),
-            initialValue: _sort,
-            onSelected: (sort) => setState(() => _sort = sort),
-            itemBuilder: (context) => [
-              for (final sort in CardSort.forGame(pool.game))
-                CheckedPopupMenuItem(value: sort, checked: sort == _sort, child: Text(sortLabel(l10n, sort))),
-            ],
-          ),
-          PopupMenuButton<GroupBy>(
-            tooltip: l10n.groupBy,
-            icon: Icon(_groupBy == GroupBy.none ? Icons.segment : Icons.view_agenda),
-            initialValue: _groupBy,
-            onSelected: _selectGroup,
-            itemBuilder: (context) => [
-              for (final group in GroupBy.forGame(pool.game))
-                CheckedPopupMenuItem(
-                    value: group,
-                    checked: group == _groupBy,
-                    child: Text(group == _groupBy ? _groupName(l10n, group, _groupQuality) : groupLabel(l10n, group))),
-            ],
-          ),
-          if (_groupBy != GroupBy.none)
-            PopupMenuButton<GroupBy>(
-              tooltip: l10n.thenBy,
-              icon: Icon(_groupBy2 == GroupBy.none ? Icons.subdirectory_arrow_right : Icons.account_tree),
-              initialValue: _groupBy2,
-              onSelected: _selectGroup2,
-              itemBuilder: (context) => [
-                for (final group in GroupBy.forGame(pool.game))
-                  if (group != _groupBy)
-                    CheckedPopupMenuItem(
-                        value: group,
-                        checked: group == _groupBy2,
-                        child: Text(
-                            group == _groupBy2 ? _groupName(l10n, group, _groupQuality2) : groupLabel(l10n, group))),
-              ],
-            ),
-          IconButton(
-            tooltip: l10n.filters,
-            icon: Badge(
-              isLabelVisible: !_filter.isEmpty,
-              label: Text('${_filter.activeCount}'),
-              child: const Icon(Icons.filter_list),
-            ),
-            onPressed: () => showFilterSheet(
-              context,
-              game: pool.game,
-              items: allItems,
-              filter: _filter,
-              onChanged: (filter) => setState(() => _filter = filter),
-            ),
-          ),
-          IconButton(
-            tooltip: l10n.poolStats,
-            icon: const Icon(Icons.bar_chart),
-            onPressed: () => showMetricsSheet(context, game: pool.game, items: items),
-          ),
           IconButton(
             tooltip: l10n.poolDetails,
             icon: const Icon(Icons.info_outline),

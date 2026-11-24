@@ -1243,6 +1243,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get groupBy => 'Grouper par';
 
   @override
+  String get viewOptions => 'Tri, regroupement et filtres';
+
+  @override
+  String get sizeOptions => 'Taille et espacement des cartes';
+
+  @override
+  String filtersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count filtres',
+      one: '1 filtre',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get close => 'Fermer';
+
+  @override
   String get groupNone => 'Sans regroupement';
 
   @override

@@ -1237,6 +1237,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get groupBy => 'Group by';
 
   @override
+  String get viewOptions => 'Sort, grouping and filters';
+
+  @override
+  String get sizeOptions => 'Card size and spacing';
+
+  @override
+  String filtersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count filters',
+      one: '1 filter',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get close => 'Close';
+
+  @override
   String get groupNone => 'No grouping';
 
   @override

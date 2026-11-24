@@ -70,6 +70,23 @@ Future<ProviderContainer> startApp(WidgetTester tester, {Locale? locale, CardSea
 }
 
 /// Lets sets, cubes and pools finish loading (asset reads are real I/O).
+/// Picks [label] in the View dialog's group-by (or then-by) dropdown, and
+/// closes the dialog unless told otherwise (a question may follow).
+Future<void> setGroupBy(WidgetTester tester, String label, {bool thenBy = false, bool close = true}) async {
+  await tester.tap(find.byKey(const Key('viewChip')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(Key(thenBy ? 'thenBy' : 'groupBy')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
+  await tester.pumpAndSettle();
+  if (close) await closeView(tester);
+}
+
+Future<void> closeView(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('viewClose')));
+  await tester.pumpAndSettle();
+}
+
 Future<void> settleLoading(WidgetTester tester) async {
   for (var i = 0; i < 20; i++) {
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
@@ -180,10 +197,7 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
     // Group the list by tag: the tagged card sits under its own header.
-    await tester.tap(find.byTooltip('Group by'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Tag').last);
-    await tester.pumpAndSettle();
+    await setGroupBy(tester, 'Tag');
     expect(find.text('mine · 1'), findsOneWidget, reason: 'the group header');
     // Headers fold their section.
     expect(find.byIcon(Icons.expand_more), findsNothing);
@@ -194,15 +208,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.expand_more), findsNothing);
     // A secondary grouping nests rarity sections under each tag.
-    await tester.tap(find.byTooltip('Then by'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Rarity').last);
-    await tester.pumpAndSettle();
+    await setGroupBy(tester, 'Rarity', thenBy: true);
     expect(find.text('Secret rare · 1'), findsOneWidget, reason: 'the rarity section inside the mine group');
-    await tester.tap(find.byTooltip('Group by'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('No grouping'));
-    await tester.pumpAndSettle();
+    await setGroupBy(tester, 'No grouping');
 
     // A layout tag is editable too: drop one card from the commons.
     await tester.tap(find.byTooltip('Pool details'));
@@ -344,19 +352,24 @@ void main() {
     await settleLoading(tester);
     expect(find.text('Mock Dragon'), findsOneWidget);
 
-    // In gallery mode each side has its own cards-per-row setting.
+    // In gallery mode each side has its own cards-per-row setting: the
+    // panel's in its toolbar, the pool's in the size dialog.
     await tester.tap(find.text('Gallery'));
     await tester.pumpAndSettle();
-    expect(find.text('auto'), findsNWidgets(2));
+    expect(find.text('auto'), findsOneWidget, reason: "the panel's; the pool's sits in a dialog");
+    await tester.tap(find.byKey(const ValueKey('moreColumns-search')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('moreColumns-search')));
+    await tester.pumpAndSettle();
+    expect(find.text('2'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('sizeOptions')));
+    await tester.pumpAndSettle();
+    expect(find.text('auto'), findsOneWidget, reason: "the pool's");
     await tester.tap(find.byKey(const ValueKey('moreColumns-pool')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('moreColumns-search')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('moreColumns-search')));
     await tester.pumpAndSettle();
     expect(find.text('auto'), findsNothing);
     expect(find.text('1'), findsOneWidget);
-    expect(find.text('2'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget, reason: 'the panel keeps its own');
     await tester.tap(find.byKey(const ValueKey('fewerColumns-pool')));
     await tester.pumpAndSettle();
     expect(find.text('auto'), findsOneWidget);
@@ -372,6 +385,8 @@ void main() {
         reason: 'a fixed number per row sets the size itself');
     expect(find.byKey(const ValueKey('gallerySpacing-pool')), findsOneWidget);
     container.read(galleryColumnsProvider('pool').notifier).set(0);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sizeClose')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('List'));
     await tester.pumpAndSettle();
@@ -668,20 +683,15 @@ void main() {
     // the pool has two.
     await tester.pageBack();
     await settleLoading(tester);
-    await tester.tap(find.byTooltip('Group by'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Quality').last);
-    await tester.pumpAndSettle();
+    await setGroupBy(tester, 'Quality', close: false);
     expect(find.text('Group by which quality?'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('groupQuality-power')));
     await tester.pumpAndSettle();
+    await closeView(tester);
     expect(find.textContaining('ø · '), findsOneWidget, reason: 'nothing holds a Power value');
     expect(find.textContaining('Rarity: '), findsNothing, reason: 'rarity left out');
     // Stacks grouped twice: one row of stacks per primary group.
-    await tester.tap(find.byTooltip('Then by'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Rarity').last);
-    await tester.pumpAndSettle();
+    await setGroupBy(tester, 'Rarity', thenBy: true);
     await tester.tap(find.text('Stacks'));
     await tester.pumpAndSettle();
     expect(find.byType(PoolStacksSliver), findsOneWidget, reason: 'one primary group, one row');
@@ -693,10 +703,7 @@ void main() {
     expect(find.descendant(of: find.byKey(const ValueKey('stackGroup-common')), matching: find.textContaining('Common · ')), findsOneWidget, reason: 'one header');
     await tester.tap(find.text('List'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Group by'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('No grouping'));
-    await tester.pumpAndSettle();
+    await setGroupBy(tester, 'No grouping');
     await tester.tap(find.byKey(const Key('tierlistButton')));
     await settleLoading(tester);
 

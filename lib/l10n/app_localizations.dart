@@ -2156,6 +2156,30 @@ abstract class AppLocalizations {
   /// **'Group by'**
   String get groupBy;
 
+  /// No description provided for @viewOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort, grouping and filters'**
+  String get viewOptions;
+
+  /// No description provided for @sizeOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Card size and spacing'**
+  String get sizeOptions;
+
+  /// No description provided for @filtersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 filter} other{{count} filters}}'**
+  String filtersCount(int count);
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
   /// No description provided for @groupNone.
   ///
   /// In en, this message translates to:
