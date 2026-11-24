@@ -5,21 +5,31 @@ import '../../../l10n/app_localizations.dart';
 import '../../cube/data/cube_repository.dart';
 import '../../cube/domain/cube.dart';
 import '../data/pool_repository.dart';
+import '../../catalog/domain/models.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
+import 'pool_widgets.dart';
 
 /// The pool a screen belongs to, for actions on a card that edit the pool
 /// (choosing its artwork). `null` outside of a pool screen.
 class PoolScope extends InheritedWidget {
-  const PoolScope({super.key, required this.poolId, required super.child});
+  const PoolScope({super.key, required this.poolId, required this.pool, required super.child});
 
   final String poolId;
+  final Pool pool;
 
   static String? of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<PoolScope>()?.poolId;
 
+  /// The color the pool gives [card]'s marker, `null` to leave it to the
+  /// rarity (no pool around, or the rarity chosen).
+  static Color? markerColorOf(BuildContext context, CardData card) {
+    final pool = context.dependOnInheritedWidgetOfExactType<PoolScope>()?.pool;
+    return pool?.markerColorOf(card.id, (tag) => valueColor(pool, tag));
+  }
+
   @override
-  bool updateShouldNotify(PoolScope oldWidget) => oldWidget.poolId != poolId;
+  bool updateShouldNotify(PoolScope oldWidget) => oldWidget.poolId != poolId || oldWidget.pool != pool;
 }
 
 /// Finds the saved pool [poolId] and loads its sets and cubes, then builds
@@ -49,6 +59,7 @@ class PoolLoader extends ConsumerWidget {
           error: (error, _) => _Failed('$error'),
           data: (sets) => PoolScope(
             poolId: pool.id,
+            pool: pool,
             child: Builder(
               builder: (context) => builder(
                 context,

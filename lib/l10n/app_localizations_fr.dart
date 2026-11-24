@@ -774,6 +774,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tabTransfer => 'Import / export';
 
   @override
+  String get markerQualitySetting => 'Marque des cartes colorée selon';
+
+  @override
   String get exportPool => 'Exporter vers un fichier';
 
   @override

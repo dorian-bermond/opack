@@ -329,6 +329,7 @@
   "tabPool": "Pool",
   "tabBooster": "Booster",
   "tabTransfer": "Import / export",
+  "markerQualitySetting": "Card marker colored by",
   "exportPool": "Export to a file",
   "exportPoolHint": "Saves the pool's sources, tags, boosters, formats, copies and chosen artworks to a file to bring elsewhere. A picture of your own stays on this device.",
   "exportPoolDone": "Pool exported",

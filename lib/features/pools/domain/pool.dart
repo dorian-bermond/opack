@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import '../../catalog/domain/models.dart';
 import '../../cube/domain/cube.dart';
 import 'pool_config.dart';
@@ -573,6 +575,7 @@ class Pool {
     this.cover,
     this.coverPrinted = false,
     this.bestVersions = false,
+    this.markerQuality,
   });
 
   factory Pool.fromJson(Map<String, dynamic> json) => Pool(
@@ -612,6 +615,7 @@ class Pool {
         tierlistQuality: json['tierlistQuality'] as String?,
         cover: json['cover'] as String?,
         coverPrinted: json['coverPrinted'] as bool? ?? false,
+        markerQuality: json['markerQuality'] as String?,
         bestVersions: json['bestVersions'] as bool? ?? false,
       );
 
@@ -677,6 +681,7 @@ class Pool {
         'tierlistQuality': ?tierlistQuality,
         'cover': ?cover,
         if (coverPrinted) 'coverPrinted': true,
+        'markerQuality': ?markerQuality,
         if (bestVersions) 'bestVersions': true,
       };
 
@@ -715,6 +720,28 @@ class Pool {
   /// rather than shown as it is.
   final bool coverPrinted;
 
+  /// The quality whose value colors a card's marker (the border or dot
+  /// under it): the rarity when `null` or gone.
+  final String? markerQuality;
+
+  /// The quality coloring the markers, among the ones the pool has.
+  String get effectiveMarkerQuality =>
+      markerQuality != null && qualities.contains(markerQuality) ? markerQuality! : 'rarity';
+
+  /// With [quality] coloring the card markers (`null` for the rarity).
+  Pool withMarkerQuality(String? quality) => copyWith(markerQuality: () => quality);
+
+  /// The color of [cardId]'s marker: its value's in the marker quality,
+  /// grey without one; `null` to leave it to the rarity.
+  Color? markerColorOf(String cardId, Color Function(String tag) valueColor) {
+    final quality = effectiveMarkerQuality;
+    if (quality == 'rarity') return null;
+    for (final MapEntry(key: tag, value: def) in tags.entries) {
+      if (qualityOf(tag) == quality && def.cards.contains(cardId)) return valueColor(tag);
+    }
+    return const Color(0xFF9E9E9E);
+  }
+
   /// Whether every card dealt is replaced by the most valuable version of
   /// the same card in the pool (a manga art for its super rare).
   final bool bestVersions;
@@ -736,6 +763,7 @@ class Pool {
         tierlistQuality: tierlistQuality,
         cover: cover,
         coverPrinted: coverPrinted,
+        markerQuality: markerQuality,
         bestVersions: on,
       );
 
@@ -756,6 +784,7 @@ class Pool {
         descending: descending,
         tierlistQuality: tierlistQuality,
         cover: cover,
+        markerQuality: markerQuality,
         coverPrinted: cover != null && printed,
         bestVersions: bestVersions,
       );
@@ -1028,6 +1057,7 @@ class Pool {
     Map<String, String>? artworks,
     Map<String, bool>? descending,
     String? tierlistQuality,
+    String? Function()? markerQuality,
   }) {
     var kinds = boosters ?? this.boosters;
     if (slots != null) {
@@ -1052,6 +1082,7 @@ class Pool {
       tierlistQuality: tierlistQuality ?? this.tierlistQuality,
       cover: cover,
       coverPrinted: coverPrinted,
+      markerQuality: markerQuality == null ? this.markerQuality : markerQuality(),
       bestVersions: bestVersions,
     );
   }

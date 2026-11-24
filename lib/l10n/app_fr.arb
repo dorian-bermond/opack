@@ -273,6 +273,7 @@
   "tabPool": "Pool",
   "tabBooster": "Booster",
   "tabTransfer": "Import / export",
+  "markerQualitySetting": "Marque des cartes colorée selon",
   "exportPool": "Exporter vers un fichier",
   "exportPoolHint": "Enregistre les sources, étiquettes, boosters, formats, exemplaires et illustrations choisies du pool dans un fichier à emporter ailleurs. Une image à vous reste sur cet appareil.",
   "exportPoolDone": "Pool exporté",

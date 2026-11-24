@@ -162,6 +162,8 @@ class CardTile extends ConsumerWidget {
     final marker = hideRarity ? null : ref.watch(rarityMarkerProvider);
     ref.watch(rarityColorsProvider); // rebuilds when a rarity color changes
     final dot = revealed && marker == RarityMarker.dot;
+    // The pool may color the marker by another quality than the rarity.
+    final markerColor = PoolScope.markerColorOf(context, card) ?? card.rarity.color;
 
     return AspectRatio(
       aspectRatio: cardAspectRatio(card),
@@ -172,13 +174,13 @@ class CardTile extends ConsumerWidget {
         ratio: cardAspectRatio(card),
         child: _RarityGlow(
         enabled: !revealed,
-        color: card.rarity.color,
+        color: markerColor,
         child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(
-            color: revealed && marker == RarityMarker.border ? card.rarity.color : theme.colorScheme.outline,
+            color: revealed && marker == RarityMarker.border ? markerColor : theme.colorScheme.outline,
             width: marker == RarityMarker.border ? 3 : 1,
           ),
         ),
@@ -252,7 +254,7 @@ class CardTile extends ConsumerWidget {
                             Text(
                               card.rarity.label(l10n),
                               style: theme.textTheme.labelSmall
-                                  ?.copyWith(color: card.rarity.color),
+                                  ?.copyWith(color: markerColor),
                             ),
                             Text(card.id, style: theme.textTheme.labelSmall),
                           ],
@@ -270,7 +272,7 @@ class CardTile extends ConsumerWidget {
                       width: 10,
                       height: 10,
                       decoration: BoxDecoration(
-                        color: card.rarity.color,
+                        color: markerColor,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                         boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 2)],

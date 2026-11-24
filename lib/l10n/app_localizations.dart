@@ -1340,6 +1340,12 @@ abstract class AppLocalizations {
   /// **'Import / export'**
   String get tabTransfer;
 
+  /// No description provided for @markerQualitySetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Card marker colored by'**
+  String get markerQualitySetting;
+
   /// No description provided for @exportPool.
   ///
   /// In en, this message translates to:

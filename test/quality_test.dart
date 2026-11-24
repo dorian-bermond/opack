@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:opack/features/catalog/domain/models.dart';
@@ -187,5 +188,23 @@ void main() {
     expect(pool.withTagColor('new', 0xFF000000).tags['new']!.cards, isEmpty);
     expect(pool.plainTags, isEmpty);
     expect(pool.valuesOf('tier'), ['tier:S']);
+  });
+  test('a pool may color the card markers by a quality other than the rarity', () {
+    const a = CardData(id: 'A', names: {'en': 'a'}, rarity: Rarity.rare);
+    const b = CardData(id: 'B', names: {'en': 'b'}, rarity: Rarity.common);
+    var pool = Pool.empty(Game.mtg, name: 'p').withSource(const CardsSource([a, b]), cards: [a, b]);
+    pool = pool.withTag('power:high', ['A']);
+    expect(pool.effectiveMarkerQuality, 'rarity');
+    expect(pool.markerColorOf('A', (_) => const Color(0xFF000001)), isNull, reason: 'left to the rarity');
+
+    pool = pool.withMarkerQuality('power');
+    expect(pool.effectiveMarkerQuality, 'power');
+    expect(pool.markerColorOf('A', (tag) => tag == 'power:high' ? const Color(0xFF112233) : const Color(0x00000000)), const Color(0xFF112233));
+    expect(pool.markerColorOf('B', (_) => const Color(0xFF000001)), const Color(0xFF9E9E9E), reason: 'no value: grey');
+    final reloaded = Pool.fromJson(jsonDecode(jsonEncode(pool.toJson())) as Map<String, dynamic>);
+    expect(reloaded.markerQuality, 'power');
+    expect(reloaded.copyWith(name: 'q').markerQuality, 'power');
+    expect(reloaded.withMarkerQuality(null).toJson().containsKey('markerQuality'), isFalse);
+    expect(pool.withoutTag('power:high').effectiveMarkerQuality, 'rarity', reason: 'the quality gone');
   });
 }

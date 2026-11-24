@@ -129,6 +129,23 @@ class _PoolDetails extends ConsumerWidget {
               children: [
                 Text(l10n.qualitiesHint, style: theme.textTheme.bodySmall),
                 Text(l10n.tagChipHint, style: theme.textTheme.bodySmall),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Text(l10n.markerQualitySetting, style: theme.textTheme.bodyMedium),
+                    const SizedBox(width: 12),
+                    DropdownButton<String>(
+                      key: const Key('markerQuality'),
+                      value: saved.effectiveMarkerQuality,
+                      items: [
+                        for (final quality in saved.qualities)
+                          DropdownMenuItem(value: quality, child: Text(qualityLabel(l10n, quality))),
+                      ],
+                      onChanged: (quality) =>
+                          savePool(ref, saved.withMarkerQuality(quality == 'rarity' ? null : quality)),
+                    ),
+                  ],
+                ),
                 for (final quality in saved.qualities) ...[
                   const SizedBox(height: 10),
                   Row(
