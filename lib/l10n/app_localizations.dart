@@ -1334,6 +1334,60 @@ abstract class AppLocalizations {
   /// **'Booster'**
   String get tabBooster;
 
+  /// No description provided for @tabTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Import / export'**
+  String get tabTransfer;
+
+  /// No description provided for @exportPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Export to a file'**
+  String get exportPool;
+
+  /// No description provided for @exportPoolHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves the pool\'s sources, tags, boosters, formats, copies and chosen artworks to a file to bring elsewhere. A picture of your own stays on this device.'**
+  String get exportPoolHint;
+
+  /// No description provided for @exportPoolDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Pool exported'**
+  String get exportPoolDone;
+
+  /// No description provided for @importPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from a file'**
+  String get importPool;
+
+  /// No description provided for @importPoolHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaces this pool with the file\'s content, its name included. The pool keeps its place in the list.'**
+  String get importPoolHint;
+
+  /// No description provided for @importPoolConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace this pool with \"{name}\"?'**
+  String importPoolConfirm(String name);
+
+  /// No description provided for @importPoolWrongGame.
+  ///
+  /// In en, this message translates to:
+  /// **'This file holds a {game} pool.'**
+  String importPoolWrongGame(String game);
+
+  /// No description provided for @importPoolInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This is not an Opack pool file.'**
+  String get importPoolInvalid;
+
   /// No description provided for @boosterPictureHint.
   ///
   /// In en, this message translates to:

@@ -248,6 +248,12 @@ void main() {
     expect(find.text('1 × Common 1/2 · Common 1/2'), findsNothing);
     expect(find.textContaining('7 × Common'), findsOneWidget, reason: 'the prefilled slots stay');
     expect(find.byKey(const Key('chooseCover')), findsOneWidget, reason: 'the pack picture lives here too');
+    // The transfer tab offers export and import.
+    await tester.tap(find.byKey(const Key('transferTab')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('exportPool')), findsOneWidget);
+    expect(find.byKey(const Key('importPool')), findsOneWidget);
+    expect(find.byTooltip('Rename'), findsNothing, reason: 'the name itself renames');
 
     await tester.pageBack();
     await tester.pumpAndSettle();

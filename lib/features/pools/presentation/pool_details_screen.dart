@@ -43,20 +43,16 @@ class _PoolDetails extends ConsumerWidget {
     final config = saved.config;
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
       appBar: AppBar(
         title: InkWell(onTap: () => renamePool(context, ref, saved), child: Text(saved.name)),
         bottom: TabBar(tabs: [
           Tab(key: const Key('poolTab'), text: l10n.tabPool),
           Tab(key: const Key('boosterTab'), text: l10n.tabBooster),
+          Tab(key: const Key('transferTab'), text: l10n.tabTransfer),
         ]),
         actions: [
-          IconButton(
-            tooltip: l10n.renamePool,
-            icon: const Icon(Icons.edit),
-            onPressed: () => renamePool(context, ref, saved),
-          ),
           IconButton(
             tooltip: l10n.tierlist,
             icon: const Icon(Icons.leaderboard_outlined),
@@ -212,6 +208,43 @@ class _PoolDetails extends ConsumerWidget {
         ],
         ),
         BoosterSettings(play: play),
+        ListView(
+          padding: const EdgeInsets.only(bottom: 24),
+          children: [
+            PoolSection(
+              title: l10n.exportPool,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.exportPoolHint, style: theme.textTheme.bodySmall),
+                  const SizedBox(height: 8),
+                  FilledButton.tonalIcon(
+                    key: const Key('exportPool'),
+                    icon: const Icon(Icons.upload_file),
+                    label: Text(l10n.exportPool),
+                    onPressed: () => exportPool(context, ref, saved),
+                  ),
+                ],
+              ),
+            ),
+            PoolSection(
+              title: l10n.importPool,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.importPoolHint, style: theme.textTheme.bodySmall),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    key: const Key('importPool'),
+                    icon: const Icon(Icons.file_open),
+                    label: Text(l10n.importPool),
+                    onPressed: () => importPoolInto(context, ref, saved),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ]),
       ),
     );

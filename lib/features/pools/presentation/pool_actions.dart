@@ -10,8 +10,10 @@ import '../../card_info/presentation/labels.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../cube/data/cube_repository.dart';
 import '../data/pool_repository.dart';
+import '../../catalog/presentation/home_screen.dart';
 import '../domain/play_pool.dart';
 import '../domain/pool.dart';
+import '../domain/pool_transfer.dart';
 import '../../../shared/widgets/booster_cover.dart';
 import '../../../shared/widgets/trimmed_image.dart';
 import 'pool_composition_screen.dart';
@@ -99,6 +101,59 @@ Future<bool?> askOddPicture(BuildContext context) {
       ],
     ),
   );
+}
+
+/// Saves [pool] to a file the user names (see `pool_transfer.dart`).
+Future<void> exportPool(BuildContext context, WidgetRef ref, Pool pool) async {
+  final l10n = AppLocalizations.of(context);
+  final saved = await FilePicker.saveFile(
+    dialogTitle: l10n.exportPool,
+    fileName: poolFileName(pool),
+    bytes: encodePool(pool),
+  );
+  if (saved != null && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.exportPoolDone)));
+  }
+}
+
+/// Replaces [pool] with the one in a file the user picks, after asking;
+/// the pool keeps its id (its place in the list), takes the file's name.
+Future<void> importPoolInto(BuildContext context, WidgetRef ref, Pool pool) async {
+  final l10n = AppLocalizations.of(context);
+  final file = await FilePicker.pickFile(type: FileType.custom, allowedExtensions: const ['json']);
+  if (file == null) return;
+  final Pool imported;
+  try {
+    imported = decodePool(await file.readAsBytes());
+  } on FormatException {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.importPoolInvalid)));
+    }
+    return;
+  }
+  if (!context.mounted) return;
+  if (imported.game != pool.game) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(l10n.importPoolWrongGame(imported.game.label(l10n)))));
+    return;
+  }
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(l10n.importPool),
+      content: Text(l10n.importPoolConfirm(imported.name)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.cancel)),
+        FilledButton(
+          key: const Key('importPoolConfirm'),
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.apply),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+  savePool(ref, imported.copyWith(id: pool.id).withCover(pool.cover, printed: pool.coverPrinted));
 }
 
 /// Drops the pool's own booster picture, back to the set's.

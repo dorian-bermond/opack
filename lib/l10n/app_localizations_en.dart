@@ -768,6 +768,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabBooster => 'Booster';
 
   @override
+  String get tabTransfer => 'Import / export';
+
+  @override
+  String get exportPool => 'Export to a file';
+
+  @override
+  String get exportPoolHint =>
+      'Saves the pool\'s sources, tags, boosters, formats, copies and chosen artworks to a file to bring elsewhere. A picture of your own stays on this device.';
+
+  @override
+  String get exportPoolDone => 'Pool exported';
+
+  @override
+  String get importPool => 'Import from a file';
+
+  @override
+  String get importPoolHint =>
+      'Replaces this pool with the file\'s content, its name included. The pool keeps its place in the list.';
+
+  @override
+  String importPoolConfirm(String name) {
+    return 'Replace this pool with \"$name\"?';
+  }
+
+  @override
+  String importPoolWrongGame(String game) {
+    return 'This file holds a $game pool.';
+  }
+
+  @override
+  String get importPoolInvalid => 'This is not an Opack pool file.';
+
+  @override
   String get boosterPictureHint =>
       'The pack shown when opening: the set\'s own picture, or one of yours.';
 
