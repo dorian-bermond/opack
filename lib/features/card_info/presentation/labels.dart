@@ -151,6 +151,8 @@ String valueLabel(AppLocalizations l10n, String value) {
     'mono' => l10n.monoColored,
     'multi' => l10n.multiColored,
     'monster' => l10n.kindMonster,
+    'normal' => l10n.kindNormal,
+    'effect' => l10n.kindEffect,
     'spell' => l10n.kindSpell,
     'trap' => l10n.kindTrap,
     'foil' => l10n.foil,

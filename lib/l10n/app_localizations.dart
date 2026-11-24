@@ -728,6 +728,36 @@ abstract class AppLocalizations {
   /// **'Opening'**
   String get settingsOpening;
 
+  /// No description provided for @ygoKindsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Card kinds'**
+  String get ygoKindsSection;
+
+  /// No description provided for @ygoNormalEffectSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell normal monsters from effect monsters'**
+  String get ygoNormalEffectSetting;
+
+  /// No description provided for @ygoNormalEffectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When sorting, grouping or filtering by card kind, monsters split into normal and effect monsters.'**
+  String get ygoNormalEffectHint;
+
+  /// No description provided for @kindNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal monster'**
+  String get kindNormal;
+
+  /// No description provided for @kindEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'Effect monster'**
+  String get kindEffect;
+
   /// No description provided for @languagesSection.
   ///
   /// In en, this message translates to:

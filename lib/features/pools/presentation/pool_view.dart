@@ -267,7 +267,7 @@ String stackLabel(CardSort sort, CardWithInfo item, String language, {String Fun
         [final one] => one,
         _ => 'multi',
       },
-    CardSort.type => mtg?.types.firstOrNull ?? opc?.type ?? '?',
+    CardSort.type => mtg?.types.firstOrNull ?? opc?.type ?? (ygo == null ? '?' : YgoKinds.keyOf(ygo)),
     CardSort.power => mtg?.power ?? (opc?.power == null ? '?' : '${opc!.power}'),
     CardSort.toughness => mtg?.toughness ?? '?',
     CardSort.collector => item.card.id.split('-').first,
@@ -311,7 +311,7 @@ enum GroupBy {
 
   static List<GroupBy> forGame(Game game) => switch (game) {
         Game.mtg => const [none, tag, quality, rarity, manaValue, color, type, collector],
-        Game.ygo => const [none, tag, quality, rarity, level, atk, def, attribute, race, archetype, collector],
+        Game.ygo => const [none, tag, quality, rarity, type, level, atk, def, attribute, race, archetype, collector],
         Game.opc => const [none, tag, quality, rarity, cost, color, type, attribute, collector],
       };
 

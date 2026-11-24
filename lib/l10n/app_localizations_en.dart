@@ -422,6 +422,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsOpening => 'Opening';
 
   @override
+  String get ygoKindsSection => 'Card kinds';
+
+  @override
+  String get ygoNormalEffectSetting =>
+      'Tell normal monsters from effect monsters';
+
+  @override
+  String get ygoNormalEffectHint =>
+      'When sorting, grouping or filtering by card kind, monsters split into normal and effect monsters.';
+
+  @override
+  String get kindNormal => 'Normal monster';
+
+  @override
+  String get kindEffect => 'Effect monster';
+
+  @override
   String get languagesSection => 'Languages';
 
   @override

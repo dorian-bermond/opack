@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:opack/core/settings/ygo_settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:opack/core/update/app_update.dart';
@@ -796,6 +797,19 @@ void main() {
     await tester.pumpAndSettle();
     expect(container.read(cardHoverPreviewSizeProvider), HoverPreviewSize.none);
     expect(container.read(copiesBadgeProvider), CopiesBadgeMode.changed, reason: 'no ×1 badge by default');
+
+    // The Yu-Gi-Oh! tab: normal and effect monsters told apart, on by default.
+    await tester.tap(find.byKey(const Key('settingsYgo')));
+    await tester.pumpAndSettle();
+    expect(container.read(ygoSplitNormalEffectProvider), isTrue);
+    await tester.tap(find.byKey(const Key('settingYgoNormalEffect')));
+    await tester.pumpAndSettle();
+    expect(container.read(ygoSplitNormalEffectProvider), isFalse);
+    expect(YgoKinds.splitNormalEffect, isFalse);
+    await tester.tap(find.byKey(const Key('settingYgoNormalEffect')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('settingsCards')));
+    await tester.pumpAndSettle();
 
     // A rarity color is picked from the palette, then reset.
     final before = Rarity.rare.color;

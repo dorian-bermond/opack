@@ -68,7 +68,7 @@ enum Facet {
       case Facet.set:
         return [mtg?.setCode ?? ygo?.setName ?? opc?.setCode ?? card.id.split('-').first];
       case Facet.kind:
-        return ygo == null ? const [] : [ygo.kind.name];
+        return ygo == null ? const [] : [YgoKinds.keyOf(ygo)];
       case Facet.category:
         return ygo?.categories ?? const [];
       case Facet.attribute:
@@ -191,7 +191,7 @@ enum CardSort {
 
   static List<CardSort> forGame(Game game) => switch (game) {
         Game.mtg => const [name, rarity, manaValue, color, type, power, toughness, collector],
-        Game.ygo => const [name, rarity, level, atk, def, attribute, race, archetype, collector],
+        Game.ygo => const [name, rarity, type, level, atk, def, attribute, race, archetype, collector],
         Game.opc => const [name, rarity, cost, power, counter, color, type, attribute, collector],
       };
 
@@ -205,7 +205,10 @@ enum CardSort {
       rarity => _desc(a.card.rarity.index, b.card.rarity.index),
       manaValue => _num(_mtg(a)?.manaValue, _mtg(b)?.manaValue),
       color => _text(_colorKey(_mtg(a)) ?? _opcColorKey(_opc(a)), _colorKey(_mtg(b)) ?? _opcColorKey(_opc(b))),
-      type => _text(_mtg(a)?.types.join(' ') ?? _opc(a)?.type, _mtg(b)?.types.join(' ') ?? _opc(b)?.type),
+      // Yu-Gi-Oh!: monsters, then spells, then traps, as a deck lists them.
+      type => _ygo(a) != null || _ygo(b) != null
+          ? _kindRank(a).compareTo(_kindRank(b))
+          : _text(_mtg(a)?.types.join(' ') ?? _opc(a)?.type, _mtg(b)?.types.join(' ') ?? _opc(b)?.type),
       power => _desc(_mtg(a)?.powerValue ?? _opc(a)?.power, _mtg(b)?.powerValue ?? _opc(b)?.power),
       toughness => _desc(_mtg(a)?.toughnessValue, _mtg(b)?.toughnessValue),
       collector => _collector(a.card.id).compareTo(_collector(b.card.id)),
@@ -229,6 +232,9 @@ enum CardSort {
 
   static MtgCardInfo? _mtg(CardWithInfo item) => item.info is MtgCardInfo ? item.info as MtgCardInfo : null;
   static YgoCardInfo? _ygo(CardWithInfo item) => item.info is YgoCardInfo ? item.info as YgoCardInfo : null;
+
+  /// Where a card sits among the Yu-Gi-Oh! kinds; last without details.
+  static int _kindRank(CardWithInfo item) => switch (_ygo(item)) { final info? => YgoKinds.rankOf(info), null => 99 };
   static OpcCardInfo? _opc(CardWithInfo item) => item.info is OpcCardInfo ? item.info as OpcCardInfo : null;
 
   /// One Piece colors in the game's order, multicolor after.

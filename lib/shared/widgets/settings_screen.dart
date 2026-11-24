@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/settings/card_languages.dart';
 import '../../core/settings/locale_controller.dart';
+import '../../core/settings/ygo_settings.dart';
 import '../../features/card_text/data/card_text_repository.dart';
 import '../../features/card_text/domain/card_text.dart';
 import '../../features/packs/presentation/opening_mode.dart';
@@ -33,6 +34,7 @@ class SettingsScreen extends ConsumerWidget {
     final images = ref.watch(cardImagesEnabledProvider);
     final hoverSize = ref.watch(cardHoverPreviewSizeProvider);
     final copiesBadge = ref.watch(copiesBadgeProvider);
+    final ygoSplit = ref.watch(ygoSplitNormalEffectProvider);
     final marker = ref.watch(rarityMarkerProvider);
     final opening = ref.watch(openingModeProvider);
     final sealedOrder = ref.watch(sealedOrderProvider);
@@ -41,7 +43,7 @@ class SettingsScreen extends ConsumerWidget {
     final languagesSetting = ref.read(cardLanguagesProvider.notifier);
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.settings),
@@ -49,6 +51,7 @@ class SettingsScreen extends ConsumerWidget {
             Tab(key: const Key('settingsGeneral'), text: l10n.settingsGeneral),
             Tab(key: const Key('settingsCards'), text: l10n.settingsCards),
             Tab(key: const Key('settingsOpening'), text: l10n.settingsOpening),
+            Tab(key: const Key('settingsYgo'), text: l10n.gameYgo),
           ]),
         ),
         body: TabBarView(children: [
@@ -201,6 +204,23 @@ class SettingsScreen extends ConsumerWidget {
                 value: sealedOrder,
                 choices: [for (final o in SealedOrder.values) (o, o.label(l10n))],
                 onChanged: (o) => ref.read(sealedOrderProvider.notifier).select(o!),
+              ),
+            ],
+          ),
+          ListView(
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              _Section(
+                title: l10n.ygoKindsSection,
+                children: [
+                  SwitchListTile(
+                    key: const Key('settingYgoNormalEffect'),
+                    title: Text(l10n.ygoNormalEffectSetting),
+                    subtitle: Text(l10n.ygoNormalEffectHint),
+                    value: ygoSplit,
+                    onChanged: ref.read(ygoSplitNormalEffectProvider.notifier).set,
+                  ),
+                ],
               ),
             ],
           ),

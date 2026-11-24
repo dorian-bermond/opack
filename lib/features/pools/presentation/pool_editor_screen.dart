@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router.dart';
+import '../../../core/settings/ygo_settings.dart';
 import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/images/card_image_cache.dart';
@@ -720,6 +721,8 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       ],
     );
 
+    // The kind of a Yu-Gi-Oh! card follows the setting as it changes.
+    ref.watch(ygoSplitNormalEffectProvider);
     final header = <Widget>[
       if (_taggingTag case final tag?)
         _Section(

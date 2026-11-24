@@ -424,6 +424,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsOpening => 'Ouverture';
 
   @override
+  String get ygoKindsSection => 'Genres de cartes';
+
+  @override
+  String get ygoNormalEffectSetting =>
+      'Distinguer les monstres normaux des monstres à effet';
+
+  @override
+  String get ygoNormalEffectHint =>
+      'Au tri, au regroupement ou au filtrage par genre de carte, les monstres se séparent en monstres normaux et à effet.';
+
+  @override
+  String get kindNormal => 'Monstre normal';
+
+  @override
+  String get kindEffect => 'Monstre à effet';
+
+  @override
   String get languagesSection => 'Langues';
 
   @override

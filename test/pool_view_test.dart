@@ -64,6 +64,22 @@ void main() {
     expect(stackLabel(CardSort.def, link, 'en'), '?');
     expect(stackLabel(CardSort.attribute, link, 'en'), 'LIGHT');
     expect(stackLabel(CardSort.archetype, link, 'en'), '');
+
+    // The kind: monsters told apart as normal and effect while the setting is on.
+    const vanilla = YgoCardInfo(name: 'Kuriboh', kind: YgoKind.monster, type: 'Normal Monster', frameType: 'normal');
+    const spell = YgoCardInfo(name: 'Pot', kind: YgoKind.spell, type: 'Spell Card', frameType: 'spell');
+    final plain = (card: card, info: vanilla, tags: const <String>{});
+    final pot = (card: card, info: spell, tags: const <String>{});
+    expect(stackLabel(CardSort.type, link, 'en'), 'effect');
+    expect(stackLabel(CardSort.type, plain, 'en'), 'normal');
+    expect(stackLabel(CardSort.type, pot, 'en'), 'spell');
+    expect(CardSort.type.compare(plain, link, 'en'), lessThan(0), reason: 'normal before effect');
+    expect(CardSort.type.compare(link, pot, 'en'), lessThan(0), reason: 'monsters before spells');
+    YgoKinds.splitNormalEffect = false;
+    addTearDown(() => YgoKinds.splitNormalEffect = true);
+    expect(stackLabel(CardSort.type, link, 'en'), 'monster');
+    expect(stackLabel(CardSort.type, plain, 'en'), 'monster');
+    expect(CardSort.type.compare(plain, link, 'en'), 0, reason: 'no difference between monsters');
   });
 
   test('the chosen view is saved', () async {

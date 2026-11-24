@@ -350,6 +350,24 @@ class MtgCardInfo extends CardInfo {
 
 enum YgoKind { monster, spell, trap }
 
+/// The kind a Yu-Gi-Oh! card is sorted, grouped and filtered under: spell,
+/// trap, and monster, told apart as normal and effect monsters while
+/// [splitNormalEffect] is on (a setting, on by default).
+class YgoKinds {
+  static bool splitNormalEffect = true;
+
+  /// The kinds in deck order, as keys the labels know.
+  static const order = ['normal', 'effect', 'monster', 'spell', 'trap'];
+
+  static String keyOf(YgoCardInfo info) {
+    if (info.kind != YgoKind.monster) return info.kind.name;
+    if (!splitNormalEffect) return 'monster';
+    return info.isNormalMonster ? 'normal' : 'effect';
+  }
+
+  static int rankOf(YgoCardInfo info) => order.indexOf(keyOf(info));
+}
+
 /// Monster categories YGOPRODeck lists in the card type, e.g.
 /// `Pendulum Tuner Effect Monster`.
 const ygoCategories = [
@@ -469,6 +487,10 @@ class YgoCardInfo extends CardInfo {
   @override
   final String name;
   final YgoKind kind;
+
+  /// A normal monster (a vanilla, a normal pendulum), by its frame or type.
+  bool get isNormalMonster =>
+      kind == YgoKind.monster && (frameType.startsWith('normal') || type.contains('Normal'));
 
   /// YGOPRODeck's full type, e.g. `Pendulum Tuner Effect Monster`.
   final String type;
