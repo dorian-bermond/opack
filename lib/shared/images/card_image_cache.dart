@@ -524,26 +524,23 @@ class CardImagesSetting extends Notifier<bool> {
   }
 }
 
-/// Whether hovering a card for a moment shows its picture large enough to
-/// read; saved across launches, on by default.
-final cardHoverPreviewProvider = NotifierProvider<CardHoverPreviewSetting, bool>(CardHoverPreviewSetting.new);
+/// Whether the hover preview is held back for the moment, whatever the
+/// setting: while a selection rectangle is drawn, the cards under the
+/// pointer stay quiet.
+final hoverPreviewSuppressedProvider = NotifierProvider<HoverPreviewSuppression, bool>(HoverPreviewSuppression.new);
 
-class CardHoverPreviewSetting extends Notifier<bool> {
-  static const _key = 'cardHoverPreview';
-
+class HoverPreviewSuppression extends Notifier<bool> {
   @override
-  bool build() => ref.read(sharedPreferencesProvider).getBool(_key) ?? true;
+  bool build() => false;
 
-  void set(bool enabled) {
-    ref.read(sharedPreferencesProvider).setBool(_key, enabled);
-    state = enabled;
-  }
+  void set(bool suppressed) => state = suppressed;
 }
 
-/// How large the hover preview shows a card: beside the pointer at a size
-/// its text reads at ([normal]), the same but bigger ([large]), or alone
-/// in the middle of the window, as large as it fits ([fullscreen]).
-enum HoverPreviewSize { normal, large, fullscreen }
+/// Whether and how large hovering a card for a moment shows its picture:
+/// not at all ([none]), beside the pointer at a size its text reads at
+/// ([normal]), the same but bigger ([large]), or alone in the middle of
+/// the window, as large as it fits ([fullscreen]).
+enum HoverPreviewSize { none, normal, large, fullscreen }
 
 /// The chosen [HoverPreviewSize], saved across launches.
 final cardHoverPreviewSizeProvider =
@@ -553,9 +550,13 @@ class CardHoverPreviewSizeSetting extends Notifier<HoverPreviewSize> {
   static const _key = 'cardHoverPreviewSize';
 
   @override
-  HoverPreviewSize build() =>
-      HoverPreviewSize.values.asNameMap()[ref.read(sharedPreferencesProvider).getString(_key)] ??
-      HoverPreviewSize.normal;
+  HoverPreviewSize build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final saved = HoverPreviewSize.values.asNameMap()[prefs.getString(_key)];
+    // The former on/off switch, kept for whoever turned it off.
+    if (saved == null && prefs.getBool('cardHoverPreview') == false) return HoverPreviewSize.none;
+    return saved ?? HoverPreviewSize.normal;
+  }
 
   void select(HoverPreviewSize size) {
     ref.read(sharedPreferencesProvider).setString(_key, size.name);

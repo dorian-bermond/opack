@@ -117,7 +117,7 @@ void main() {
   });
 
   testWidgets('English: create a pool from a set, edit it, play it', (tester) async {
-    await startApp(tester, locale: const Locale('en'));
+    final container = await startApp(tester, locale: const Locale('en'));
     expect(find.text('Opack'), findsOneWidget);
     await createPoolFromSet(tester, 'circuit', newPool: 'New pool', fromSet: 'From a set');
     expect(find.text('Gallery'), findsOneWidget);
@@ -139,7 +139,12 @@ void main() {
     await tester.tap(find.text('Gallery'));
     await tester.pumpAndSettle();
     expect(find.byType(CardTile), findsWidgets);
-    expect(find.textContaining('×'), findsWidgets);
+    expect(find.textContaining('×'), findsNothing, reason: 'no ×1 badge on untouched cards by default');
+    container.read(copiesBadgeProvider.notifier).select(CopiesBadgeMode.always);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('×'), findsWidgets, reason: 'every card badged on demand');
+    container.read(copiesBadgeProvider.notifier).select(CopiesBadgeMode.changed);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Stacks'));
     await tester.pumpAndSettle();
     // The stacks column header (the layout tag chip is on the details page).
@@ -772,11 +777,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Rarity colors'), findsOneWidget);
 
-    // A switch flips its setting.
-    expect(container.read(cardHoverPreviewProvider), isTrue);
-    await tester.tap(find.byKey(const Key('settingHoverPreview')));
+    // The hover preview is turned off among its sizes.
+    expect(container.read(cardHoverPreviewSizeProvider), HoverPreviewSize.normal);
+    await tester.tap(find.byKey(const ValueKey('setting-Card hover preview-HoverPreviewSize.none')));
     await tester.pumpAndSettle();
-    expect(container.read(cardHoverPreviewProvider), isFalse);
+    expect(container.read(cardHoverPreviewSizeProvider), HoverPreviewSize.none);
+    expect(container.read(copiesBadgeProvider), CopiesBadgeMode.changed, reason: 'no ×1 badge by default');
 
     // A rarity color is picked from the palette, then reset.
     final before = Rarity.rare.color;

@@ -955,10 +955,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get valueColor => 'Couleur';
 
   @override
-  String get cardHoverPreview => 'Grand aperçu au survol d\'une carte';
+  String get hoverPreviewSizeSetting => 'Aperçu au survol d\'une carte';
 
   @override
-  String get hoverPreviewSizeSetting => 'Taille de l\'aperçu au survol';
+  String get hoverPreviewNone => 'Aucun aperçu';
+
+  @override
+  String get copiesBadgeSetting =>
+      'Badge d\'exemplaires sur les images de cartes';
+
+  @override
+  String get copiesBadgeNone => 'Jamais';
+
+  @override
+  String get copiesBadgeChanged =>
+      'Seulement sur les cartes modifiées par rapport au préréglage';
+
+  @override
+  String get copiesBadgeAlways => 'Toujours';
 
   @override
   String get hoverPreviewNormal => 'À côté du pointeur';

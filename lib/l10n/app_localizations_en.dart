@@ -952,10 +952,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get valueColor => 'Color';
 
   @override
-  String get cardHoverPreview => 'Large preview when hovering a card';
+  String get hoverPreviewSizeSetting => 'Card hover preview';
 
   @override
-  String get hoverPreviewSizeSetting => 'Hover preview size';
+  String get hoverPreviewNone => 'No preview';
+
+  @override
+  String get copiesBadgeSetting => 'Copies badge on card pictures';
+
+  @override
+  String get copiesBadgeNone => 'Never';
+
+  @override
+  String get copiesBadgeChanged => 'Only on cards set apart from the preset';
+
+  @override
+  String get copiesBadgeAlways => 'Always';
 
   @override
   String get hoverPreviewNormal => 'Beside the pointer';

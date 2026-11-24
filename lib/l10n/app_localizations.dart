@@ -1646,17 +1646,41 @@ abstract class AppLocalizations {
   /// **'Color'**
   String get valueColor;
 
-  /// No description provided for @cardHoverPreview.
-  ///
-  /// In en, this message translates to:
-  /// **'Large preview when hovering a card'**
-  String get cardHoverPreview;
-
   /// No description provided for @hoverPreviewSizeSetting.
   ///
   /// In en, this message translates to:
-  /// **'Hover preview size'**
+  /// **'Card hover preview'**
   String get hoverPreviewSizeSetting;
+
+  /// No description provided for @hoverPreviewNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No preview'**
+  String get hoverPreviewNone;
+
+  /// No description provided for @copiesBadgeSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies badge on card pictures'**
+  String get copiesBadgeSetting;
+
+  /// No description provided for @copiesBadgeNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get copiesBadgeNone;
+
+  /// No description provided for @copiesBadgeChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Only on cards set apart from the preset'**
+  String get copiesBadgeChanged;
+
+  /// No description provided for @copiesBadgeAlways.
+  ///
+  /// In en, this message translates to:
+  /// **'Always'**
+  String get copiesBadgeAlways;
 
   /// No description provided for @hoverPreviewNormal.
   ///

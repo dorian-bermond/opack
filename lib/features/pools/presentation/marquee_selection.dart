@@ -65,7 +65,7 @@ class _MarqueeTargetState extends State<MarqueeTarget> {
 ///
 /// [onStart] tells a drag begins, `additive` with Ctrl or Shift held (the
 /// selection is added to, else replaced); [onHits] gives the caught ids as
-/// the rectangle changes. A press released without really moving is a
+/// the rectangle changes; [onEnd] tells the rectangle is gone. A press released without really moving is a
 /// click: [onClick] gets the target under it, `null` on empty space.
 class MarqueeSelection extends StatefulWidget {
   const MarqueeSelection({
@@ -75,6 +75,7 @@ class MarqueeSelection extends StatefulWidget {
     required this.onStart,
     required this.onHits,
     required this.onClick,
+    this.onEnd,
     required this.child,
   });
 
@@ -83,6 +84,7 @@ class MarqueeSelection extends StatefulWidget {
   final void Function(bool additive) onStart;
   final void Function(Set<String> ids) onHits;
   final void Function(String? id) onClick;
+  final VoidCallback? onEnd;
   final Widget child;
 
   /// The move from which a press is a rectangle rather than a click.
@@ -228,12 +230,14 @@ class _MarqueeSelectionState extends State<MarqueeSelection> {
   }
 
   void _stop() {
+    final wasDrawing = _drawing;
     _autoScroll?.cancel();
     _autoScroll = null;
     _start = null;
     _drawing = false;
     _seen.clear();
     if (mounted) setState(() {});
+    if (wasDrawing) widget.onEnd?.call();
   }
 
   @override

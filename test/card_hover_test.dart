@@ -109,7 +109,7 @@ void main() {
     await tester.pump();
 
     // Off by the setting, hovering shows nothing.
-    container.read(cardHoverPreviewProvider.notifier).set(false);
+    container.read(cardHoverPreviewSizeProvider.notifier).select(HoverPreviewSize.none);
     await tester.pump();
     await mouse.moveTo(const Offset(60, 85));
     await tester.pump(const Duration(seconds: 1));

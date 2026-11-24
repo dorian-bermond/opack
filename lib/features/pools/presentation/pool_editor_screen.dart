@@ -320,7 +320,13 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     super.dispose();
   }
 
-  void _marqueeStart(bool additive) => _marqueeBase = additive ? {..._selected} : const {};
+  void _marqueeStart(bool additive) {
+    _marqueeBase = additive ? {..._selected} : const {};
+    // No card preview pops up under a rectangle being drawn.
+    ref.read(hoverPreviewSuppressedProvider.notifier).set(true);
+  }
+
+  void _marqueeEnd() => ref.read(hoverPreviewSuppressedProvider.notifier).set(false);
 
   void _marqueeHits(Set<String> ids) => setState(() => _selected
     ..clear()
@@ -761,6 +767,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         onStart: _marqueeStart,
         onHits: _marqueeHits,
         onClick: _marqueeClick,
+        onEnd: _marqueeEnd,
         child: CustomScrollView(
         controller: _scroll,
         slivers: [

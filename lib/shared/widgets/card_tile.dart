@@ -154,7 +154,11 @@ class CardTile extends ConsumerWidget {
     final source = cardImageSource(card, language: pictureLanguage(ref, context));
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
 
-    final preview = revealed && image != null && ref.watch(cardHoverPreviewProvider);
+    final previewSize = ref.watch(cardHoverPreviewSizeProvider);
+    final preview = revealed &&
+        image != null &&
+        previewSize != HoverPreviewSize.none &&
+        !ref.watch(hoverPreviewSuppressedProvider);
     final marker = hideRarity ? null : ref.watch(rarityMarkerProvider);
     ref.watch(rarityColorsProvider); // rebuilds when a rarity color changes
     final dot = revealed && marker == RarityMarker.dot;
@@ -163,7 +167,7 @@ class CardTile extends ConsumerWidget {
       aspectRatio: cardAspectRatio(card),
       child: _HoverPreview(
         enabled: preview,
-        size: ref.watch(cardHoverPreviewSizeProvider),
+        size: previewSize,
         image: image,
         ratio: cardAspectRatio(card),
         child: _RarityGlow(

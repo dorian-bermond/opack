@@ -477,6 +477,28 @@ Future<({int? copies})?> pickCopies(BuildContext context, int? current) {
   );
 }
 
+/// When a card picture carries its copies badge (`×1`, `×3`): never, only
+/// on the cards set apart from the pool's preset, or always.
+enum CopiesBadgeMode { none, changed, always }
+
+/// The chosen [CopiesBadgeMode], saved across launches; the changed cards
+/// only by default.
+final copiesBadgeProvider = NotifierProvider<CopiesBadgeSetting, CopiesBadgeMode>(CopiesBadgeSetting.new);
+
+class CopiesBadgeSetting extends Notifier<CopiesBadgeMode> {
+  static const _key = 'copiesBadge';
+
+  @override
+  CopiesBadgeMode build() =>
+      CopiesBadgeMode.values.asNameMap()[ref.read(sharedPreferencesProvider).getString(_key)] ??
+      CopiesBadgeMode.changed;
+
+  void select(CopiesBadgeMode mode) {
+    ref.read(sharedPreferencesProvider).setString(_key, mode.name);
+    state = mode;
+  }
+}
+
 /// A small copies badge over a card picture.
 class _CopiesBadge extends StatelessWidget {
   const _CopiesBadge({required this.copies, required this.changed});
@@ -523,7 +545,7 @@ Widget _selectable(CardData card, PoolCardActions actions, Widget row) {
 
 /// A card picture with its copies badge; tapping asks for the copies, or,
 /// when [selectable] and the actions hold a selection, selects the card.
-class _PictureCard extends StatelessWidget {
+class _PictureCard extends ConsumerWidget {
   const _PictureCard({required this.card, required this.actions, this.selectable = false});
 
   final CardData card;
@@ -531,14 +553,15 @@ class _PictureCard extends StatelessWidget {
   final bool selectable;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final badge = ref.watch(copiesBadgeProvider);
     final tint = actions.tint(card);
     // Bulk tagging keeps the tap for itself.
     final selecting = selectable && actions.onTap == null;
     final onSelect = selecting ? actions.onSelect : null;
     final onMenu = selecting ? actions.onMenu : null;
     final selected = selecting && (actions.selected?.call(card) ?? false);
-    final picture = _picture(context, tint: tint, onSelect: onSelect, onMenu: onMenu, selected: selected);
+    final picture = _picture(context, tint: tint, onSelect: onSelect, onMenu: onMenu, selected: selected, badge: badge);
     // A selectable card is caught by the editor's selection rectangle.
     return onSelect == null ? picture : MarqueeTarget(id: card.id, child: picture);
   }
@@ -546,6 +569,7 @@ class _PictureCard extends StatelessWidget {
   Widget _picture(
     BuildContext context, {
     required Color? tint,
+    required CopiesBadgeMode badge,
     required void Function(CardData card)? onSelect,
     required void Function(CardData card, Offset position)? onMenu,
     required bool selected,
@@ -603,7 +627,8 @@ class _PictureCard extends StatelessWidget {
               ),
             ),
           ),
-        if (actions.trailing == null)
+        if (actions.trailing == null &&
+            (badge == CopiesBadgeMode.always || (badge == CopiesBadgeMode.changed && actions.changed(card))))
           Positioned(
             right: 8,
             bottom: 8,

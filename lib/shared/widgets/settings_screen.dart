@@ -11,6 +11,7 @@ import '../../features/packs/presentation/opening_mode.dart';
 import '../../features/catalog/domain/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../features/pools/data/artwork_language.dart';
+import '../../features/pools/presentation/pool_view.dart';
 import '../../features/pools/presentation/pool_widgets.dart';
 import '../images/artwork_picker.dart';
 import '../images/card_image_cache.dart';
@@ -30,8 +31,8 @@ class SettingsScreen extends ConsumerWidget {
     final language = ref.watch(localeProvider)?.languageCode ?? '';
     final mode = ref.watch(textPreferencesProvider).mode;
     final images = ref.watch(cardImagesEnabledProvider);
-    final hoverPreview = ref.watch(cardHoverPreviewProvider);
     final hoverSize = ref.watch(cardHoverPreviewSizeProvider);
+    final copiesBadge = ref.watch(copiesBadgeProvider);
     final marker = ref.watch(rarityMarkerProvider);
     final opening = ref.watch(openingModeProvider);
     final sealedOrder = ref.watch(sealedOrderProvider);
@@ -107,18 +108,13 @@ class SettingsScreen extends ConsumerWidget {
                     value: images,
                     onChanged: ref.read(cardImagesEnabledProvider.notifier).set,
                   ),
-                  SwitchListTile(
-                    key: const Key('settingHoverPreview'),
-                    title: Text(l10n.cardHoverPreview),
-                    value: hoverPreview,
-                    onChanged: ref.read(cardHoverPreviewProvider.notifier).set,
-                  ),
                 ],
               ),
               _Choice<HoverPreviewSize>(
                 title: l10n.hoverPreviewSizeSetting,
                 value: hoverSize,
                 choices: [
+                  (HoverPreviewSize.none, l10n.hoverPreviewNone),
                   (HoverPreviewSize.normal, l10n.hoverPreviewNormal),
                   (HoverPreviewSize.large, l10n.hoverPreviewLarge),
                   (HoverPreviewSize.fullscreen, l10n.hoverPreviewFullscreen),
@@ -134,6 +130,16 @@ class SettingsScreen extends ConsumerWidget {
                   (RarityMarker.dot, l10n.rarityMarkerDot),
                 ],
                 onChanged: (m) => ref.read(rarityMarkerProvider.notifier).select(m!),
+              ),
+              _Choice<CopiesBadgeMode>(
+                title: l10n.copiesBadgeSetting,
+                value: copiesBadge,
+                choices: [
+                  (CopiesBadgeMode.none, l10n.copiesBadgeNone),
+                  (CopiesBadgeMode.changed, l10n.copiesBadgeChanged),
+                  (CopiesBadgeMode.always, l10n.copiesBadgeAlways),
+                ],
+                onChanged: (m) => ref.read(copiesBadgeProvider.notifier).select(m!),
               ),
               _Section(
                 title: l10n.rarityColorsSetting,
