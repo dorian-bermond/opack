@@ -199,11 +199,19 @@ void main() {
     await tester.pumpAndSettle();
     expect(selected, {'X-0', 'X-2', 'X-3'});
     gesture = await press(tester.getCenter(find.text('header')));
-    await gesture.moveBy(const Offset(200, 300));
     await gesture.up();
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('marquee')), findsNothing);
-    expect(selected, {'X-0', 'X-2', 'X-3'}, reason: 'no rectangle starts above the cards');
+    expect(selected, isEmpty, reason: 'a click on the header is one on empty space: it clears');
+
+    // A rectangle may start on the header, above the cards.
+    gesture = await press(tester.getCenter(find.text('header')));
+    await gesture.moveTo(center(0));
+    await tester.pump();
+    expect(find.byKey(const Key('marquee')), findsOneWidget, reason: 'started above the cards');
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(selected, {'X-0', 'X-1'}, reason: 'from the middle of the header down to the first card');
 
     // The wheel scrolls under a held rectangle, which keeps what it caught.
     gesture = await press(center(0));

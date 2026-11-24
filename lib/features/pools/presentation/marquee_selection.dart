@@ -60,8 +60,8 @@ class _MarqueeTargetState extends State<MarqueeTarget> {
 /// scroll view driven by [controller], as in a file manager: holding the
 /// left button and dragging catches every [MarqueeTarget] the rectangle
 /// touches. The rectangle is anchored in the content, so the wheel and the
-/// edges of the view scroll it along. It starts anywhere from the first
-/// target down (what is above, a header, keeps its own gestures).
+/// edges of the view scroll it along. It starts anywhere over the view,
+/// headers included: a press that does not move stays a click for them.
 ///
 /// [onStart] tells a drag begins, `additive` with Ctrl or Shift held (the
 /// selection is added to, else replaced); [onHits] gives the caught ids as
@@ -152,17 +152,9 @@ class _MarqueeSelectionState extends State<MarqueeSelection> {
     });
   }
 
-  /// Whether a press at [position] may start a rectangle: from the first
-  /// target down.
-  bool _allows(Offset position) {
-    if (!widget.enabled) return false;
-    double? top;
-    for (final target in _targets) {
-      final rect = target._rect;
-      if (rect != null && (top == null || rect.top < top)) top = rect.top;
-    }
-    return top != null && position.dy >= top;
-  }
+  /// Whether a press at [position] may start a rectangle: anywhere, while
+  /// the selection is on.
+  bool _allows(Offset position) => widget.enabled;
 
   void _begin(DragStartDetails details) {
     _start = details.globalPosition + Offset(0, _offset);

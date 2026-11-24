@@ -753,8 +753,8 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         play,
         _withBaskets(play, MarqueeSelection(
         controller: _scroll,
-        // The gallery's selection; bulk tagging and baskets keep the mouse.
-        enabled: view == PoolView.gallery && !tagging && !_baskets,
+        // The selection, in every view; bulk tagging and baskets keep the mouse.
+        enabled: !tagging && !_baskets,
         onStart: _marqueeStart,
         onHits: _marqueeHits,
         onClick: _marqueeClick,

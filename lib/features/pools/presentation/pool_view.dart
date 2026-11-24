@@ -277,6 +277,10 @@ class PoolCardActions {
   final bool Function(CardData card)? selected;
   final void Function(CardData card)? onSelect;
   final void Function(CardData card, Offset position)? onMenu;
+
+  /// Whether cards are being selected: a selection is wanted and bulk
+  /// tagging does not keep the tap for itself.
+  bool get selecting => onSelect != null && onTap == null;
 }
 
 /// [child] showing [card], dragged as a small picture of it when
@@ -351,6 +355,23 @@ class _CopiesBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+/// [row] as a card the editor's selection rectangle catches, with a
+/// right-click opening the operations on the selection; plain when cards
+/// are not being selected.
+Widget _selectable(CardData card, PoolCardActions actions, Widget row) {
+  if (!actions.selecting) return row;
+  final onMenu = actions.onMenu;
+  return MarqueeTarget(
+    id: card.id,
+    child: onMenu == null
+        ? row
+        : GestureDetector(
+            onSecondaryTapUp: (d) => onMenu(card, d.globalPosition),
+            child: row,
+          ),
+  );
 }
 
 /// A card picture with its copies badge; tapping asks for the copies, or,
@@ -558,7 +579,7 @@ class PoolStacksSliver extends StatelessWidget {
                                       top: i * step,
                                       width: cardWidth,
                                       height: cardHeight,
-                                      child: _PictureCard(card: item.card, actions: actions),
+                                      child: _PictureCard(card: item.card, actions: actions, selectable: true),
                                     ),
                                 ],
                               ),
@@ -610,11 +631,18 @@ class PoolSpoilerSliver extends ConsumerWidget {
           _ => const <String>[],
         };
         final tags = actions.tagsOf(card);
-        return DraggableCard(
+        final selecting = actions.selecting;
+        final selected = selecting && (actions.selected?.call(card) ?? false);
+        return _selectable(
+          card,
+          actions,
+          DraggableCard(
           card: card,
           enabled: actions.draggable,
           child: Material(
-          color: actions.tint(card)?.withValues(alpha: 0.18) ?? Colors.transparent,
+          color: selected
+              ? theme.colorScheme.primaryContainer
+              : actions.tint(card)?.withValues(alpha: 0.18) ?? Colors.transparent,
           child: InkWell(
             onTap: actions.onTap == null ? null : () => actions.onTap!(card),
             child: Padding(
@@ -677,6 +705,7 @@ class PoolSpoilerSliver extends ConsumerWidget {
             ),
           ),
           ),
+          ),
         );
       },
     );
@@ -700,11 +729,18 @@ class PoolListSliver extends ConsumerWidget {
         final (:card, :info, tags: _) = items[i];
         final listedTimes = actions.listedOf(card);
         final tags = actions.tagsOf(card);
-        return DraggableCard(
+        final selecting = actions.selecting;
+        final selected = selecting && (actions.selected?.call(card) ?? false);
+        return _selectable(
+          card,
+          actions,
+          DraggableCard(
           card: card,
           enabled: actions.draggable,
           child: ListTile(
           dense: true,
+          selected: selected,
+          selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
           tileColor: actions.tint(card)?.withValues(alpha: 0.18),
           onTap: actions.onTap == null ? null : () => actions.onTap!(card),
           onLongPress: () => showCardDetails(context, card, poolId: PoolScope.of(context)),
@@ -737,6 +773,7 @@ class PoolListSliver extends ConsumerWidget {
                   ),
                 ],
               ),
+          ),
           ),
         );
       },
