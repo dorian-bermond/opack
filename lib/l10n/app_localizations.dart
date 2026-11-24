@@ -731,20 +731,50 @@ abstract class AppLocalizations {
   /// No description provided for @ygoKindsSection.
   ///
   /// In en, this message translates to:
-  /// **'Card kinds'**
+  /// **'Frames'**
   String get ygoKindsSection;
 
   /// No description provided for @ygoNormalEffectSetting.
   ///
   /// In en, this message translates to:
-  /// **'Tell normal monsters from effect monsters'**
+  /// **'Tell monster frames apart'**
   String get ygoNormalEffectSetting;
 
   /// No description provided for @ygoNormalEffectHint.
   ///
   /// In en, this message translates to:
-  /// **'When sorting, grouping or filtering by card kind, monsters split into normal and effect monsters.'**
+  /// **'When sorting, grouping or filtering by frame, monsters split into normal, effect, ritual, fusion, synchro, xyz and link monsters.'**
   String get ygoNormalEffectHint;
+
+  /// No description provided for @kindRitual.
+  ///
+  /// In en, this message translates to:
+  /// **'Ritual monster'**
+  String get kindRitual;
+
+  /// No description provided for @kindFusion.
+  ///
+  /// In en, this message translates to:
+  /// **'Fusion monster'**
+  String get kindFusion;
+
+  /// No description provided for @kindSynchro.
+  ///
+  /// In en, this message translates to:
+  /// **'Synchro monster'**
+  String get kindSynchro;
+
+  /// No description provided for @kindXyz.
+  ///
+  /// In en, this message translates to:
+  /// **'Xyz monster'**
+  String get kindXyz;
+
+  /// No description provided for @kindLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Link monster'**
+  String get kindLink;
 
   /// No description provided for @kindNormal.
   ///
@@ -857,8 +887,14 @@ abstract class AppLocalizations {
   /// No description provided for @sortRace.
   ///
   /// In en, this message translates to:
-  /// **'Monster type'**
+  /// **'Type'**
   String get sortRace;
+
+  /// No description provided for @sortFrame.
+  ///
+  /// In en, this message translates to:
+  /// **'Frame'**
+  String get sortFrame;
 
   /// No description provided for @sortArchetype.
   ///
@@ -983,7 +1019,7 @@ abstract class AppLocalizations {
   /// No description provided for @facetKind.
   ///
   /// In en, this message translates to:
-  /// **'Card kind'**
+  /// **'Frame'**
   String get facetKind;
 
   /// No description provided for @facetCategory.
@@ -1001,7 +1037,7 @@ abstract class AppLocalizations {
   /// No description provided for @facetRace.
   ///
   /// In en, this message translates to:
-  /// **'Monster type'**
+  /// **'Type'**
   String get facetRace;
 
   /// No description provided for @facetProperty.
@@ -1115,7 +1151,7 @@ abstract class AppLocalizations {
   /// No description provided for @metricKind.
   ///
   /// In en, this message translates to:
-  /// **'Monsters, Spells, Traps'**
+  /// **'Frames'**
   String get metricKind;
 
   /// No description provided for @metricCategories.
@@ -1151,7 +1187,7 @@ abstract class AppLocalizations {
   /// No description provided for @metricRaces.
   ///
   /// In en, this message translates to:
-  /// **'Monster types'**
+  /// **'Types'**
   String get metricRaces;
 
   /// No description provided for @metricAtk.

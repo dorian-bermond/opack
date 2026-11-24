@@ -422,15 +422,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsOpening => 'Opening';
 
   @override
-  String get ygoKindsSection => 'Card kinds';
+  String get ygoKindsSection => 'Frames';
 
   @override
-  String get ygoNormalEffectSetting =>
-      'Tell normal monsters from effect monsters';
+  String get ygoNormalEffectSetting => 'Tell monster frames apart';
 
   @override
   String get ygoNormalEffectHint =>
-      'When sorting, grouping or filtering by card kind, monsters split into normal and effect monsters.';
+      'When sorting, grouping or filtering by frame, monsters split into normal, effect, ritual, fusion, synchro, xyz and link monsters.';
+
+  @override
+  String get kindRitual => 'Ritual monster';
+
+  @override
+  String get kindFusion => 'Fusion monster';
+
+  @override
+  String get kindSynchro => 'Synchro monster';
+
+  @override
+  String get kindXyz => 'Xyz monster';
+
+  @override
+  String get kindLink => 'Link monster';
 
   @override
   String get kindNormal => 'Normal monster';
@@ -487,7 +501,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortAttribute => 'Attribute';
 
   @override
-  String get sortRace => 'Monster type';
+  String get sortRace => 'Type';
+
+  @override
+  String get sortFrame => 'Frame';
 
   @override
   String get sortArchetype => 'Archetype';
@@ -573,7 +590,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get facetSet => 'Set';
 
   @override
-  String get facetKind => 'Card kind';
+  String get facetKind => 'Frame';
 
   @override
   String get facetCategory => 'Monster category';
@@ -582,7 +599,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get facetAttribute => 'Attribute';
 
   @override
-  String get facetRace => 'Monster type';
+  String get facetRace => 'Type';
 
   @override
   String get facetProperty => 'Spell / Trap property';
@@ -639,7 +656,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricSets => 'Sets';
 
   @override
-  String get metricKind => 'Monsters, Spells, Traps';
+  String get metricKind => 'Frames';
 
   @override
   String get metricCategories => 'Monster categories';
@@ -657,7 +674,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricAttributes => 'Attributes';
 
   @override
-  String get metricRaces => 'Monster types';
+  String get metricRaces => 'Types';
 
   @override
   String get metricAtk => 'ATK';

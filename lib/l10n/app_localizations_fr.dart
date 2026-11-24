@@ -424,15 +424,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsOpening => 'Ouverture';
 
   @override
-  String get ygoKindsSection => 'Genres de cartes';
+  String get ygoKindsSection => 'Cadres';
 
   @override
-  String get ygoNormalEffectSetting =>
-      'Distinguer les monstres normaux des monstres à effet';
+  String get ygoNormalEffectSetting => 'Distinguer les cadres de monstres';
 
   @override
   String get ygoNormalEffectHint =>
-      'Au tri, au regroupement ou au filtrage par genre de carte, les monstres se séparent en monstres normaux et à effet.';
+      'Au tri, au regroupement ou au filtrage par cadre, les monstres se séparent en monstres normaux, à effet, rituels, fusion, synchro, xyz et lien.';
+
+  @override
+  String get kindRitual => 'Monstre Rituel';
+
+  @override
+  String get kindFusion => 'Monstre Fusion';
+
+  @override
+  String get kindSynchro => 'Monstre Synchro';
+
+  @override
+  String get kindXyz => 'Monstre Xyz';
+
+  @override
+  String get kindLink => 'Monstre Lien';
 
   @override
   String get kindNormal => 'Monstre normal';
@@ -489,7 +503,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sortAttribute => 'Attribut';
 
   @override
-  String get sortRace => 'Type de monstre';
+  String get sortRace => 'Type';
+
+  @override
+  String get sortFrame => 'Cadre';
 
   @override
   String get sortArchetype => 'Archétype';
@@ -575,7 +592,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get facetSet => 'Extension';
 
   @override
-  String get facetKind => 'Genre de carte';
+  String get facetKind => 'Cadre';
 
   @override
   String get facetCategory => 'Catégorie de monstre';
@@ -584,7 +601,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get facetAttribute => 'Attribut';
 
   @override
-  String get facetRace => 'Type de monstre';
+  String get facetRace => 'Type';
 
   @override
   String get facetProperty => 'Propriété Magie / Piège';
@@ -641,7 +658,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get metricSets => 'Extensions';
 
   @override
-  String get metricKind => 'Monstres, Magies, Pièges';
+  String get metricKind => 'Cadres';
 
   @override
   String get metricCategories => 'Catégories de monstres';
@@ -659,7 +676,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get metricAttributes => 'Attributs';
 
   @override
-  String get metricRaces => 'Types de monstres';
+  String get metricRaces => 'Types';
 
   @override
   String get metricAtk => 'ATK';

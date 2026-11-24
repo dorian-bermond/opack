@@ -70,10 +70,13 @@ void main() {
     const spell = YgoCardInfo(name: 'Pot', kind: YgoKind.spell, type: 'Spell Card', frameType: 'spell');
     final plain = (card: card, info: vanilla, tags: const <String>{});
     final pot = (card: card, info: spell, tags: const <String>{});
-    expect(stackLabel(CardSort.type, link, 'en'), 'effect');
+    expect(stackLabel(CardSort.type, link, 'en'), 'link', reason: 'the frame');
     expect(stackLabel(CardSort.type, plain, 'en'), 'normal');
     expect(stackLabel(CardSort.type, pot, 'en'), 'spell');
-    expect(CardSort.type.compare(plain, link, 'en'), lessThan(0), reason: 'normal before effect');
+    const pendulum = YgoCardInfo(name: 'Odd-Eyes', kind: YgoKind.monster, type: 'Pendulum Effect Fusion Monster', frameType: 'fusion_pendulum');
+    expect(stackLabel(CardSort.type, (card: card, info: pendulum, tags: const <String>{}), 'en'), 'fusion',
+        reason: 'a pendulum monster goes with its base frame');
+    expect(CardSort.type.compare(plain, link, 'en'), lessThan(0), reason: 'normal before link');
     expect(CardSort.type.compare(link, pot, 'en'), lessThan(0), reason: 'monsters before spells');
     YgoKinds.splitNormalEffect = false;
     addTearDown(() => YgoKinds.splitNormalEffect = true);

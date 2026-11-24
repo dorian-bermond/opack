@@ -131,7 +131,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
   /// A grouping's name, with the quality it is narrowed to.
   String _groupName(AppLocalizations l10n, GroupBy group, String? quality) =>
-      quality == null ? groupLabel(l10n, group) : '${groupLabel(l10n, group)} · ${qualityLabel(l10n, quality)}';
+      quality == null ? groupLabel(l10n, group, game: _pool.game) : '${groupLabel(l10n, group, game: _pool.game)} · ${qualityLabel(l10n, quality)}';
 
   /// Group labels folded away by the user.
   final Set<String> _collapsed = {};
@@ -350,7 +350,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// What the View chip reads: the sort, the grouping and the filters on,
   /// each named ("Sort by Name · Group by Level / Rank, then ATK").
   String _viewSummary(AppLocalizations l10n) => [
-        '${l10n.sortBy} ${sortLabel(l10n, _sort)}',
+        '${l10n.sortBy} ${sortLabel(l10n, _sort, game: _pool.game)}',
         if (_groupBy != GroupBy.none)
           [
             '${l10n.groupBy} ${_groupName(l10n, _groupBy, _groupQuality)}',
@@ -393,7 +393,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                     value: _sort,
                     items: [
                       for (final sort in CardSort.forGame(pool.game))
-                        DropdownMenuItem(value: sort, child: Text(sortLabel(l10n, sort))),
+                        DropdownMenuItem(value: sort, child: Text(sortLabel(l10n, sort, game: _pool.game))),
                     ],
                     onChanged: (sort) => both(() => _sort = sort!),
                   ),
@@ -408,7 +408,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                       for (final group in GroupBy.forGame(pool.game))
                         DropdownMenuItem(
                             value: group,
-                            child: Text(group == _groupBy ? _groupName(l10n, group, _groupQuality) : groupLabel(l10n, group))),
+                            child: Text(group == _groupBy ? _groupName(l10n, group, _groupQuality) : groupLabel(l10n, group, game: _pool.game))),
                     ],
                     onChanged: (group) async {
                       await _selectGroup(group!);
@@ -429,7 +429,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                             DropdownMenuItem(
                                 value: group,
                                 child: Text(
-                                    group == _groupBy2 ? _groupName(l10n, group, _groupQuality2) : groupLabel(l10n, group))),
+                                    group == _groupBy2 ? _groupName(l10n, group, _groupQuality2) : groupLabel(l10n, group, game: _pool.game))),
                       ],
                       onChanged: (group) async {
                         await _selectGroup2(group!);
@@ -895,7 +895,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   : _groupBy.labelsOf(item, language, quality: _groupQuality),
               header: (label) => _groupBy == GroupBy.none
                   ? valueLabel(l10n, label)
-                  : groupHeader(l10n, _groupBy, label),
+                  : groupHeader(l10n, _groupBy, label, game: _pool.game),
             )
           else if (view == PoolView.stacks)
             // Grouped twice: a foldable row of stacks per primary group,
@@ -903,7 +903,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             for (final (label, group) in _grouped(items, language, _groupBy, _groupQuality)) ...[
               _groupHeader(
                 key: label!,
-                title: '${groupHeader(l10n, _groupBy, label)} · ${group.length}',
+                title: '${groupHeader(l10n, _groupBy, label, game: _pool.game)} · ${group.length}',
                 theme: theme,
                 level: 0,
               ),
@@ -913,7 +913,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   items: group,
                   actions: actions,
                   labelOf: (item) => _groupBy2.labelsOf(item, language, quality: _groupQuality2),
-                  header: (sub) => groupHeader(l10n, _groupBy2, sub),
+                  header: (sub) => groupHeader(l10n, _groupBy2, sub, game: _pool.game),
                 ),
             ]
           else
@@ -921,7 +921,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               if (label != null)
                 _groupHeader(
                   key: label,
-                  title: '${groupHeader(l10n, _groupBy, label)} · ${group.length}',
+                  title: '${groupHeader(l10n, _groupBy, label, game: _pool.game)} · ${group.length}',
                   theme: theme,
                   level: 0,
                 ),
@@ -932,7 +932,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   for (final (sub, subgroup) in _grouped(group, language, _groupBy2, _groupQuality2)) ...[
                     _groupHeader(
                       key: '$label/$sub',
-                      title: '${groupHeader(l10n, _groupBy2, sub!)} · ${subgroup.length}',
+                      title: '${groupHeader(l10n, _groupBy2, sub!, game: _pool.game)} · ${subgroup.length}',
                       theme: theme,
                       level: 1,
                     ),

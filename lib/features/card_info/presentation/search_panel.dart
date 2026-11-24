@@ -201,7 +201,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                 onSelected: (sort) => setState(() => _sort = sort),
                 itemBuilder: (context) => [
                   for (final sort in CardSort.forGame(_game))
-                    CheckedPopupMenuItem(value: sort, checked: sort == _sort, child: Text(sortLabel(l10n, sort))),
+                    CheckedPopupMenuItem(value: sort, checked: sort == _sort, child: Text(sortLabel(l10n, sort, game: _game))),
                 ],
               ),
               IconButton.filled(

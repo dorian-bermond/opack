@@ -6,12 +6,14 @@ import '../domain/card_info.dart';
 import '../domain/pool_metrics.dart';
 import '../../pools/domain/pool.dart';
 
-String sortLabel(AppLocalizations l10n, CardSort sort) => switch (sort) {
+/// A sort as the user reads it; the type sort of a Yu-Gi-Oh! [game] is
+/// the frame.
+String sortLabel(AppLocalizations l10n, CardSort sort, {Game? game}) => switch (sort) {
       CardSort.name => l10n.sortName,
       CardSort.rarity => l10n.sortRarity,
       CardSort.manaValue => l10n.sortManaValue,
       CardSort.color => l10n.sortColor,
-      CardSort.type => l10n.sortType,
+      CardSort.type => game == Game.ygo ? l10n.sortFrame : l10n.sortType,
       CardSort.power => l10n.sortPower,
       CardSort.toughness => l10n.sortToughness,
       CardSort.collector => l10n.sortCollector,
@@ -153,6 +155,11 @@ String valueLabel(AppLocalizations l10n, String value) {
     'monster' => l10n.kindMonster,
     'normal' => l10n.kindNormal,
     'effect' => l10n.kindEffect,
+    'ritual' => l10n.kindRitual,
+    'fusion' => l10n.kindFusion,
+    'synchro' => l10n.kindSynchro,
+    'xyz' => l10n.kindXyz,
+    'link' => l10n.kindLink,
     'spell' => l10n.kindSpell,
     'trap' => l10n.kindTrap,
     'foil' => l10n.foil,
