@@ -142,7 +142,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
             SizedBox(width: 140, child: Text(_label(key), style: theme.textTheme.bodyMedium)),
             Expanded(child: field),
             SizedBox(
-              width: 150,
+              width: 180,
               child: custom
                   ? Row(
                       mainAxisSize: MainAxisSize.min,
