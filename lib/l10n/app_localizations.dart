@@ -1448,6 +1448,12 @@ abstract class AppLocalizations {
   /// **'Add…'**
   String get addWord;
 
+  /// No description provided for @typeLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Type line'**
+  String get typeLine;
+
   /// No description provided for @customOptionTitle.
   ///
   /// In en, this message translates to:

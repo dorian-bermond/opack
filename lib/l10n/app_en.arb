@@ -348,6 +348,7 @@
   "fieldEmpty": "(none)",
   "customOption": "Custom…",
   "addWord": "Add…",
+  "typeLine": "Type line",
   "customOptionTitle": "New {field}",
   "@customOptionTitle": { "placeholders": { "field": { "type": "String" } } },
   "noTextInLanguage": "No {wanted} text: the {shown} one is shown.",

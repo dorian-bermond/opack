@@ -62,12 +62,22 @@ class CustomFieldOptions extends Notifier<List<String>> {
 }
 
 /// The list fields picked among known words, several at once: a Yu-Gi-Oh!
-/// card's categories (Effect, Tuner, Pendulum…).
-const multiChoiceFields = {'categories': ygoCategories};
+/// card's subtypes (its type with its categories: Zombie, Toon, Effect…),
+/// MtG's types, supertypes, subtypes and keywords, One Piece's subtypes;
+/// the known words come from the pool's cards and the user.
+const multiChoiceFields = {
+  'subtypes': ygoCategories,
+  'types': <String>[],
+  'supertypes': <String>[],
+  'keywords': <String>[],
+};
 
-/// The fields told from others rather than edited: a Yu-Gi-Oh! frame
-/// follows the categories.
-const derivedFields = {'frameType'};
+/// The fields told from others rather than edited: a Yu-Gi-Oh! card's
+/// type, categories, frame and type string all follow its subtypes.
+const derivedFields = {'race', 'categories', 'frameType', 'type'};
+
+/// The virtual field standing for a Yu-Gi-Oh! card's type and categories.
+const ygoSubtypesKey = 'subtypes';
 
 /// Whether [key] applies to a [game]'s cards at all: MtG alone colors its
 /// cards by letters on the card itself.
@@ -116,10 +126,14 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
         if (fieldAppliesTo(key, _game)) key: cardFieldValue(base, key),
       if (baseInfo != null) ...editableInfoFields(baseInfo),
     };
+    // A Yu-Gi-Oh! card's type and categories edit as one subtypes field.
+    if (baseInfo is YgoCardInfo) {
+      _bases[ygoSubtypesKey] = ygoSubtypes(race: baseInfo.race, categories: baseInfo.categories);
+    }
     _keys = _bases.keys.toList();
     _poolOptions = {
       for (final key in _keys)
-        if (_isChoice(key) || multiChoiceFields.containsKey(key))
+        if (_isChoice(key) || _isMultiChoice(key))
           key: {
             for (final info in infos.values)
               if (editableInfoFields(info)[key] case final value?)
@@ -130,7 +144,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     for (final key in _keys) {
       if (key == '${cardFieldPrefix}rarity' || key == '${cardFieldPrefix}printedRarity') continue;
       _controllers[key] = TextEditingController(text: fieldText(current[key]));
-      if (_isChoice(key) || multiChoiceFields.containsKey(key)) _focuses[key] = FocusNode();
+      if (_isChoice(key) || _isMultiChoice(key)) _focuses[key] = FocusNode();
     }
     _rarity = '${current['${cardFieldPrefix}rarity']}';
     _printedRarity = current['${cardFieldPrefix}printedRarity'] as String?;
@@ -149,18 +163,31 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
 
   bool _isChoice(String key) => choiceFields.contains(key) && _bases[key] is String?;
 
+  bool _isMultiChoice(String key) => multiChoiceFields.containsKey(key) && _bases[key] is List;
+
   /// Whether [key] reads something else than its original.
   bool _isCustom(String key) => fieldText(_valueOf(key)) != fieldText(_bases[key]);
 
   Object? _valueOf(String key) {
     if (key == '${cardFieldPrefix}rarity') return _rarity;
     if (key == '${cardFieldPrefix}printedRarity') return _printedRarity;
-    if (key == 'frameType' && _game == Game.ygo && _controllers.containsKey('categories')) {
-      // The frame follows the categories: Fusion and Pendulum make a fusion pendulum.
-      return ygoFrameFromCategories(_picked('categories')) ?? _bases[key];
+    if (_game == Game.ygo && _controllers.containsKey(ygoSubtypesKey) && _isDerived(key)) {
+      // The type, categories, frame and type string follow the subtypes.
+      final (:race, :categories) = ygoSplitSubtypes(_picked(ygoSubtypesKey));
+      return switch (key) {
+        'race' => race,
+        'categories' => categories,
+        'frameType' => ygoFrameFromCategories(categories) ?? _bases[key],
+        _ => ygoTypeString(categories, '${_bases[key] ?? ''}'),
+      };
     }
     return parseFieldText(_controllers[key]!.text, _bases[key]);
   }
+
+  bool _isDerived(String key) => _game == Game.ygo && derivedFields.contains(key);
+
+  /// The type line the card reads with, from the fields as they are.
+  String get _typeLine => computedTypeLine(_game, {for (final key in _keys) key: _valueOf(key)});
 
   /// The words picked in a multiple-choice field.
   List<String> _picked(String key) =>
@@ -181,6 +208,8 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   Future<void> _apply() async {
     var pool = widget.play.pool;
     for (final key in _keys) {
+      // The subtypes field is the editor's own: its parts are what is kept.
+      if (key == ygoSubtypesKey && _game == Game.ygo) continue;
       final custom = _isCustom(key);
       pool = pool.withCustom(_id, key, custom ? _valueOf(key) : null, remove: !custom);
     }
@@ -284,9 +313,9 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     Widget multiChoiceField(String key) {
       final picked = _picked(key);
       final options = [
-        for (final option in {...multiChoiceFields[key]!, ...?_poolOptions[key]})
+        for (final option in {...multiChoiceFields[key]!, ...?_poolOptions[key], ...ref.watch(customFieldOptionsProvider((_game, key)))})
           if (!picked.contains(option)) option,
-      ];
+      ]..sort();
       return Wrap(
         spacing: 6,
         runSpacing: 4,
@@ -318,8 +347,12 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                   hintText: l10n.addWord,
                 ),
                 onSubmitted: (text) {
+                  // A word of one's own is kept among the known ones.
                   final word = text.trim();
-                  if (word.isNotEmpty && !picked.contains(word)) _setPicked(key, [...picked, word]);
+                  if (word.isNotEmpty && !picked.contains(word)) {
+                    ref.read(customFieldOptionsProvider((_game, key)).notifier).add(word);
+                    _setPicked(key, [...picked, word]);
+                  }
                   controller.clear();
                 },
               ),
@@ -418,14 +451,25 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Text(l10n.editCardHint, style: theme.textTheme.bodySmall),
         ),
+        // The type line as the fields make it, live.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Row(
+            children: [
+              SizedBox(width: 150, child: Text(l10n.typeLine, style: theme.textTheme.bodyMedium)),
+              const SizedBox(width: 80),
+              Expanded(child: Text(_typeLine, key: const Key('typeLine'), style: theme.textTheme.titleSmall)),
+            ],
+          ),
+        ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             children: [
               for (final key in _keys)
-                if (derivedFields.contains(key))
+                if (_isDerived(key))
                   const SizedBox.shrink()
-                else if (multiChoiceFields.containsKey(key))
+                else if (_isMultiChoice(key))
                   row(key, multiChoiceField(key))
                 else if (key == '${cardFieldPrefix}rarity')
                   row(key, rarityField(key, _rarity, nullable: false))

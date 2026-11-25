@@ -832,6 +832,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addWord => 'Ajouter…';
 
   @override
+  String get typeLine => 'Ligne de type';
+
+  @override
   String customOptionTitle(String field) {
     return 'Nouveau $field';
   }

@@ -291,6 +291,7 @@
   "fieldEmpty": "(aucun)",
   "customOption": "Personnalisé…",
   "addWord": "Ajouter…",
+  "typeLine": "Ligne de type",
   "customOptionTitle": "Nouveau {field}",
   "noTextInLanguage": "Pas de texte en {wanted} : celui en {shown} est affiché.",
   "markerQualitySetting": "Marque des cartes colorée selon",

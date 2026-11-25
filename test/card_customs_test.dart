@@ -45,6 +45,26 @@ void main() {
     expect(editableInfoFields(info)['atk'], 2500);
   });
 
+  test("a Yu-Gi-Oh! card's subtypes join its type and categories, and make its type line", () {
+    expect(ygoSubtypes(race: 'Zombie', categories: ['Effect', 'Toon']), ['Zombie', 'Toon', 'Effect'],
+        reason: 'the categories in their usual order');
+    final zombie = ygoSplitSubtypes(['Zombie', 'Toon', 'Effect']);
+    expect(zombie.race, 'Zombie');
+    expect(zombie.categories, ['Toon', 'Effect']);
+    final dragon = ygoSplitSubtypes(['Tuner', 'Dragon', 'Synchro']);
+    expect(dragon.race, 'Dragon');
+    expect(dragon.categories, ['Tuner', 'Synchro'], reason: 'abilities before the frame');
+    expect(ygoSplitSubtypes(const []).race, isNull);
+    expect(ygoTypeString(['Pendulum', 'Tuner', 'Effect'], 'Effect Monster'), 'Pendulum Tuner Effect Monster');
+    expect(ygoTypeString(const [], 'Spell Card'), 'Spell Card');
+    expect(computedTypeLine(Game.ygo, {'subtypes': ['Zombie', 'Toon', 'Effect']}), 'Zombie / Toon / Effect');
+    expect(computedTypeLine(Game.ygo, {'race': 'Zombie', 'categories': ['Effect']}), 'Zombie / Effect');
+    expect(computedTypeLine(Game.mtg, {'supertypes': ['Legendary'], 'types': ['Artifact'], 'subtypes': ['Equipment']}),
+        'Legendary Artifact — Equipment');
+    expect(computedTypeLine(Game.mtg, {'types': ['Instant'], 'subtypes': <String>[]}), 'Instant');
+    expect(computedTypeLine(Game.opc, {'type': 'Character', 'subtypes': ['Straw Hat Crew']}), 'Character / Straw Hat Crew');
+  });
+
   test("a Yu-Gi-Oh! frame follows the monster's categories", () {
     expect(ygoFrameFromCategories(['Effect']), 'effect');
     expect(ygoFrameFromCategories(['Pendulum', 'Tuner', 'Effect']), 'effect_pendulum');

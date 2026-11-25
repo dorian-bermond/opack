@@ -113,6 +113,52 @@ Object? parseFieldText(String text, Object? base) {
   };
 }
 
+/// A Yu-Gi-Oh! card's subtypes as one list: its type (Zombie, Spellcaster…)
+/// first, then its categories (Toon, Tuner, Effect…), what the editor
+/// shows as one field.
+List<String> ygoSubtypes({String? race, List<String> categories = const []}) =>
+    [?race, for (final c in ygoCategoryOrder) if (categories.contains(c)) c];
+
+/// The categories as a type string orders them: the abilities (Pendulum,
+/// Tuner…) before the frame words (Effect, Fusion…).
+final ygoCategoryOrder = [...ygoAbilities, for (final c in ygoCategories) if (!ygoAbilities.contains(c)) c];
+
+/// The type and categories [subtypes] hold: the first word that is no
+/// category is the type, the categories come in their usual order.
+({String? race, List<String> categories}) ygoSplitSubtypes(List<String> subtypes) => (
+      race: subtypes.where((w) => !ygoCategories.contains(w)).firstOrNull,
+      categories: [for (final c in ygoCategoryOrder) if (subtypes.contains(c)) c],
+    );
+
+/// YGOPRODeck's type string for [categories] (`Pendulum Tuner Effect
+/// Monster`); [base] stays for a spell or a trap.
+String ygoTypeString(List<String> categories, String base) =>
+    categories.isEmpty ? base : '${categories.join(' ')} Monster';
+
+/// The type line a card reads with, from its fields as edited: Yu-Gi-Oh!
+/// `Zombie / Toon / Effect`, MtG `Legendary Artifact — Equipment`, One
+/// Piece `Character / Straw Hat Crew`.
+String computedTypeLine(Game game, Map<String, Object?> fields) {
+  List<String> words(String key) => switch (fields[key]) {
+        final List list => list.map((e) => '$e').toList(),
+        final String s when s.isNotEmpty => [s],
+        _ => const [],
+      };
+  switch (game) {
+    case Game.ygo:
+      final subtypes = words('subtypes');
+      if (subtypes.isNotEmpty) return subtypes.join(' / ');
+      final (:race, :categories) = (race: fields['race'] as String?, categories: words('categories'));
+      return ygoSubtypes(race: race, categories: categories).join(' / ');
+    case Game.mtg:
+      final left = [...words('supertypes'), ...words('types')].join(' ');
+      final sub = words('subtypes');
+      return sub.isEmpty ? left : '$left — ${sub.join(' ')}';
+    case Game.opc:
+      return [...words('type'), ...words('subtypes')].join(' / ');
+  }
+}
+
 /// The frame a Yu-Gi-Oh! monster's [categories] imply (`Fusion`,
 /// `Pendulum` → `fusion_pendulum`), the extra-deck kinds first; `null`
 /// when they tell nothing (a spell, a trap, no category).
