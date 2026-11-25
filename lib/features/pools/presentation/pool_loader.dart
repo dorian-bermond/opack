@@ -13,10 +13,15 @@ import 'pool_widgets.dart';
 /// The pool a screen belongs to, for actions on a card that edit the pool
 /// (choosing its artwork). `null` outside of a pool screen.
 class PoolScope extends InheritedWidget {
-  const PoolScope({super.key, required this.poolId, required this.pool, required super.child});
+  const PoolScope({super.key, required this.poolId, required this.pool, this.play, required super.child});
 
   final String poolId;
   final Pool pool;
+
+  /// The pool as resolved, when the scope comes from a [PoolLoader].
+  final PlayPool? play;
+
+  static PlayPool? playOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<PoolScope>()?.play;
 
   static String? of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<PoolScope>()?.poolId;
@@ -57,18 +62,17 @@ class PoolLoader extends ConsumerWidget {
     return ref.watch(poolSetsProvider(poolSetsKey(pool))).when(
           loading: () => const _Loading(),
           error: (error, _) => _Failed('$error'),
-          data: (sets) => PoolScope(
-            poolId: pool.id,
-            pool: pool,
-            child: Builder(
-              builder: (context) => builder(
-                context,
-                PlayPool.resolve(pool, sets: sets, cubes: {
-                  for (final Cube cube in cubes.value!) cube.id: cube,
-                }),
-              ),
-            ),
-          ),
+          data: (sets) {
+            final play = PlayPool.resolve(pool, sets: sets, cubes: {
+              for (final Cube cube in cubes.value!) cube.id: cube,
+            });
+            return PoolScope(
+              poolId: pool.id,
+              pool: pool,
+              play: play,
+              child: Builder(builder: (context) => builder(context, play)),
+            );
+          },
         );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:ui' show Color;
 
 import '../../catalog/domain/models.dart';
 import '../../cube/domain/cube.dart';
+import 'card_customs.dart';
 import 'pool_config.dart';
 
 /// Where a pool's cards come from.
@@ -570,6 +571,7 @@ class Pool {
     this.boosters = const [],
     this.formats = const [],
     this.artworks = const {},
+    this.customs = const {},
     this.descending = const {},
     this.tierlistQuality,
     this.cover,
@@ -611,6 +613,10 @@ class Pool {
             PlayFormat.fromJson(format as Map<String, dynamic>),
         ],
         artworks: (json['artworks'] as Map<String, dynamic>? ?? const {}).cast<String, String>(),
+        customs: {
+          for (final MapEntry(:key, :value) in (json['customs'] as Map<String, dynamic>? ?? const {}).entries)
+            key: (value as Map<String, dynamic>).cast<String, Object?>(),
+        },
         descending: (json['descending'] as Map<String, dynamic>? ?? const {}).cast<String, bool>(),
         tierlistQuality: json['tierlistQuality'] as String?,
         cover: json['cover'] as String?,
@@ -677,6 +683,7 @@ class Pool {
         if (boosters.isNotEmpty) 'boosters': [for (final booster in boosters) booster.toJson()],
         if (formats.isNotEmpty) 'formats': [for (final format in formats) format.toJson()],
         if (artworks.isNotEmpty) 'artworks': artworks,
+        if (customs.isNotEmpty) 'customs': customs,
         if (descending.isNotEmpty) 'descending': descending,
         'tierlistQuality': ?tierlistQuality,
         'cover': ?cover,
@@ -759,6 +766,7 @@ class Pool {
         boosters: boosters,
         formats: formats,
         artworks: artworks,
+        customs: customs,
         descending: descending,
         tierlistQuality: tierlistQuality,
         cover: cover,
@@ -781,6 +789,7 @@ class Pool {
         boosters: boosters,
         formats: formats,
         artworks: artworks,
+        customs: customs,
         descending: descending,
         tierlistQuality: tierlistQuality,
         cover: cover,
@@ -793,6 +802,28 @@ class Pool {
   /// exists, else the first.
   String? get defaultTierlistQuality =>
       tierlistQuality != null && qualities.contains(tierlistQuality) ? tierlistQuality : qualities.firstOrNull;
+
+  /// The pool's own values for cards' fields, by card id then field key
+  /// (see `card_customs.dart`); the base values stay in the sources.
+  final Map<String, CardCustoms> customs;
+
+  /// The custom fields of [cardId], none by default.
+  CardCustoms customsOf(String cardId) => customs[cardId] ?? const {};
+
+  /// Sets [field] of [cardId] to [value], or forgets it with [remove].
+  Pool withCustom(String cardId, String field, Object? value, {bool remove = false}) {
+    final fields = {...customsOf(cardId)};
+    if (remove) {
+      fields.remove(field);
+    } else {
+      fields[field] = value;
+    }
+    return copyWith(customs: {
+      for (final MapEntry(:key, :value) in customs.entries)
+        if (key != cardId) key: value,
+      if (fields.isNotEmpty) cardId: fields,
+    });
+  }
 
   /// Shows [cardId] with [artwork]'s picture, or its own again with `null`.
   Pool withArtwork(String cardId, String? artwork) => copyWith(artworks: {
@@ -1055,6 +1086,7 @@ class Pool {
     List<PlayFormat>? formats,
     List<PackSlot>? slots,
     Map<String, String>? artworks,
+    Map<String, CardCustoms>? customs,
     Map<String, bool>? descending,
     String? tierlistQuality,
     String? Function()? markerQuality,
@@ -1078,6 +1110,7 @@ class Pool {
       boosters: kinds,
       formats: formats ?? this.formats,
       artworks: artworks ?? this.artworks,
+      customs: customs ?? this.customs,
       descending: descending ?? this.descending,
       tierlistQuality: tierlistQuality ?? this.tierlistQuality,
       cover: cover,

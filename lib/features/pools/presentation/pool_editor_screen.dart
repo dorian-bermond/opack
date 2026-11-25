@@ -606,7 +606,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       case 'tags':
         await _editCardsTags(cards);
       case 'details':
-        await showCardDetails(context, cards.single, poolId: _pool.id);
+        await showCardDetails(context, cards.single, poolId: _pool.id, play: widget.pool);
       case 'all':
         setState(() => _selected.addAll(_shown.map((c) => c.id)));
       case 'clear':
@@ -723,7 +723,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     final query = _query.trim().toLowerCase();
     final allItems = [
       for (final e in play.entries)
-        (card: e.card, info: infos[e.card.id], tags: play.tagsOfCard(e.card.id)),
+        (card: e.card, info: play.customizedInfo(e.card.id, infos[e.card.id]), tags: play.tagsOfCard(e.card.id)),
     ];
     final shownNames = {for (final e in play.entries) e.card.id: shownName(ref, e.card, language)};
     String nameOf(CardData card) => shownNames[card.id] ?? card.nameFor(language);

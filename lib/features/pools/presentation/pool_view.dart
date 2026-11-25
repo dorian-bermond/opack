@@ -942,7 +942,7 @@ class PoolListSliver extends ConsumerWidget {
           selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
           tileColor: actions.tint(card)?.withValues(alpha: 0.18),
           onTap: actions.onTap == null ? null : () => actions.onTap!(card),
-          onLongPress: () => showCardDetails(context, card, poolId: PoolScope.of(context)),
+          onLongPress: () => showCardDetails(context, card, poolId: PoolScope.of(context), play: PoolScope.playOf(context)),
           title: Text(
             shownName(ref, card, language),
             style: actions.changed(card) ? const TextStyle(fontWeight: FontWeight.bold) : null,

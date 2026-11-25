@@ -1,6 +1,8 @@
 import '../../catalog/domain/models.dart';
 import '../../cube/domain/cube.dart';
+import '../../card_info/domain/card_info.dart';
 import '../../packs/domain/best_versions.dart';
+import 'card_customs.dart';
 import '../../packs/domain/pack_generator.dart';
 import '../../packs/domain/pack_source.dart';
 import '../../packs/domain/pool_dealer.dart';
@@ -30,6 +32,7 @@ class PlayPool {
     required this.entries,
     required this.boosters,
     required this.tagCards,
+    this.bases = const {},
     this.sets = const {},
     this.layoutSet,
     this.cardCount,
@@ -46,8 +49,11 @@ class PlayPool {
     required Map<String, Cube> cubes,
   }) {
     final byId = <String, PoolEntry>{};
+    final bases = <String, CardData>{};
     void add(CardData listed) {
-      final card = saved.withChosenArtwork(listed);
+      final shown = saved.withChosenArtwork(listed);
+      bases.putIfAbsent(listed.id, () => shown);
+      final card = customizeCard(shown, saved.customsOf(listed.id));
       byId.update(card.id, (e) => (card: e.card, listed: e.listed + 1), ifAbsent: () => (card: card, listed: 1));
     }
     for (final source in saved.sources) {
@@ -131,6 +137,7 @@ class PlayPool {
     return PlayPool(
       pool: pool,
       entries: entries,
+      bases: bases,
       sets: sets,
       layoutSet: layoutSet,
       tagCards: tagCards,
@@ -176,6 +183,13 @@ class PlayPool {
       sameTags(pool, prefill) && sameSlots(pool.slots, prefill.slots);
 
   final Pool pool;
+
+  /// Every card as its source lists it (artwork applied, custom fields
+  /// not), by id: what a custom field reverts to.
+  final Map<String, CardData> bases;
+
+  /// [info] as the pool shows it for [cardId]: its custom fields applied.
+  CardInfo? customizedInfo(String cardId, CardInfo? info) => customizeInfo(info, pool.customsOf(cardId));
 
   /// Distinct cards of the pool, for the editor.
   final List<PoolEntry> entries;

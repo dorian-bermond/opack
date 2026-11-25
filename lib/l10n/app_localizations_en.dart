@@ -805,6 +805,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabTransfer => 'Import / export';
 
   @override
+  String get editCard => 'Edit the card';
+
+  @override
+  String get editCardHint =>
+      'Change any field for this pool; the original stays and comes back on demand.';
+
+  @override
+  String get customField => 'Custom';
+
+  @override
+  String revertField(String value) {
+    return 'Back to the original: $value';
+  }
+
+  @override
+  String get fieldEmpty => '(none)';
+
+  @override
   String noTextInLanguage(String wanted, String shown) {
     return 'No $wanted text: the $shown one is shown.';
   }

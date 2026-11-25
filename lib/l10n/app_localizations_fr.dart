@@ -808,6 +808,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tabTransfer => 'Import / export';
 
   @override
+  String get editCard => 'Modifier la carte';
+
+  @override
+  String get editCardHint =>
+      'Changez n\'importe quel champ pour ce pool ; l\'original reste et revient à la demande.';
+
+  @override
+  String get customField => 'Personnalisé';
+
+  @override
+  String revertField(String value) {
+    return 'Revenir à l\'original : $value';
+  }
+
+  @override
+  String get fieldEmpty => '(aucun)';
+
+  @override
   String noTextInLanguage(String wanted, String shown) {
     return 'Pas de texte en $wanted : celui en $shown est affiché.';
   }

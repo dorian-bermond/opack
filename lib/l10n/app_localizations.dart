@@ -1406,6 +1406,36 @@ abstract class AppLocalizations {
   /// **'Import / export'**
   String get tabTransfer;
 
+  /// No description provided for @editCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the card'**
+  String get editCard;
+
+  /// No description provided for @editCardHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Change any field for this pool; the original stays and comes back on demand.'**
+  String get editCardHint;
+
+  /// No description provided for @customField.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customField;
+
+  /// No description provided for @revertField.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the original: {value}'**
+  String revertField(String value);
+
+  /// No description provided for @fieldEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'(none)'**
+  String get fieldEmpty;
+
   /// No description provided for @noTextInLanguage.
   ///
   /// In en, this message translates to:

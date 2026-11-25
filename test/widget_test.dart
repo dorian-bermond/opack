@@ -220,6 +220,22 @@ void main() {
     tester.binding.focusManager.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
 
+    // A card's fields are edited for the pool: the name changes, flagged custom.
+    await tester.longPress(find.descendant(of: find.byType(PoolListSliver), matching: find.byType(ListTile)).first);
+    await settleLoading(tester);
+    await tester.tap(find.byKey(const Key('editCard')));
+    await settleLoading(tester);
+    expect(find.byKey(const ValueKey('custom-card.name.en')), findsNothing, reason: 'nothing custom yet');
+    await tester.enterText(find.byKey(const ValueKey('field-card.name.en')), 'Renamed card');
+    await settleLoading(tester);
+    expect(find.byKey(const ValueKey('custom-card.name.en')), findsOneWidget);
+    expect(find.byKey(const ValueKey('revert-card.name.en')), findsOneWidget, reason: 'the original comes back on demand');
+    await tester.tap(find.byKey(const Key('applyCardEdit')));
+    await settleLoading(tester);
+    expect(find.text('Renamed card'), findsWidgets, reason: 'the pool shows the custom name');
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+
     // A right-click on the header selects the group and opens its operations.
     await tester.tapAt(tester.getCenter(find.text('mine · 1')), buttons: kSecondaryButton);
     await tester.pumpAndSettle();

@@ -259,7 +259,8 @@ class _TierlistState extends ConsumerState<_Tierlist> {
     final spacing = ref.watch(tierlistSpacingProvider);
 
     final allItems = [
-      for (final e in play.entries) (card: e.card, info: infos[e.card.id], tags: play.tagsOfCard(e.card.id)),
+      for (final e in play.entries)
+        (card: e.card, info: play.customizedInfo(e.card.id, infos[e.card.id]), tags: play.tagsOfCard(e.card.id)),
     ];
     final inTag = _tag == null ? null : {for (final c in play.tagCards[_tag] ?? const <CardData>[]) c.id};
     final group = [

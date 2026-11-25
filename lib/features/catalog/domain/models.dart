@@ -49,6 +49,7 @@ class CardData {
     this.scryfallId,
     this.artwork,
     this.printedRarity,
+    this.customFields = const {},
   });
 
   factory CardData.fromJson(Map<String, dynamic> json) => CardData(
@@ -92,6 +93,25 @@ class CardData {
   /// The rarity printed on the card.
   Rarity get printed => printedRarity ?? rarity;
 
+  /// The fields a pool set its own values for on this card (see the
+  /// pool's card customs), by key; not saved with the card.
+  final Set<String> customFields;
+
+  /// This card marked as customized on [fields].
+  CardData withCustomFields(Set<String> fields) => CardData(
+        id: id,
+        names: names,
+        rarity: rarity,
+        colors: colors,
+        foil: foil,
+        score: score,
+        passcode: passcode,
+        scryfallId: scryfallId,
+        artwork: artwork,
+        printedRarity: printedRarity,
+        customFields: fields,
+      );
+
   /// MtG color letters (`WUBRG`), used to balance commons.
   final String colors;
   final bool foil;
@@ -123,6 +143,7 @@ class CardData {
         scryfallId: scryfallId,
         artwork: artwork,
         printedRarity: printedRarity,
+        customFields: customFields,
       );
 
   /// This card shown with [artwork]'s picture (`null` for its own print's).
@@ -137,6 +158,7 @@ class CardData {
         scryfallId: scryfallId,
         artwork: artwork,
         printedRarity: printedRarity,
+        customFields: customFields,
       );
 }
 

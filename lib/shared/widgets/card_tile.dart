@@ -150,7 +150,7 @@ class CardTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final language = dataLanguage(ref, context);
     final name = shownName(ref, card, language);
-    void details() => showCardDetails(context, card, poolId: PoolScope.of(context));
+    void details() => showCardDetails(context, card, poolId: PoolScope.of(context), play: PoolScope.playOf(context));
     final source = cardImageSource(card, language: pictureLanguage(ref, context));
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
 

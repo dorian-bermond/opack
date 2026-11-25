@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/settings/card_languages.dart';
+import '../../pools/domain/card_customs.dart';
+import '../../pools/domain/play_pool.dart';
+import '../../pools/presentation/card_edit_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/images/artwork_picker.dart';
 import '../../../shared/images/card_image_cache.dart';
@@ -13,14 +16,14 @@ import '../domain/card_text.dart';
 
 /// Shows [card]'s picture and text; within the pool [poolId], its artwork
 /// can be swapped from there.
-Future<void> showCardDetails(BuildContext context, CardData card, {String? poolId}) =>
+Future<void> showCardDetails(BuildContext context, CardData card, {String? poolId, PlayPool? play}) =>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (context) => SizedBox(
         height: MediaQuery.sizeOf(context).height * 0.75,
-        child: CardDetailsSheet(card: card, poolId: poolId),
+        child: CardDetailsSheet(card: card, poolId: poolId, play: play),
       ),
     );
 
@@ -42,19 +45,24 @@ TextVersion? shownVersion(WidgetRef ref, CardData card, String lang) {
 /// The name [card] is shown under for [lang]: its shown text version's, which
 /// knows translations the card itself may lack, else the card's own.
 String shownName(WidgetRef ref, CardData card, String lang) =>
-    shownVersion(ref, card, lang)?.name ?? card.nameFor(lang);
+    card.customFields.contains('${cardFieldPrefix}name.$lang')
+        ? card.nameFor(lang)
+        : shownVersion(ref, card, lang)?.name ?? card.nameFor(lang);
 
 /// The card's picture as tall as the sheet on the left; on the right its
 /// name, then its text: every text version per language for Yu-Gi-Oh!
 /// (tapping a version makes it this card's text in that language), the
 /// printed rules and flavor text from Scryfall for MtG.
 class CardDetailsSheet extends ConsumerWidget {
-  const CardDetailsSheet({super.key, required this.card, this.poolId});
+  const CardDetailsSheet({super.key, required this.card, this.poolId, this.play});
 
   final CardData card;
 
   /// The pool the card is seen in, enabling the artwork swap.
   final String? poolId;
+
+  /// The pool as resolved, enabling the card's fields to be edited.
+  final PlayPool? play;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -73,21 +81,35 @@ class CardDetailsSheet extends ConsumerWidget {
               style: theme.textTheme.titleLarge),
           Text('${card.id} · ${card.rarity.label(l10n)}${card.foil ? ' · ${l10n.foil}' : ''}',
               style: theme.textTheme.bodySmall),
-          if (poolId case final poolId? when source != null)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.brush_outlined),
-                  label: Text(l10n.swapArtwork),
-                  onPressed: () async {
-                    // The sheet holds the card as it was: once the pool
-                    // changed, close it so the screen shows the new picture.
-                    final changed = await pickArtwork(context, poolId: poolId, card: card);
-                    if (changed && context.mounted) Navigator.pop(context);
-                  },
-                ),
+          if (poolId != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  if (source != null)
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.brush_outlined),
+                      label: Text(l10n.swapArtwork),
+                      onPressed: () async {
+                        // The sheet holds the card as it was: once the pool
+                        // changed, close it so the screen shows the new picture.
+                        final changed = await pickArtwork(context, poolId: poolId!, card: card);
+                        if (changed && context.mounted) Navigator.pop(context);
+                      },
+                    ),
+                  if (play case final play?)
+                    OutlinedButton.icon(
+                      key: const Key('editCard'),
+                      icon: const Icon(Icons.edit_outlined),
+                      label: Text(l10n.editCard),
+                      onPressed: () async {
+                        final changed = await editCardFields(context, play: play, card: card);
+                        if (changed && context.mounted) Navigator.pop(context);
+                      },
+                    ),
+                ],
               ),
             ),
         ],
