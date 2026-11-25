@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/card_tile.dart';
 import '../../card_info/data/card_info_repository.dart';
+import '../../card_info/domain/card_info.dart';
 import '../../card_text/data/card_text_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../data/pool_repository.dart';
@@ -60,6 +61,14 @@ class CustomFieldOptions extends Notifier<List<String>> {
   }
 }
 
+/// The list fields picked among known words, several at once: a Yu-Gi-Oh!
+/// card's categories (Effect, Tuner, Pendulum…).
+const multiChoiceFields = {'categories': ygoCategories};
+
+/// The fields told from others rather than edited: a Yu-Gi-Oh! frame
+/// follows the categories.
+const derivedFields = {'frameType'};
+
 /// Whether [key] applies to a [game]'s cards at all: MtG alone colors its
 /// cards by letters on the card itself.
 bool fieldAppliesTo(String key, Game game) => key != '${cardFieldPrefix}colors' || game == Game.mtg;
@@ -110,17 +119,18 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     _keys = _bases.keys.toList();
     _poolOptions = {
       for (final key in _keys)
-        if (_isChoice(key))
+        if (_isChoice(key) || multiChoiceFields.containsKey(key))
           key: {
             for (final info in infos.values)
-              if (editableInfoFields(info)[key] case final String value when value.isNotEmpty) value,
+              if (editableInfoFields(info)[key] case final value?)
+                if (value is String && value.isNotEmpty) value else if (value is List) ...value.cast<String>(),
           },
     };
     final current = {..._bases, ..._customs};
     for (final key in _keys) {
       if (key == '${cardFieldPrefix}rarity' || key == '${cardFieldPrefix}printedRarity') continue;
       _controllers[key] = TextEditingController(text: fieldText(current[key]));
-      if (_isChoice(key)) _focuses[key] = FocusNode();
+      if (_isChoice(key) || multiChoiceFields.containsKey(key)) _focuses[key] = FocusNode();
     }
     _rarity = '${current['${cardFieldPrefix}rarity']}';
     _printedRarity = current['${cardFieldPrefix}printedRarity'] as String?;
@@ -145,8 +155,18 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   Object? _valueOf(String key) {
     if (key == '${cardFieldPrefix}rarity') return _rarity;
     if (key == '${cardFieldPrefix}printedRarity') return _printedRarity;
+    if (key == 'frameType' && _game == Game.ygo && _controllers.containsKey('categories')) {
+      // The frame follows the categories: Fusion and Pendulum make a fusion pendulum.
+      return ygoFrameFromCategories(_picked('categories')) ?? _bases[key];
+    }
     return parseFieldText(_controllers[key]!.text, _bases[key]);
   }
+
+  /// The words picked in a multiple-choice field.
+  List<String> _picked(String key) =>
+      [for (final w in _controllers[key]!.text.split(',')) if (w.trim().isNotEmpty) w.trim()];
+
+  void _setPicked(String key, List<String> words) => setState(() => _controllers[key]!.text = words.join(', '));
 
   void _revert(String key) => setState(() {
         if (key == '${cardFieldPrefix}rarity') {
@@ -259,6 +279,73 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
           }),
         );
 
+    // A multiple-choice field: the picked words as chips, one more typed
+    // with the known words offered as one types.
+    Widget multiChoiceField(String key) {
+      final picked = _picked(key);
+      final options = [
+        for (final option in {...multiChoiceFields[key]!, ...?_poolOptions[key]})
+          if (!picked.contains(option)) option,
+      ];
+      return Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          for (final word in picked)
+            InputChip(
+              key: ValueKey('pick-$key-$word'),
+              label: Text(word),
+              visualDensity: VisualDensity.compact,
+              onDeleted: () => _setPicked(key, [for (final w in picked) if (w != word) w]),
+            ),
+          SizedBox(
+            width: 200,
+            child: RawAutocomplete<String>(
+              focusNode: _focuses[key],
+              optionsBuilder: (value) {
+                final query = value.text.toLowerCase();
+                return [for (final option in options) if (option.toLowerCase().contains(query)) option];
+              },
+              onSelected: (option) => _setPicked(key, [...picked, option]),
+              fieldViewBuilder: (context, controller, focusNode, onSubmitted) => TextField(
+                key: ValueKey('field-$key'),
+                controller: controller,
+                focusNode: focusNode,
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: const OutlineInputBorder(),
+                  hintText: l10n.addWord,
+                ),
+                onSubmitted: (text) {
+                  final word = text.trim();
+                  if (word.isNotEmpty && !picked.contains(word)) _setPicked(key, [...picked, word]);
+                  controller.clear();
+                },
+              ),
+              optionsViewBuilder: (context, onSelected, options) => Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 4,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 240, maxWidth: 240),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      children: [
+                        for (final option in options)
+                          ListTile(dense: true, title: Text(option), onTap: () => onSelected(option)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     // A choice field: the known values filtered as one types, then "Custom…".
     Widget choiceField(String key) {
       final options = _options(key);
@@ -336,7 +423,11 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             children: [
               for (final key in _keys)
-                if (key == '${cardFieldPrefix}rarity')
+                if (derivedFields.contains(key))
+                  const SizedBox.shrink()
+                else if (multiChoiceFields.containsKey(key))
+                  row(key, multiChoiceField(key))
+                else if (key == '${cardFieldPrefix}rarity')
                   row(key, rarityField(key, _rarity, nullable: false))
                 else if (key == '${cardFieldPrefix}printedRarity')
                   row(key, rarityField(key, _printedRarity, nullable: true))

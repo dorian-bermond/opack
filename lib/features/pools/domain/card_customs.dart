@@ -112,3 +112,14 @@ Object? parseFieldText(String text, Object? base) {
     _ => trimmed,
   };
 }
+
+/// The frame a Yu-Gi-Oh! monster's [categories] imply (`Fusion`,
+/// `Pendulum` → `fusion_pendulum`), the extra-deck kinds first; `null`
+/// when they tell nothing (a spell, a trap, no category).
+String? ygoFrameFromCategories(List<String> categories) {
+  final words = categories.map((c) => c.toLowerCase()).toSet();
+  const frames = ['link', 'xyz', 'synchro', 'fusion', 'ritual', 'effect', 'normal'];
+  final frame = frames.where(words.contains).firstOrNull;
+  if (frame == null) return null;
+  return words.contains('pendulum') && frame != 'link' ? '${frame}_pendulum' : frame;
+}

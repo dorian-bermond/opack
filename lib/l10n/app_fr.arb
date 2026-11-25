@@ -290,6 +290,7 @@
   "revertField": "Revenir à l'original : {value}",
   "fieldEmpty": "(aucun)",
   "customOption": "Personnalisé…",
+  "addWord": "Ajouter…",
   "customOptionTitle": "Nouveau {field}",
   "noTextInLanguage": "Pas de texte en {wanted} : celui en {shown} est affiché.",
   "markerQualitySetting": "Marque des cartes colorée selon",

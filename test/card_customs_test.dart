@@ -45,6 +45,16 @@ void main() {
     expect(editableInfoFields(info)['atk'], 2500);
   });
 
+  test("a Yu-Gi-Oh! frame follows the monster's categories", () {
+    expect(ygoFrameFromCategories(['Effect']), 'effect');
+    expect(ygoFrameFromCategories(['Pendulum', 'Tuner', 'Effect']), 'effect_pendulum');
+    expect(ygoFrameFromCategories(['Fusion', 'Effect', 'Pendulum']), 'fusion_pendulum', reason: 'the extra-deck kind wins');
+    expect(ygoFrameFromCategories(['Link', 'Pendulum']), 'link', reason: 'no pendulum link');
+    expect(ygoFrameFromCategories(['Normal']), 'normal');
+    expect(ygoFrameFromCategories(['Tuner']), isNull, reason: 'no frame word');
+    expect(ygoFrameFromCategories(const []), isNull);
+  });
+
   test('field texts parse back as their original kind', () {
     expect(fieldText(['a', 'b']), 'a, b');
     expect(fieldText(null), '');

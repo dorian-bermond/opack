@@ -1442,6 +1442,12 @@ abstract class AppLocalizations {
   /// **'Custom…'**
   String get customOption;
 
+  /// No description provided for @addWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Add…'**
+  String get addWord;
+
   /// No description provided for @customOptionTitle.
   ///
   /// In en, this message translates to:

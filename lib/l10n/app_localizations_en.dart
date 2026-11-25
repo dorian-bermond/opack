@@ -826,6 +826,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customOption => 'Custom…';
 
   @override
+  String get addWord => 'Add…';
+
+  @override
   String customOptionTitle(String field) {
     return 'New $field';
   }

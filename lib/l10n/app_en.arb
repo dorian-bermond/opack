@@ -347,6 +347,7 @@
   "@revertField": { "placeholders": { "value": { "type": "String" } } },
   "fieldEmpty": "(none)",
   "customOption": "Custom…",
+  "addWord": "Add…",
   "customOptionTitle": "New {field}",
   "@customOptionTitle": { "placeholders": { "field": { "type": "String" } } },
   "noTextInLanguage": "No {wanted} text: the {shown} one is shown.",
