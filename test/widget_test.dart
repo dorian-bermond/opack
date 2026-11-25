@@ -226,6 +226,7 @@ void main() {
     await tester.tap(find.byKey(const Key('editCard')));
     await settleLoading(tester);
     expect(find.byKey(const ValueKey('custom-card.name.en')), findsNothing, reason: 'nothing custom yet');
+    expect(find.byKey(const ValueKey('field-card.colors')), findsNothing, reason: 'no color letters on a Yu-Gi-Oh! card');
     await tester.enterText(find.byKey(const ValueKey('field-card.name.en')), 'Renamed card');
     await settleLoading(tester);
     expect(find.byKey(const ValueKey('custom-card.name.en')), findsOneWidget);

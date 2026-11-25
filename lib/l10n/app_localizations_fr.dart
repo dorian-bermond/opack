@@ -826,6 +826,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fieldEmpty => '(aucun)';
 
   @override
+  String get customOption => 'Personnalisé…';
+
+  @override
+  String customOptionTitle(String field) {
+    return 'Nouveau $field';
+  }
+
+  @override
   String noTextInLanguage(String wanted, String shown) {
     return 'Pas de texte en $wanted : celui en $shown est affiché.';
   }

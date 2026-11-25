@@ -1436,6 +1436,18 @@ abstract class AppLocalizations {
   /// **'(none)'**
   String get fieldEmpty;
 
+  /// No description provided for @customOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom…'**
+  String get customOption;
+
+  /// No description provided for @customOptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New {field}'**
+  String customOptionTitle(String field);
+
   /// No description provided for @noTextInLanguage.
   ///
   /// In en, this message translates to:

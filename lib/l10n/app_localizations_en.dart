@@ -823,6 +823,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldEmpty => '(none)';
 
   @override
+  String get customOption => 'Custom…';
+
+  @override
+  String customOptionTitle(String field) {
+    return 'New $field';
+  }
+
+  @override
   String noTextInLanguage(String wanted, String shown) {
     return 'No $wanted text: the $shown one is shown.';
   }
