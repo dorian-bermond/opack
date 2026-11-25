@@ -266,10 +266,7 @@ class _YgoTexts extends ConsumerWidget {
           if (!languages.contains(uiLang)) OtherLanguageNote(lang: languages.first, wanted: uiLang),
           TabBar(tabs: [
             for (final lang in languages)
-              Tab(
-                icon: lang == uiLang ? null : LanguageFlag(lang, size: 18),
-                text: _languageName(l10n, lang),
-              ),
+              Tab(text: _languageName(l10n, lang)),
           ]),
           Expanded(
             child: TabBarView(
