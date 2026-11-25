@@ -200,6 +200,26 @@ void main() {
     // Group the list by tag: the tagged card sits under its own header.
     await setGroupBy(tester, 'Tag');
     expect(find.text('mine · 1'), findsOneWidget, reason: 'the group header');
+    // Ctrl+A selects every card shown, Escape clears; Ctrl+F reaches the search bar.
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('100 selected'), findsOneWidget, reason: 'every card shown');
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('selected'), findsNothing);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyF);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(tester.binding.focusManager.primaryFocus?.context?.findAncestorWidgetOfExactType<EditableText>(), isNotNull,
+        reason: 'the search bar took the focus');
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+
     // A right-click on the header selects the group and opens its operations.
     await tester.tapAt(tester.getCenter(find.text('mine · 1')), buttons: kSecondaryButton);
     await tester.pumpAndSettle();

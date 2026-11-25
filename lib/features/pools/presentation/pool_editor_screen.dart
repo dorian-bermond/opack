@@ -143,6 +143,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// Whether the search panel is open beside (or over) the pool.
   bool _searchOpen = false;
 
+  /// The search bar's focus, for Ctrl+F.
+  final _searchFocus = FocusNode();
+
   /// The panel's share of the window, dragged by the user.
   double _panelShare = 0.4;
 
@@ -175,6 +178,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   @override
   void initState() {
     super.initState();
+    HardwareKeyboard.instance.addHandler(_handleKey);
     if (widget.taggingTag case final tag? when widget.pool.pool.tags.containsKey(tag)) {
       _startTagging(tag, (widget.pool.tagCards[tag] ?? const []).map((c) => c.id));
     }
@@ -317,9 +321,44 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
   @override
   void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handleKey);
     _scroll.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
+
+  /// The classic shortcuts, whatever holds the focus: Ctrl+A selects every
+  /// card shown, Ctrl+F goes to the search bar, Escape clears the
+  /// selection. A text field being typed in keeps Ctrl+A and Escape; a
+  /// page pushed over this one keeps every key.
+  bool _handleKey(KeyEvent event) {
+    if (event is! KeyDownEvent || !mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) return false;
+    final keys = HardwareKeyboard.instance;
+    final command = keys.isControlPressed || keys.isMetaPressed;
+    // The focused node is the text field's inner Focus: the field is above it.
+    final typing = FocusManager.instance.primaryFocus?.context?.findAncestorWidgetOfExactType<EditableText>() != null;
+    if (command && event.logicalKey == LogicalKeyboardKey.keyF) {
+      _searchFocus.requestFocus();
+      return true;
+    }
+    if (typing) return false;
+    if (command && event.logicalKey == LogicalKeyboardKey.keyA) {
+      _selectAllShown();
+      return true;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape && _selected.isNotEmpty) {
+      setState(_selected.clear);
+      return true;
+    }
+    return false;
+  }
+
+  /// Ctrl+A: every card shown.
+  void _selectAllShown() => setState(() => _selected
+    ..clear()
+    ..addAll(_shown.map((c) => c.id)));
+
+
 
   void _marqueeStart(bool additive) {
     _marqueeBase = additive ? {..._selected} : const {};
@@ -773,7 +812,13 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         ),
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        child: Text(l10n.cardsShown(items.length, allItems.length), style: theme.textTheme.labelMedium),
+        child: Text(
+          [
+            l10n.cardsShown(items.length, allItems.length),
+            if (_selected.isNotEmpty) l10n.selectedCount(_selected.length),
+          ].join(' · '),
+          style: theme.textTheme.labelMedium,
+        ),
       ),
       Padding(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
@@ -825,6 +870,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       Padding(
         padding: const EdgeInsets.all(12),
         child: SearchBar(
+          focusNode: _searchFocus,
           leading: const Icon(Icons.search),
           hintText: l10n.searchCards,
           onChanged: (value) => setState(() => _query = value),

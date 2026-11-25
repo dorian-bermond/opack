@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router.dart';
@@ -19,6 +20,7 @@ class OpackApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) => AppShortcuts(child: child!),
     );
   }
 
@@ -28,4 +30,49 @@ class OpackApp extends ConsumerWidget {
           brightness: brightness,
         ),
       );
+}
+
+/// The shortcuts that hold everywhere, whatever has the focus: Ctrl+,
+/// opens the settings, Alt+Left (or the browser-back key) goes back.
+/// Screens add their own with [CallbackShortcuts].
+class AppShortcuts extends StatefulWidget {
+  const AppShortcuts({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  State<AppShortcuts> createState() => _AppShortcutsState();
+}
+
+class _AppShortcutsState extends State<AppShortcuts> {
+  @override
+  void initState() {
+    super.initState();
+    HardwareKeyboard.instance.addHandler(_handle);
+  }
+
+  @override
+  void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handle);
+    super.dispose();
+  }
+
+  bool _handle(KeyEvent event) {
+    if (event is! KeyDownEvent) return false;
+    final keys = HardwareKeyboard.instance;
+    if (event.logicalKey == LogicalKeyboardKey.comma && (keys.isControlPressed || keys.isMetaPressed)) {
+      if (router.state.uri.path != '/settings') router.push('/settings');
+      return true;
+    }
+    final back = event.logicalKey == LogicalKeyboardKey.browserBack ||
+        (event.logicalKey == LogicalKeyboardKey.arrowLeft && keys.isAltPressed);
+    if (back && router.canPop()) {
+      router.pop();
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
