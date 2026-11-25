@@ -748,7 +748,13 @@ class PoolStacksSliver extends StatelessWidget {
               Card(
                 key: ValueKey('stackGroup-$label'),
                 margin: EdgeInsets.zero,
-                child: Padding(
+                // A right-click anywhere on the panel but a card (its header,
+                // its blank parts) selects the column and opens its operations.
+                child: GestureDetector(
+                  key: ValueKey('stackHeader-$label'),
+                  behavior: HitTestBehavior.opaque,
+                  onSecondaryTapUp: onHeaderMenu == null ? null : (d) => onHeaderMenu!(cards, d.globalPosition),
+                  child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -756,11 +762,7 @@ class PoolStacksSliver extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
-                        child: GestureDetector(
-                          key: ValueKey('stackHeader-$label'),
-                          onSecondaryTapUp: onHeaderMenu == null ? null : (d) => onHeaderMenu!(cards, d.globalPosition),
-                          child: Text('${header(label)} · ${cards.length}', style: theme.textTheme.titleSmall),
-                        ),
+                        child: Text('${header(label)} · ${cards.length}', style: theme.textTheme.titleSmall),
                       ),
                       Wrap(
                         spacing: 8,
@@ -787,6 +789,7 @@ class PoolStacksSliver extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
                 ),
               ),
           ],
