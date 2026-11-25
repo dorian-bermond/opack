@@ -896,6 +896,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               header: (label) => _groupBy == GroupBy.none
                   ? valueLabel(l10n, label)
                   : groupHeader(l10n, _groupBy, label, game: _pool.game),
+              onHeaderMenu: _groupMenu,
             )
           else if (view == PoolView.stacks)
             // Grouped twice: a foldable row of stacks per primary group,
@@ -906,6 +907,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                 title: '${groupHeader(l10n, _groupBy, label, game: _pool.game)} · ${group.length}',
                 theme: theme,
                 level: 0,
+                cards: group,
               ),
               if (!_collapsed.contains(label))
                 PoolStacksSliver(
@@ -914,6 +916,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   actions: actions,
                   labelOf: (item) => _groupBy2.labelsOf(item, language, quality: _groupQuality2),
                   header: (sub) => groupHeader(l10n, _groupBy2, sub, game: _pool.game),
+                  onHeaderMenu: _groupMenu,
                 ),
             ]
           else
@@ -924,6 +927,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   title: '${groupHeader(l10n, _groupBy, label, game: _pool.game)} · ${group.length}',
                   theme: theme,
                   level: 0,
+                  cards: group,
                 ),
               if (label == null || !_collapsed.contains(label))
                 if (_groupBy2 == GroupBy.none || label == null)
@@ -935,6 +939,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                       title: '${groupHeader(l10n, _groupBy2, sub!, game: _pool.game)} · ${subgroup.length}',
                       theme: theme,
                       level: 1,
+                      cards: subgroup,
                     ),
                     if (!_collapsed.contains('$label/$sub'))
                       _viewSliver(view, subgroup, actions, language, l10n),
@@ -1101,12 +1106,32 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   }
 
   /// A foldable section header; [level] 1 is a secondary group, indented.
-  Widget _groupHeader({required String key, required String title, required ThemeData theme, required int level}) =>
+  /// Selects every card of a group and opens the selection's operations
+  /// at [position]: a right-click on a group header.
+  void _groupMenu(List<CardWithInfo> cards, Offset position) {
+    if (cards.isEmpty) return;
+    setState(() => _selected
+      ..clear()
+      ..addAll(cards.map((c) => c.card.id)));
+    _selectionMenu(cards.first.card, position);
+  }
+
+  /// A group's header: tapped, it folds the group; right-clicked, it
+  /// selects the group's [cards] and opens their operations.
+  Widget _groupHeader({
+    required String key,
+    required String title,
+    required ThemeData theme,
+    required int level,
+    required List<CardWithInfo> cards,
+  }) =>
       SliverToBoxAdapter(
         child: InkWell(
+          key: ValueKey('groupHeader-$key'),
           onTap: () => setState(() {
             _collapsed.contains(key) ? _collapsed.remove(key) : _collapsed.add(key);
           }),
+          onSecondaryTapUp: (d) => _groupMenu(cards, d.globalPosition),
           child: Padding(
             padding: EdgeInsets.fromLTRB(16.0 + 24 * level, level == 0 ? 12 : 6, 16, 4),
             child: Row(

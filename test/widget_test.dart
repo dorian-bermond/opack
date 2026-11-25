@@ -200,6 +200,13 @@ void main() {
     // Group the list by tag: the tagged card sits under its own header.
     await setGroupBy(tester, 'Tag');
     expect(find.text('mine · 1'), findsOneWidget, reason: 'the group header');
+    // A right-click on the header selects the group and opens its operations.
+    await tester.tapAt(tester.getCenter(find.text('mine · 1')), buttons: kSecondaryButton);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('selectionTags')), findsOneWidget, reason: 'the selection menu');
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('selectionTags')), findsNothing);
     // Headers fold their section.
     expect(find.byIcon(Icons.expand_more), findsNothing);
     await tester.tap(find.text('mine · 1').last);

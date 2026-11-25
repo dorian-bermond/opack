@@ -702,7 +702,11 @@ class PoolStacksSliver extends StatelessWidget {
     required this.actions,
     required this.labelOf,
     required this.header,
+    this.onHeaderMenu,
   });
+
+  /// A right-click on a column's header, with the column's cards.
+  final void Function(List<CardWithInfo> cards, Offset position)? onHeaderMenu;
 
   final List<CardWithInfo> items;
   final PoolCardActions actions;
@@ -752,7 +756,11 @@ class PoolStacksSliver extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
-                        child: Text('${header(label)} · ${cards.length}', style: theme.textTheme.titleSmall),
+                        child: GestureDetector(
+                          key: ValueKey('stackHeader-$label'),
+                          onSecondaryTapUp: onHeaderMenu == null ? null : (d) => onHeaderMenu!(cards, d.globalPosition),
+                          child: Text('${header(label)} · ${cards.length}', style: theme.textTheme.titleSmall),
+                        ),
                       ),
                       Wrap(
                         spacing: 8,
