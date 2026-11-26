@@ -146,6 +146,15 @@ void main() {
     expect(find.text('Gallery'), findsOneWidget);
     expect(find.text('Cards from'), findsNothing, reason: 'sources live on the details page');
 
+    // Copies are set in a mode of their own, like the tierlist.
+    await tester.tap(find.byKey(const Key('copiesButton')));
+    await settleLoading(tester);
+    expect(find.text('Copies'), findsOneWidget);
+    expect(find.byType(CardTile), findsWidgets);
+    expect(find.textContaining('×'), findsWidgets, reason: 'every card badged with its copies here');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
     // The details page holds the sources, tags and copies.
     await tester.tap(find.byTooltip('Pool details'));
     await tester.pumpAndSettle();

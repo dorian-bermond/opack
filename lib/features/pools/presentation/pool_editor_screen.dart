@@ -570,11 +570,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         PopupMenuItem(enabled: false, height: 32, child: Text(l10n.selectedCount(cards.length))),
         const PopupMenuDivider(),
         PopupMenuItem(
-          key: const Key('selectionCopies'),
-          value: 'copies',
-          child: ListTile(leading: const Icon(Icons.filter_none), title: Text(l10n.selectionCopies)),
-        ),
-        PopupMenuItem(
           key: const Key('selectionTags'),
           value: 'tags',
           child: ListTile(leading: const Icon(Icons.label_outline), title: Text(l10n.selectionTags)),
@@ -600,17 +595,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
     );
     if (!mounted) return;
     switch (operation) {
-      case 'copies':
-        final listed = {for (final e in play.entries) e.card.id: e.listed};
-        final picked =
-            await pickCopies(context, _pool.copiesOf(cards.first.id, listed: listed[cards.first.id] ?? 1));
-        if (picked == null) return;
-        // Every card in one save, on the pool as it is now.
-        var config = _pool.config;
-        for (final c in cards) {
-          config = config.withCard(c.id, picked.copies, listed: listed[c.id] ?? 1);
-        }
-        _save(_pool.copyWith(config: config));
       case 'tags':
         await _editCardsTags(cards);
       case 'details':
@@ -761,6 +745,8 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       onTags: _editCardTags,
       selected: (card) => _selected.contains(card.id),
       selection: _selectionChanges,
+      // Copies are set in their own mode.
+      copiesEditable: false,
       onSelect: _toggleSelected,
       onMenu: _selectionMenu,
       tagsOf: (card) => [
@@ -895,6 +881,12 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         title: InkWell(onTap: _rename, child: Text(pool.name)),
         actions: [
           IconButton(
+            key: const Key('copiesButton'),
+            tooltip: l10n.poolCopies,
+            icon: const Icon(Icons.filter_none),
+            onPressed: () => context.push(poolModePath(pool.game, pool.id, 'copies')),
+          ),
+          IconButton(
             key: const Key('tierlistButton'),
             tooltip: l10n.tierlist,
             icon: const Icon(Icons.leaderboard_outlined),
@@ -922,12 +914,6 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
             icon: const Icon(Icons.info_outline),
             onPressed: () => context.push(poolModePath(pool.game, pool.id, 'details')),
           ),
-          if (config.overrides.isNotEmpty)
-            IconButton(
-              tooltip: l10n.resetCards,
-              icon: const Icon(Icons.restart_alt),
-              onPressed: () => _save(pool.copyWith(config: config.withoutOverrides())),
-            ),
         ],
       ),
       body: _withSearchPanel(

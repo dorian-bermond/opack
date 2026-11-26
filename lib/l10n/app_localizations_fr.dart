@@ -322,6 +322,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get poolCopies => 'Exemplaires';
 
   @override
+  String get copiesByCard => 'Carte par carte…';
+
+  @override
+  String get copiesHint => 'Touchez une carte pour fixer ses exemplaires.';
+
+  @override
   String get randomPacks => 'Boosters aléatoires';
 
   @override

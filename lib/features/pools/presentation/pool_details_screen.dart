@@ -216,7 +216,19 @@ class _PoolDetails extends ConsumerWidget {
           ),
           PoolSection(
             title: l10n.poolCopies,
-            child: PresetPicker(config: config, onChanged: (c) => savePool(ref, saved.copyWith(config: c))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PresetPicker(config: config, onChanged: (c) => savePool(ref, saved.copyWith(config: c))),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  key: const Key('copiesByCard'),
+                  icon: const Icon(Icons.filter_none),
+                  label: Text(l10n.copiesByCard),
+                  onPressed: () => context.push(poolModePath(saved.game, saved.id, 'copies')),
+                ),
+              ],
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),

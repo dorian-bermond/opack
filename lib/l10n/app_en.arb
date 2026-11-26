@@ -135,6 +135,8 @@
   "poolSources": "Cards from",
   "packLayout": "Pack layout",
   "poolCopies": "Copies",
+  "copiesByCard": "Card by card…",
+  "copiesHint": "Tap a card to set its copies.",
   "randomPacks": "Random packs",
   "cardsPerPack": "{count} cards per pack",
   "@cardsPerPack": {

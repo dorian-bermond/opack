@@ -100,6 +100,8 @@
   "poolSources": "Cartes de",
   "packLayout": "Composition des boosters",
   "poolCopies": "Exemplaires",
+  "copiesByCard": "Carte par carte…",
+  "copiesHint": "Touchez une carte pour fixer ses exemplaires.",
   "randomPacks": "Boosters aléatoires",
   "cardsPerPack": "{count} cartes par booster",
   "cardsUnplaced": "{count, plural, =1{1 carte ne correspond à aucun emplacement} other{{count} cartes ne correspondent à aucun emplacement}}",

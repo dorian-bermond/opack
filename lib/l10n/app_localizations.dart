@@ -614,6 +614,18 @@ abstract class AppLocalizations {
   /// **'Copies'**
   String get poolCopies;
 
+  /// No description provided for @copiesByCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Card by card…'**
+  String get copiesByCard;
+
+  /// No description provided for @copiesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a card to set its copies.'**
+  String get copiesHint;
+
   /// No description provided for @randomPacks.
   ///
   /// In en, this message translates to:

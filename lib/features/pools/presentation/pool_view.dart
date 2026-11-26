@@ -405,6 +405,8 @@ class PoolCardActions {
     this.onSelect,
     this.onMenu,
     this.selection,
+    this.showCopies = false,
+    this.copiesEditable = true,
   });
 
   final int? Function(CardData card) copiesOf;
@@ -438,6 +440,12 @@ class PoolCardActions {
   final bool Function(CardData card)? selected;
   final void Function(CardData card)? onSelect;
   final void Function(CardData card, Offset position)? onMenu;
+
+  /// Whether every card picture carries its copies badge, whatever the
+  /// setting (the copies mode), and whether rows offer to change the
+  /// copies (the editor leaves that to the copies mode).
+  final bool showCopies;
+  final bool copiesEditable;
 
   /// Fires when the selection changes, so the cards redraw on their own
   /// without the whole page being rebuilt (a rectangle sweeps fast).
@@ -693,7 +701,9 @@ class _PictureCard extends ConsumerWidget {
             ),
           ),
         if (actions.trailing == null &&
-            (badge == CopiesBadgeMode.always || (badge == CopiesBadgeMode.changed && actions.changed(card))))
+            (actions.showCopies ||
+                badge == CopiesBadgeMode.always ||
+                (badge == CopiesBadgeMode.changed && actions.changed(card))))
           Positioned(
             right: 8,
             bottom: 8,
@@ -950,10 +960,11 @@ class PoolSpoilerSliver extends ConsumerWidget {
               actions.trailing?.call(card) ??
                   Column(
                     children: [
-                      CopiesDropdown(
-                        value: actions.copiesOf(card),
-                        onChanged: (value) => actions.setCopies(card, value),
-                      ),
+                      if (actions.copiesEditable)
+                        CopiesDropdown(
+                          value: actions.copiesOf(card),
+                          onChanged: (value) => actions.setCopies(card, value),
+                        ),
                       IconButton(
                         tooltip: l10n.cardTags,
                         icon: const Icon(Icons.label_outline, size: 20),
@@ -1030,10 +1041,11 @@ class PoolListSliver extends ConsumerWidget {
                     icon: const Icon(Icons.label_outline, size: 20),
                     onPressed: () => actions.onTags(card),
                   ),
-                  CopiesDropdown(
-                    value: actions.copiesOf(card),
-                    onChanged: (value) => actions.setCopies(card, value),
-                  ),
+                  if (actions.copiesEditable)
+                    CopiesDropdown(
+                      value: actions.copiesOf(card),
+                      onChanged: (value) => actions.setCopies(card, value),
+                    ),
                 ],
               ),
           ),

@@ -320,6 +320,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get poolCopies => 'Copies';
 
   @override
+  String get copiesByCard => 'Card by card…';
+
+  @override
+  String get copiesHint => 'Tap a card to set its copies.';
+
+  @override
   String get randomPacks => 'Random packs';
 
   @override

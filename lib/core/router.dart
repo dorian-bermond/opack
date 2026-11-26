@@ -4,6 +4,7 @@ import '../features/catalog/domain/models.dart';
 import '../features/cube/presentation/cube_list.dart';
 import '../features/draft/presentation/draft_screen.dart';
 import '../features/packs/presentation/pack_opening_screen.dart';
+import '../features/pools/presentation/copies_screen.dart';
 import '../features/pools/presentation/pool_composition_screen.dart';
 import '../features/pools/presentation/pool_details_screen.dart';
 import '../features/pools/presentation/pool_editor_screen.dart';
@@ -83,6 +84,10 @@ final router = GoRouter(
             GoRoute(
               path: 'pool/:pool/details',
               builder: (context, state) => PoolDetailsScreen(poolId: _pool(state)),
+            ),
+            GoRoute(
+              path: 'pool/:pool/copies',
+              builder: (context, state) => CopiesScreen(poolId: _pool(state)),
             ),
             GoRoute(
               path: 'pool/:pool/composition',
