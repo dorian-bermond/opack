@@ -312,6 +312,10 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   /// The gallery's selected cards, by id.
   final Set<String> _selected = {};
 
+  /// Ticks when the selection changes: the cards and the count listen,
+  /// so a sweeping rectangle does not rebuild the page.
+  final _selectionChanges = ValueNotifier<int>(0);
+
   /// Scrolls the card list; the selection rectangle follows it.
   final _scroll = ScrollController();
 
@@ -322,6 +326,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
   @override
   void dispose() {
     HardwareKeyboard.instance.removeHandler(_handleKey);
+    _selectionChanges.dispose();
     _scroll.dispose();
     _searchFocus.dispose();
     super.dispose();
@@ -368,10 +373,13 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
 
   void _marqueeEnd() => ref.read(hoverPreviewSuppressedProvider.notifier).set(false);
 
-  void _marqueeHits(Set<String> ids) => setState(() => _selected
-    ..clear()
-    ..addAll(_marqueeBase)
-    ..addAll(ids));
+  void _marqueeHits(Set<String> ids) {
+    _selected
+      ..clear()
+      ..addAll(_marqueeBase)
+      ..addAll(ids);
+    _selectionChanges.value++;
+  }
 
   /// A click the rectangle took: on a card it selects it or not, as a tap
   /// does; on empty space it clears the selection.
@@ -752,6 +760,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
       draggable: _baskets,
       onTags: _editCardTags,
       selected: (card) => _selected.contains(card.id),
+      selection: _selectionChanges,
       onSelect: _toggleSelected,
       onMenu: _selectionMenu,
       tagsOf: (card) => [
@@ -812,12 +821,15 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         ),
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        child: Text(
-          [
-            l10n.cardsShown(items.length, allItems.length),
-            if (_selected.isNotEmpty) l10n.selectedCount(_selected.length),
-          ].join(' · '),
-          style: theme.textTheme.labelMedium,
+        child: ListenableBuilder(
+          listenable: _selectionChanges,
+          builder: (context, _) => Text(
+            [
+              l10n.cardsShown(items.length, allItems.length),
+              if (_selected.isNotEmpty) l10n.selectedCount(_selected.length),
+            ].join(' · '),
+            style: theme.textTheme.labelMedium,
+          ),
         ),
       ),
       Padding(

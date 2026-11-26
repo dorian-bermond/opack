@@ -404,6 +404,7 @@ class PoolCardActions {
     this.selected,
     this.onSelect,
     this.onMenu,
+    this.selection,
   });
 
   final int? Function(CardData card) copiesOf;
@@ -437,6 +438,10 @@ class PoolCardActions {
   final bool Function(CardData card)? selected;
   final void Function(CardData card)? onSelect;
   final void Function(CardData card, Offset position)? onMenu;
+
+  /// Fires when the selection changes, so the cards redraw on their own
+  /// without the whole page being rebuilt (a rectangle sweeps fast).
+  final Listenable? selection;
 
   /// Whether cards are being selected: a selection is wanted and bulk
   /// tagging does not keep the tap for itself.
@@ -539,6 +544,12 @@ class _CopiesBadge extends StatelessWidget {
   }
 }
 
+/// [build]'s widget, rebuilt on its own whenever the selection changes.
+Widget selectionAware(PoolCardActions actions, Widget Function() build) => switch (actions.selection) {
+      null => build(),
+      final selection => ListenableBuilder(listenable: selection, builder: (_, _) => build()),
+    };
+
 /// [row] as a card the editor's selection rectangle catches, with a
 /// right-click opening the operations on the selection; plain when cards
 /// are not being selected.
@@ -573,10 +584,12 @@ class _PictureCard extends ConsumerWidget {
     final selecting = selectable && actions.onTap == null;
     final onSelect = selecting ? actions.onSelect : null;
     final onMenu = selecting ? actions.onMenu : null;
-    final selected = selecting && (actions.selected?.call(card) ?? false);
-    final picture = _picture(context, tint: tint, onSelect: onSelect, onMenu: onMenu, selected: selected, badge: badge);
-    // A selectable card is caught by the editor's selection rectangle.
-    return onSelect == null ? picture : MarqueeTarget(id: card.id, child: picture);
+    return selectionAware(actions, () {
+      final selected = selecting && (actions.selected?.call(card) ?? false);
+      final picture = _picture(context, tint: tint, onSelect: onSelect, onMenu: onMenu, selected: selected, badge: badge);
+      // A selectable card is caught by the editor's selection rectangle.
+      return onSelect == null ? picture : MarqueeTarget(id: card.id, child: picture);
+    });
   }
 
   Widget _picture(
@@ -834,6 +847,7 @@ class PoolSpoilerSliver extends ConsumerWidget {
         };
         final tags = actions.tagsOf(card);
         final selecting = actions.selecting;
+        return selectionAware(actions, () {
         final selected = selecting && (actions.selected?.call(card) ?? false);
         return _selectable(
           card,
@@ -909,6 +923,7 @@ class PoolSpoilerSliver extends ConsumerWidget {
           ),
           ),
         );
+        });
       },
     );
   }
@@ -932,6 +947,7 @@ class PoolListSliver extends ConsumerWidget {
         final listedTimes = actions.listedOf(card);
         final tags = actions.tagsOf(card);
         final selecting = actions.selecting;
+        return selectionAware(actions, () {
         final selected = selecting && (actions.selected?.call(card) ?? false);
         return _selectable(
           card,
@@ -978,6 +994,7 @@ class PoolListSliver extends ConsumerWidget {
           ),
           ),
         );
+        });
       },
     );
   }

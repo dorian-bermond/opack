@@ -285,7 +285,8 @@ class _MarqueeSelectionState extends State<MarqueeSelection> {
           if (_drawing)
             Positioned.fill(
               child: IgnorePointer(
-                child: ClipRect(
+                child: RepaintBoundary(
+                  child: ClipRect(
                   child: CustomPaint(
                     key: const Key('marquee'),
                     painter: _MarqueePainter(
@@ -296,6 +297,7 @@ class _MarqueeSelectionState extends State<MarqueeSelection> {
                       color: color,
                     ),
                   ),
+                ),
                 ),
               ),
             ),
