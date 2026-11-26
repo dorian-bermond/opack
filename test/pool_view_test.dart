@@ -4,6 +4,7 @@ import 'package:opack/features/card_info/domain/card_filter.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_text/data/card_text_repository.dart';
 import 'package:opack/features/catalog/domain/models.dart';
+import 'package:opack/features/pools/domain/pool.dart';
 import 'package:opack/features/pools/presentation/pool_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -101,5 +102,28 @@ void main() {
     container.read(poolViewProvider.notifier).select(PoolView.stacks);
     expect(container.read(poolViewProvider), PoolView.stacks);
     expect(prefs.getString('poolView'), 'stacks');
+  });
+}
+
+void groupOrderTests() {
+  test('groups come in their own order, the cards without a value last', () {
+    const card = CardData(id: 'X', names: {'en': 'x'}, rarity: Rarity.common);
+    CardWithInfo level(int? level) => (
+          card: card,
+          info: YgoCardInfo(name: 'm', kind: YgoKind.monster, type: 'Effect Monster', frameType: 'effect', level: level),
+          tags: const <String>{},
+        );
+    final pool = Pool.empty(Game.ygo, name: 'p').withTag('mine', ['X']).withTag('power:high', ['X']);
+    final groups = [('8', [level(8)]), ('?', [level(null)]), ('6', [level(6)]), ('12', [level(12)])];
+    groups.sort((a, b) => compareGroups(GroupBy.level, pool, 'en', a: a, b: b));
+    expect(groups.map((g) => g.$1), ['12', '8', '6', '?'], reason: 'levels down, the unknown last');
+
+    final tags = [('', [level(1)]), ('power:high', [level(1)]), ('mine', [level(1)])];
+    tags.sort((a, b) => compareGroups(GroupBy.tag, pool, 'en', a: a, b: b));
+    expect(tags.map((g) => g.$1), ['mine', 'power:high', ''], reason: "the pool's order, no tag last");
+
+    final values = [(GroupBy.noValue, [level(1)]), ('power:high', [level(1)])];
+    values.sort((a, b) => compareGroups(GroupBy.quality, pool, 'en', quality: 'power', a: a, b: b));
+    expect(values.map((g) => g.$1), ['power:high', GroupBy.noValue]);
   });
 }

@@ -951,6 +951,9 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
               labelOf: (item) => _groupBy == GroupBy.none
                   ? [stackLabel(_sort, item, language, nameOf: nameOf)]
                   : _groupBy.labelsOf(item, language, quality: _groupQuality),
+              compare: (a, b) => _groupBy == GroupBy.none
+                  ? (a.$1 == '?' ? 1 : b.$1 == '?' ? -1 : _sort.compare(a.$2.first, b.$2.first, language, nameOf: nameOf))
+                  : compareGroups(_groupBy, _pool, language, quality: _groupQuality, a: a, b: b),
               header: (label) => _groupBy == GroupBy.none
                   ? valueLabel(l10n, label)
                   : groupHeader(l10n, _groupBy, label, game: _pool.game),
@@ -973,6 +976,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   items: group,
                   actions: actions,
                   labelOf: (item) => _groupBy2.labelsOf(item, language, quality: _groupQuality2),
+                  compare: (a, b) => compareGroups(_groupBy2, _pool, language, quality: _groupQuality2, a: a, b: b),
                   header: (sub) => groupHeader(l10n, _groupBy2, sub, game: _pool.game),
                   onHeaderMenu: _groupMenu,
                 ),
@@ -1160,7 +1164,10 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
         (groups[label] ??= []).add(item);
       }
     }
-    return [for (final MapEntry(:key, :value) in groups.entries) (key, value)];
+    // The groups in their own order; the cards inside keep the sort.
+    final ordered = [for (final MapEntry(:key, :value) in groups.entries) (key, value)];
+    ordered.sort((a, b) => compareGroups(group, _pool, language, quality: quality, a: a, b: b));
+    return [for (final (label, cards) in ordered) (label, cards)];
   }
 
   /// A foldable section header; [level] 1 is a secondary group, indented.

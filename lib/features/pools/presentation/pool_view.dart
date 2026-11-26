@@ -544,6 +544,45 @@ class _CopiesBadge extends StatelessWidget {
   }
 }
 
+/// Orders groups of cards the way their grouping reads: tags and quality
+/// values as the pool lists them (cards without one last), anything else
+/// by the grouping's own sort on a card of each (so levels run 12 down
+/// to 1 and names A to Z), the cards without a value last.
+int compareGroups(
+  GroupBy group,
+  Pool pool,
+  String language, {
+  String? quality,
+  required (String, List<CardWithInfo>) a,
+  required (String, List<CardWithInfo>) b,
+}) {
+  final (labelA, cardsA) = a;
+  final (labelB, cardsB) = b;
+  switch (group) {
+    case GroupBy.none:
+      return 0;
+    case GroupBy.tag:
+      int rank(String label) => label.isEmpty ? 1 << 20 : pool.plainTags.indexOf(label);
+      return rank(labelA).compareTo(rank(labelB));
+    case GroupBy.quality:
+      int rank(String label) {
+        if (label == GroupBy.noValue) return 1 << 20;
+        final q = Pool.qualityOf(label) ?? quality;
+        final values = q == null ? const <String>[] : pool.orderedValuesOf(q);
+        final at = values.indexOf(label);
+        return at < 0 ? 1 << 19 : at;
+      }
+      return rank(labelA).compareTo(rank(labelB));
+    default:
+      // A missing value ("?") goes last; the sort tells the rest.
+      final unknownA = labelA == '?';
+      final unknownB = labelB == '?';
+      if (unknownA != unknownB) return unknownA ? 1 : -1;
+      if (cardsA.isEmpty || cardsB.isEmpty) return 0;
+      return group.sort!.compare(cardsA.first, cardsB.first, language);
+  }
+}
+
 /// [build]'s widget, rebuilt on its own whenever the selection changes.
 Widget selectionAware(PoolCardActions actions, Widget Function() build) => switch (actions.selection) {
       null => build(),
@@ -716,7 +755,11 @@ class PoolStacksSliver extends StatelessWidget {
     required this.labelOf,
     required this.header,
     this.onHeaderMenu,
+    this.compare,
   });
+
+  /// How the columns are ordered; as they come without.
+  final int Function((String, List<CardWithInfo>) a, (String, List<CardWithInfo>) b)? compare;
 
   /// A right-click on a column's header, with the column's cards.
   final void Function(List<CardWithInfo> cards, Offset position)? onHeaderMenu;
@@ -747,6 +790,8 @@ class PoolStacksSliver extends StatelessWidget {
         (columns[label] ??= []).add(item);
       }
     }
+    final ordered = [for (final MapEntry(:key, :value) in columns.entries) (key, value)];
+    if (compare case final compare?) ordered.sort(compare);
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -757,7 +802,7 @@ class PoolStacksSliver extends StatelessWidget {
           children: [
             // One panel per group, its header once, its stacks side by
             // side inside and wrapping when the group is large.
-            for (final MapEntry(key: label, value: cards) in columns.entries)
+            for (final (label, cards) in ordered)
               Card(
                 key: ValueKey('stackGroup-$label'),
                 margin: EdgeInsets.zero,

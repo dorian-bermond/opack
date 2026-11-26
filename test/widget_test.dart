@@ -74,6 +74,11 @@ Future<ProviderContainer> startApp(WidgetTester tester, {Locale? locale, CardSea
 /// Picks [label] in the View dialog's group-by (or then-by) dropdown, and
 /// closes the dialog unless told otherwise (a question may follow).
 Future<void> setGroupBy(WidgetTester tester, String label, {bool thenBy = false, bool close = true}) async {
+  // The View chip sits in the header, which a long list may have scrolled away.
+  if (find.byType(CustomScrollView).evaluate().isNotEmpty) {
+    await tester.drag(find.byType(CustomScrollView).first, const Offset(0, 5000));
+    await tester.pumpAndSettle();
+  }
   await tester.tap(find.byKey(const Key('viewChip')));
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(Key(thenBy ? 'thenBy' : 'groupBy')));
@@ -199,7 +204,14 @@ void main() {
     await tester.pumpAndSettle();
     // Group the list by tag: the tagged card sits under its own header.
     await setGroupBy(tester, 'Tag');
+    // Groups follow the pool's tag order: the big common group comes first.
+    await tester.scrollUntilVisible(find.text('mine · 1'), 400,
+        scrollable: find.descendant(of: find.byType(CustomScrollView), matching: find.byType(Scrollable)).first);
+    await tester.pumpAndSettle();
     expect(find.text('mine · 1'), findsOneWidget, reason: 'the group header');
+    // Back to the top: the count line sits in the scrolled-away header.
+    await tester.drag(find.byType(CustomScrollView).first, const Offset(0, 5000));
+    await tester.pumpAndSettle();
     // Ctrl+A selects every card shown, Escape clears; Ctrl+F reaches the search bar.
     tester.binding.focusManager.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
@@ -238,6 +250,9 @@ void main() {
     await tester.pumpAndSettle();
 
     // A right-click on the header selects the group and opens its operations.
+    await tester.scrollUntilVisible(find.text('mine · 1'), 400,
+        scrollable: find.descendant(of: find.byType(CustomScrollView), matching: find.byType(Scrollable)).first);
+    await tester.pumpAndSettle();
     await tester.tapAt(tester.getCenter(find.text('mine · 1')), buttons: kSecondaryButton);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('selectionTags')), findsOneWidget, reason: 'the selection menu');
@@ -254,7 +269,10 @@ void main() {
     expect(find.byIcon(Icons.expand_more), findsNothing);
     // A secondary grouping nests rarity sections under each tag.
     await setGroupBy(tester, 'Rarity', thenBy: true);
-    expect(find.text('Secret rare · 1'), findsOneWidget, reason: 'the rarity section inside the mine group');
+    await tester.scrollUntilVisible(find.text('mine · 1'), 400,
+        scrollable: find.descendant(of: find.byType(CustomScrollView), matching: find.byType(Scrollable)).first);
+    await tester.pumpAndSettle();
+    expect(find.text('Secret rare · 1'), findsWidgets, reason: 'the rarity section inside the mine group');
     await setGroupBy(tester, 'No grouping');
 
     // A layout tag is editable too: drop one card from the commons.
