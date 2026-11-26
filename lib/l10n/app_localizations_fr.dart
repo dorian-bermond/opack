@@ -52,6 +52,102 @@ class AppLocalizationsFr extends AppLocalizations {
   String get modeDraft => 'Draft';
 
   @override
+  String get playTogether => 'Jouer ensemble';
+
+  @override
+  String get joinRoom => 'Rejoindre une partie';
+
+  @override
+  String get joinAgain => 'Réessayer';
+
+  @override
+  String get joinRoomHint =>
+      'Quelqu\'un sur le même Wi-Fi héberge la partie depuis un pool et vous donne une adresse et un code.';
+
+  @override
+  String get hostRoomHint =>
+      'Les autres sur le même Wi-Fi rejoignent avec l\'adresse et le code affichés ensuite ; vous jouez aussi depuis cet appareil.';
+
+  @override
+  String get roomOpenHint =>
+      'Donnez l\'adresse et le code aux joueurs. Lancez une fois tout le monde là ; les sièges restants sont tenus par des bots en draft.';
+
+  @override
+  String get yourName => 'Votre nom';
+
+  @override
+  String get roomAddress => 'Adresse';
+
+  @override
+  String get roomCode => 'Code de la partie';
+
+  @override
+  String get noAddress =>
+      'Aucune adresse réseau trouvée : le Wi-Fi est-il allumé ?';
+
+  @override
+  String get copy => 'Copier';
+
+  @override
+  String get players => 'Joueurs';
+
+  @override
+  String get you => 'vous';
+
+  @override
+  String get bot => 'bot';
+
+  @override
+  String get disconnected => 'déconnecté';
+
+  @override
+  String get seats => 'Joueurs';
+
+  @override
+  String seatsCount(int count) {
+    return '$count sièges';
+  }
+
+  @override
+  String get seatsHint =>
+      'Les sièges que personne ne prend sont joués par des bots.';
+
+  @override
+  String get openRoom => 'Ouvrir la partie';
+
+  @override
+  String get startGame => 'Lancer';
+
+  @override
+  String get leaveRoom => 'Quitter';
+
+  @override
+  String get waitingForHost => 'En attente du lancement par l\'hôte…';
+
+  @override
+  String waitingFor(String names) {
+    return 'En attente de $names';
+  }
+
+  @override
+  String get roomClosed => 'La partie est fermée.';
+
+  @override
+  String get roomTooSmall =>
+      'Le pool ne peut pas fournir assez de boosters pour autant de joueurs.';
+
+  @override
+  String connectionFailed(String error) {
+    return 'Impossible de rejoindre : $error';
+  }
+
+  @override
+  String get wrongRoomCode => 'mauvais code';
+
+  @override
+  String get roomStarted => 'la partie a déjà commencé';
+
+  @override
   String get tapToOpen =>
       'Touchez le booster, ou déchirez-le d\'un trait, pour l\'ouvrir';
 
@@ -1415,9 +1511,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get burnPerPass => 'Cartes brûlées par passage';
-
-  @override
-  String get seats => 'Joueurs';
 
   @override
   String get boosterKind => 'Booster';

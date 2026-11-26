@@ -20,6 +20,12 @@ class PoolsScreen extends StatelessWidget {
         title: Text(l10n.appTitle),
         actions: [
           IconButton(
+            key: const Key('joinRoomButton'),
+            tooltip: l10n.joinRoom,
+            icon: const Icon(Icons.login),
+            onPressed: () => context.go(joinPath),
+          ),
+          IconButton(
             tooltip: l10n.tabCubes,
             icon: const Icon(Icons.view_module),
             onPressed: () => context.go(cubesPath),

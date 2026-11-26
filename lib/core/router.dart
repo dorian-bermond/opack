@@ -4,6 +4,8 @@ import '../features/catalog/domain/models.dart';
 import '../features/cube/presentation/cube_list.dart';
 import '../features/draft/presentation/draft_screen.dart';
 import '../features/packs/presentation/pack_opening_screen.dart';
+import '../features/multiplayer/presentation/join_screen.dart';
+import '../features/multiplayer/presentation/room_screen.dart';
 import '../features/pools/presentation/copies_screen.dart';
 import '../features/pools/presentation/pool_composition_screen.dart';
 import '../features/pools/presentation/pool_details_screen.dart';
@@ -28,6 +30,9 @@ const settingsPath = '/settings';
 String poolModePath(Game game, String poolId, String mode) =>
     '/game/${game.name}/pool/${Uri.encodeComponent(poolId)}/$mode';
 
+/// Joining a room others host on the local network.
+const joinPath = '/join';
+
 final router = GoRouter(
   routes: [
     GoRoute(
@@ -41,6 +46,10 @@ final router = GoRouter(
         GoRoute(
           path: 'settings',
           builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: 'join',
+          builder: (context, state) => const JoinScreen(),
         ),
         GoRoute(
           path: 'game/:game',
@@ -84,6 +93,10 @@ final router = GoRouter(
             GoRoute(
               path: 'pool/:pool/details',
               builder: (context, state) => PoolDetailsScreen(poolId: _pool(state)),
+            ),
+            GoRoute(
+              path: 'pool/:pool/room',
+              builder: (context, state) => RoomScreen(poolId: _pool(state)),
             ),
             GoRoute(
               path: 'pool/:pool/copies',

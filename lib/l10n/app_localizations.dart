@@ -182,6 +182,174 @@ abstract class AppLocalizations {
   /// **'Draft'**
   String get modeDraft;
 
+  /// No description provided for @playTogether.
+  ///
+  /// In en, this message translates to:
+  /// **'Play together'**
+  String get playTogether;
+
+  /// No description provided for @joinRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a room'**
+  String get joinRoom;
+
+  /// No description provided for @joinAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get joinAgain;
+
+  /// No description provided for @joinRoomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone on the same Wi-Fi hosts the game from a pool and gives you an address and a code.'**
+  String get joinRoomHint;
+
+  /// No description provided for @hostRoomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Others on the same Wi-Fi join with the address and the code shown next; you play from this device too.'**
+  String get hostRoomHint;
+
+  /// No description provided for @roomOpenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the players the address and the code. Start once everyone is in; the seats left are bots in a draft.'**
+  String get roomOpenHint;
+
+  /// No description provided for @yourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get yourName;
+
+  /// No description provided for @roomAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get roomAddress;
+
+  /// No description provided for @roomCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Room code'**
+  String get roomCode;
+
+  /// No description provided for @noAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'No network address found: is Wi-Fi on?'**
+  String get noAddress;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @players.
+  ///
+  /// In en, this message translates to:
+  /// **'Players'**
+  String get players;
+
+  /// No description provided for @you.
+  ///
+  /// In en, this message translates to:
+  /// **'you'**
+  String get you;
+
+  /// No description provided for @bot.
+  ///
+  /// In en, this message translates to:
+  /// **'bot'**
+  String get bot;
+
+  /// No description provided for @disconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'disconnected'**
+  String get disconnected;
+
+  /// No description provided for @seats.
+  ///
+  /// In en, this message translates to:
+  /// **'Players'**
+  String get seats;
+
+  /// No description provided for @seatsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} seats'**
+  String seatsCount(int count);
+
+  /// No description provided for @seatsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Seats no one takes are played by bots.'**
+  String get seatsHint;
+
+  /// No description provided for @openRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the room'**
+  String get openRoom;
+
+  /// No description provided for @startGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get startGame;
+
+  /// No description provided for @leaveRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get leaveRoom;
+
+  /// No description provided for @waitingForHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the host to start…'**
+  String get waitingForHost;
+
+  /// No description provided for @waitingFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {names}'**
+  String waitingFor(String names);
+
+  /// No description provided for @roomClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'The room closed.'**
+  String get roomClosed;
+
+  /// No description provided for @roomTooSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'The pool cannot deal enough packs for this many players.'**
+  String get roomTooSmall;
+
+  /// No description provided for @connectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not join: {error}'**
+  String connectionFailed(String error);
+
+  /// No description provided for @wrongRoomCode.
+  ///
+  /// In en, this message translates to:
+  /// **'wrong room code'**
+  String get wrongRoomCode;
+
+  /// No description provided for @roomStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'the game already started'**
+  String get roomStarted;
+
   /// No description provided for @tapToOpen.
   ///
   /// In en, this message translates to:
@@ -2455,12 +2623,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Burn per pass'**
   String get burnPerPass;
-
-  /// No description provided for @seats.
-  ///
-  /// In en, this message translates to:
-  /// **'Players'**
-  String get seats;
 
   /// No description provided for @boosterKind.
   ///

@@ -229,6 +229,12 @@ class _PoolTile extends ConsumerWidget {
                     label: Text(label),
                     onPressed: pool.sources.isEmpty ? null : () => _play(context, pool, kind),
                   ),
+                FilledButton.tonalIcon(
+                  key: ValueKey('playTogether-${pool.id}'),
+                  icon: const Icon(Icons.wifi_tethering),
+                  label: Text(l10n.playTogether),
+                  onPressed: pool.sources.isEmpty ? null : () => context.go(poolModePath(pool.game, pool.id, 'room')),
+                ),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.info_outline),
                   label: Text(l10n.poolDetails),

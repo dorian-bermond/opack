@@ -7,7 +7,6 @@ import '../../catalog/domain/models.dart';
 import '../../packs/domain/pack_source.dart';
 import '../../packs/presentation/opening_mode.dart';
 import '../../packs/presentation/pack_stack.dart';
-import '../../pools/domain/play_pool.dart';
 import '../../pools/domain/pool.dart';
 import '../../pools/presentation/pool_widgets.dart';
 import '../../pools/presentation/pool_loader.dart';
@@ -25,12 +24,21 @@ class SealedScreen extends StatelessWidget {
   Widget build(BuildContext context) => PoolLoader(
         poolId: poolId,
         builder: (context, pool) {
+          final l10n = AppLocalizations.of(context);
           final formats = pool.pool.playFormats.where((f) => f.kind == FormatKind.sealed);
           final format = formats.where((f) => f.id == formatId).firstOrNull ?? formats.firstOrNull;
           if (format == null || !pool.canPlay(format)) {
             return PoolTooSmall(pool: pool, neededPacks: format?.rounds.length ?? game.sealedPackCount);
           }
-          return SealedView(pool: pool, format: format);
+          final sources = <String, PackSource>{};
+          return SealedView(
+            title: l10n.sealedPool,
+            subtitle: [pool.name, pool.config.label(AppLocalizations.of(context)), l10n.packsCount(format.rounds.length)].join(' · '),
+            deal: () => [
+              for (final round in format.rounds)
+                (sources[round.booster] ??= pool.boosterPlay(round.booster)!.newSource()).nextPack(),
+            ],
+          );
         },
       );
 }
@@ -61,38 +69,38 @@ List<SealedCard> sealedOrder(List<List<CardData>> packs, SealedOrder order) {
   }
 }
 
-/// Opens the packs of [format] from a fresh deal of [pool] the way a loose
-/// pack is opened (a grid of face-down cards, or a stack swiped card by
-/// card), in the order the user picks.
+/// Opens the packs [deal] gives (a fresh deal of a pool, or the packs a
+/// host sent) the way a loose pack is opened (a grid of face-down cards,
+/// or a stack swiped card by card), in the order the user picks.
 class SealedView extends ConsumerStatefulWidget {
-  const SealedView({super.key, required this.pool, required this.format});
+  const SealedView({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.deal,
+    this.canRedeal = true,
+  });
 
-  final PlayPool pool;
-  final PlayFormat format;
+  final String title;
+  final String subtitle;
+  final List<List<CardData>> Function() deal;
 
-  int get packCount => format.rounds.length;
+  /// Whether "deal again" makes sense: not with packs dealt elsewhere.
+  final bool canRedeal;
 
   @override
   ConsumerState<SealedView> createState() => _SealedViewState();
 }
 
 class _SealedViewState extends ConsumerState<SealedView> {
-  late List<List<CardData>> _packs = _deal();
+  late List<List<CardData>> _packs = widget.deal();
 
   /// Cards turned face up, as (pack, slot), so a change of order keeps them.
   final Set<(int, int)> _revealed = {};
   int _deals = 0;
 
-  List<List<CardData>> _deal() {
-    final sources = <String, PackSource>{};
-    return [
-      for (final round in widget.format.rounds)
-        (sources[round.booster] ??= widget.pool.boosterPlay(round.booster)!.newSource()).nextPack(),
-    ];
-  }
-
   void _dealAgain() => setState(() {
-        _packs = _deal();
+        _packs = widget.deal();
         _revealed.clear();
         _deals++;
       });
@@ -100,24 +108,18 @@ class _SealedViewState extends ConsumerState<SealedView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final pool = widget.pool;
     final order = ref.watch(sealedOrderProvider);
     final swipe = ref.watch(openingModeProvider) == OpeningMode.swipe;
     final cards = sealedOrder(_packs, order);
     final total = cards.length;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.sealedPool),
+        title: Text(widget.title),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(24),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text([
-              pool.name,
-              pool.config.label(l10n),
-              l10n.packsCount(widget.packCount),
-              l10n.cardsCount(total),
-            ].join(' · ')),
+            child: Text('${widget.subtitle} · ${l10n.cardsCount(total)}'),
           ),
         ),
         actions: [
@@ -132,11 +134,12 @@ class _SealedViewState extends ConsumerState<SealedView> {
                 PopupMenuItem(value: o, child: Text(o.label(l10n))),
             ],
           ),
-          IconButton(
-            tooltip: l10n.dealAgain,
-            icon: const Icon(Icons.refresh),
-            onPressed: _dealAgain,
-          ),
+          if (widget.canRedeal)
+            IconButton(
+              tooltip: l10n.dealAgain,
+              icon: const Icon(Icons.refresh),
+              onPressed: _dealAgain,
+            ),
         ],
       ),
       body: swipe

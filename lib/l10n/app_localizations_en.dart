@@ -52,6 +52,100 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modeDraft => 'Draft';
 
   @override
+  String get playTogether => 'Play together';
+
+  @override
+  String get joinRoom => 'Join a room';
+
+  @override
+  String get joinAgain => 'Try again';
+
+  @override
+  String get joinRoomHint =>
+      'Someone on the same Wi-Fi hosts the game from a pool and gives you an address and a code.';
+
+  @override
+  String get hostRoomHint =>
+      'Others on the same Wi-Fi join with the address and the code shown next; you play from this device too.';
+
+  @override
+  String get roomOpenHint =>
+      'Give the players the address and the code. Start once everyone is in; the seats left are bots in a draft.';
+
+  @override
+  String get yourName => 'Your name';
+
+  @override
+  String get roomAddress => 'Address';
+
+  @override
+  String get roomCode => 'Room code';
+
+  @override
+  String get noAddress => 'No network address found: is Wi-Fi on?';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get players => 'Players';
+
+  @override
+  String get you => 'you';
+
+  @override
+  String get bot => 'bot';
+
+  @override
+  String get disconnected => 'disconnected';
+
+  @override
+  String get seats => 'Players';
+
+  @override
+  String seatsCount(int count) {
+    return '$count seats';
+  }
+
+  @override
+  String get seatsHint => 'Seats no one takes are played by bots.';
+
+  @override
+  String get openRoom => 'Open the room';
+
+  @override
+  String get startGame => 'Start';
+
+  @override
+  String get leaveRoom => 'Leave';
+
+  @override
+  String get waitingForHost => 'Waiting for the host to start…';
+
+  @override
+  String waitingFor(String names) {
+    return 'Waiting for $names';
+  }
+
+  @override
+  String get roomClosed => 'The room closed.';
+
+  @override
+  String get roomTooSmall =>
+      'The pool cannot deal enough packs for this many players.';
+
+  @override
+  String connectionFailed(String error) {
+    return 'Could not join: $error';
+  }
+
+  @override
+  String get wrongRoomCode => 'wrong room code';
+
+  @override
+  String get roomStarted => 'the game already started';
+
+  @override
   String get tapToOpen => 'Tap the pack, or slash across it, to open it';
 
   @override
@@ -1409,9 +1503,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get burnPerPass => 'Burn per pass';
-
-  @override
-  String get seats => 'Players';
 
   @override
   String get boosterKind => 'Booster';
