@@ -203,7 +203,7 @@ abstract class AppLocalizations {
   /// No description provided for @joinRoomHint.
   ///
   /// In en, this message translates to:
-  /// **'Someone on the same Wi-Fi hosts the game from a pool and gives you an address and a code.'**
+  /// **'Someone hosts the game from a pool and gives you an address and a code: on the same Wi-Fi, or from anywhere with Tailscale.'**
   String get joinRoomHint;
 
   /// No description provided for @hostRoomHint.
@@ -229,6 +229,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Address'**
   String get roomAddress;
+
+  /// No description provided for @addressLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Same Wi-Fi or hotspot'**
+  String get addressLocal;
+
+  /// No description provided for @addressTailscale.
+  ///
+  /// In en, this message translates to:
+  /// **'Tailscale: works from anywhere'**
+  String get addressTailscale;
 
   /// No description provided for @roomCode.
   ///

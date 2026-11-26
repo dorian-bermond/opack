@@ -62,7 +62,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joinRoomHint =>
-      'Someone on the same Wi-Fi hosts the game from a pool and gives you an address and a code.';
+      'Someone hosts the game from a pool and gives you an address and a code: on the same Wi-Fi, or from anywhere with Tailscale.';
 
   @override
   String get hostRoomHint =>
@@ -77,6 +77,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roomAddress => 'Address';
+
+  @override
+  String get addressLocal => 'Same Wi-Fi or hotspot';
+
+  @override
+  String get addressTailscale => 'Tailscale: works from anywhere';
 
   @override
   String get roomCode => 'Room code';

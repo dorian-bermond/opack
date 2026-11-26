@@ -134,3 +134,13 @@ void main() {
     await client.close();
   });
 }
+
+void addressTests() {
+  test('a Tailscale address is told from a local one', () {
+    expect(isTailscaleAddress('100.101.102.103:5000'), isTrue);
+    expect(isTailscaleAddress('100.64.0.1:1'), isTrue);
+    expect(isTailscaleAddress('100.128.0.1:1'), isFalse, reason: 'past the range');
+    expect(isTailscaleAddress('192.168.1.10:51234'), isFalse);
+    expect(isTailscaleAddress('bad'), isFalse);
+  });
+}

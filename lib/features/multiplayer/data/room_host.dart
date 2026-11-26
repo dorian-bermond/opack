@@ -12,6 +12,17 @@ import '../../pools/domain/pool.dart';
 import '../domain/multi_draft.dart';
 import '../domain/protocol.dart';
 
+/// Whether an IPv4 address is Tailscale's (the 100.64.0.0/10 range it
+/// hands out): one that works across the internet, not only on the
+/// local network.
+bool isTailscaleAddress(String address) {
+  final parts = address.split(':').first.split('.');
+  if (parts.length != 4) return false;
+  final first = int.tryParse(parts[0]);
+  final second = int.tryParse(parts[1]);
+  return first == 100 && second != null && second >= 64 && second <= 127;
+}
+
 /// Where a room stands.
 enum RoomPhase { lobby, sealed, draft }
 

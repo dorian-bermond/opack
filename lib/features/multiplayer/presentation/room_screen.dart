@@ -203,6 +203,7 @@ class _RoomState extends ConsumerState<_Room> {
               key: ValueKey('address-$address'),
               dense: true,
               title: SelectableText(address, style: theme.textTheme.titleMedium),
+              subtitle: Text(isTailscaleAddress(address) ? l10n.addressTailscale : l10n.addressLocal),
               trailing: IconButton(
                 tooltip: l10n.copy,
                 icon: const Icon(Icons.copy),
