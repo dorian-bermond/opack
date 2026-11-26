@@ -232,32 +232,45 @@ class CardTile extends ConsumerWidget {
                     : Padding(
                         key: const ValueKey('front'),
                         padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              name,
-                              style: theme.textTheme.titleSmall,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const Spacer(),
-                            if (card.foil)
-                              Row(
-                                children: [
-                                  Icon(Icons.auto_awesome,
-                                      size: 14, color: theme.colorScheme.tertiary),
-                                  const SizedBox(width: 4),
-                                  Text(l10n.foil, style: theme.textTheme.labelSmall),
-                                ],
-                              ),
-                            Text(
-                              card.rarity.label(l10n),
-                              style: theme.textTheme.labelSmall
-                                  ?.copyWith(color: markerColor),
-                            ),
-                            Text(card.id, style: theme.textTheme.labelSmall),
-                          ],
+                        // A small tile has room for the name alone; a larger one
+                        // adds the rarity and the code at the bottom.
+                        child: LayoutBuilder(
+                          builder: (context, constraints) => constraints.maxHeight < 110 || constraints.maxWidth < 70
+                              ? Text(
+                                  name,
+                                  style: theme.textTheme.labelSmall,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        name,
+                                        style: theme.textTheme.titleSmall,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    if (card.foil)
+                                      Row(
+                                        children: [
+                                          Icon(Icons.auto_awesome, size: 14, color: theme.colorScheme.tertiary),
+                                          const SizedBox(width: 4),
+                                          Text(l10n.foil, style: theme.textTheme.labelSmall),
+                                        ],
+                                      ),
+                                    Text(
+                                      card.rarity.label(l10n),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.labelSmall?.copyWith(color: markerColor),
+                                    ),
+                                    Text(card.id, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelSmall),
+                                  ],
+                                ),
                         ),
                       ),
           ),

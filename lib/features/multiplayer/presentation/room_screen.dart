@@ -128,18 +128,20 @@ class _RoomState extends ConsumerState<_Room> {
             decoration: InputDecoration(labelText: l10n.yourName, border: const OutlineInputBorder()),
           ),
           const SizedBox(height: 12),
-          DropdownButtonFormField<PlayFormat>(
+          // Formats are compared by id: the pool builds its defaults anew each time.
+          DropdownButtonFormField<String>(
             key: const Key('hostFormat'),
-            initialValue: _format,
+            initialValue: _format?.id,
             decoration: InputDecoration(labelText: l10n.formats, border: const OutlineInputBorder()),
             items: [
               for (final f in formats)
                 DropdownMenuItem(
-                  value: f,
+                  value: f.id,
                   child: Text('${f.name} · ${f.kind == FormatKind.sealed ? l10n.modeSealed : l10n.modeDraft}'),
                 ),
             ],
-            onChanged: (f) => setState(() {
+            onChanged: (id) => setState(() {
+              final f = formats.where((f) => f.id == id).firstOrNull;
               _format = f;
               if (f != null) _seats = play.seatsForFormat(f).clamp(people, 8);
             }),
