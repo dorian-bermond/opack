@@ -145,11 +145,20 @@ class _MarqueeSelectionState extends State<MarqueeSelection> {
   /// them only at the next frame.
   double _laidOut = 0;
 
+  /// Whether the targets' places must be measured again: at the start,
+  /// after a scroll laid them out anew, or when targets came or went.
+  bool _rectsDirty = true;
+  int _measuredTargets = -1;
+
+  /// The ids caught last, so the owner only hears of a change.
+  Set<String> _lastHits = const {};
+
   void _scrolled() {
     if (_start == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _start == null) return;
       _laidOut = _offset;
+      _rectsDirty = true;
       if (_drawing) _update();
     });
   }
@@ -164,6 +173,8 @@ class _MarqueeSelectionState extends State<MarqueeSelection> {
     _drawing = false;
     _laidOut = _offset;
     _seen.clear();
+    _rectsDirty = true;
+    _lastHits = const {};
   }
 
   void _move(DragUpdateDetails details) {
@@ -183,18 +194,31 @@ class _MarqueeSelectionState extends State<MarqueeSelection> {
   /// The rectangle in the content.
   Rect get _rect => Rect.fromPoints(_start!, _pointer + Offset(0, _offset));
 
+  /// Measures what moved, tells the owner when the catch changed, and
+  /// repaints the rectangle. Measuring every target walks the render tree
+  /// for each, so it waits for a layout change rather than a pointer move;
+  /// the owner's rebuild is the costly part, so it only comes with a
+  /// different catch.
   void _update() {
-    final shift = Offset(0, _laidOut);
-    for (final target in _targets) {
-      if (target._rect case final rect?) _seen[target] = (target.widget.id, rect.shift(shift));
+    if (_rectsDirty || _targets.length != _measuredTargets) {
+      final shift = Offset(0, _laidOut);
+      for (final target in _targets) {
+        if (target._rect case final rect?) _seen[target] = (target.widget.id, rect.shift(shift));
+      }
+      final box = context.findRenderObject();
+      if (box is RenderBox && box.attached) _origin = box.localToGlobal(Offset.zero);
+      _rectsDirty = false;
+      _measuredTargets = _targets.length;
     }
-    final box = context.findRenderObject();
-    if (box is RenderBox && box.attached) _origin = box.localToGlobal(Offset.zero);
     final rect = _rect;
-    widget.onHits({
+    final hits = {
       for (final (id, where) in _seen.values)
         if (where.overlaps(rect)) id,
-    });
+    };
+    if (hits.length != _lastHits.length || !hits.containsAll(_lastHits)) {
+      _lastHits = hits;
+      widget.onHits(hits);
+    }
     setState(() {});
   }
 
