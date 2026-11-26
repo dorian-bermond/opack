@@ -1710,4 +1710,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String updateInstallFailed(String error) {
     return 'La mise à jour n\'a pas pu être installée : $error. Vous pouvez la télécharger et remplacer l\'application à la main.';
   }
+
+  @override
+  String get generatedCardsSetting => 'Dessiner les cartes Yu-Gi-Oh! modifiées';
+
+  @override
+  String get generatedCardsHint =>
+      'Une carte dont les champs ont été modifiés pour un pool est dessinée d\'après ses détails au lieu de son scan.';
+
+  @override
+  String get editOnCardHint =>
+      'Cliquez sur une partie de la carte pour la modifier.';
+
+  @override
+  String get exportCardList => 'Exporter en liste de cartes';
+
+  @override
+  String get exportCardListHint =>
+      'Enregistre les cartes en texte simple, une par ligne avec ses exemplaires (« 3 Nom »), pour un outil de deck ou l\'import par lot. Les étiquettes, boosters et formats n\'y sont pas.';
+
+  @override
+  String get exportCardListDone => 'Liste de cartes exportée';
+
+  @override
+  String get pickTribe => 'Changer le type du monstre';
+
+  @override
+  String get fieldTribe => 'Tribu';
+
+  @override
+  String get fieldSpellKind => 'Genre';
 }

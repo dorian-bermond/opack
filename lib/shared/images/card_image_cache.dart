@@ -68,6 +68,15 @@ ImageSource? cardImageSource(CardData card, {String language = 'en'}) {
   return null;
 }
 
+/// The artwork alone of a Yu-Gi-Oh! card, without its frame: YGOPRODeck's
+/// cropped picture of the artwork chosen for it when that is one of
+/// theirs, else of its passcode. `null` without either.
+ImageSource? ygoArtworkSource(CardData card) {
+  final id = int.tryParse(card.artwork ?? '') ?? int.tryParse(card.passcode ?? '');
+  if (id == null) return null;
+  return ImageSource('ygo-art-$id', Uri.https('images.ygoprodeck.com', '/images/cards_cropped/$id.jpg'));
+}
+
 /// The product picture (the booster pack) on an official One Piece product
 /// page (given as `{'html': page}`): the page's `img_item01` picture, made
 /// absolute on [site]'s host; `null` when the page has none.

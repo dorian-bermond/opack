@@ -1701,4 +1701,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String updateInstallFailed(String error) {
     return 'The update could not be installed: $error. You can download it and replace the app by hand.';
   }
+
+  @override
+  String get generatedCardsSetting => 'Draw edited Yu-Gi-Oh! cards';
+
+  @override
+  String get generatedCardsHint =>
+      'A card whose fields were edited for a pool is drawn from its details instead of shown as its scan.';
+
+  @override
+  String get editOnCardHint => 'Click a part of the card to edit it.';
+
+  @override
+  String get exportCardList => 'Export as a card list';
+
+  @override
+  String get exportCardListHint =>
+      'Saves the cards as plain text, one per line with its copies (\"3 Name\"), for a deck tool or the batch import. Tags, boosters and formats are not in it.';
+
+  @override
+  String get exportCardListDone => 'Card list exported';
+
+  @override
+  String get pickTribe => 'Change the monster type';
+
+  @override
+  String get fieldTribe => 'Tribe';
+
+  @override
+  String get fieldSpellKind => 'Kind';
 }

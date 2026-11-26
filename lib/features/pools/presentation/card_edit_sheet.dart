@@ -3,15 +3,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/card_tile.dart';
 import '../../card_info/data/card_info_repository.dart';
 import '../../card_info/domain/card_info.dart';
+import '../../card_info/data/card_search.dart' show ygoAttributes;
+import '../../card_render/generated_card.dart';
+import '../../card_render/ygo_card_face.dart';
 import '../../card_text/data/card_text_repository.dart';
 import '../../catalog/domain/models.dart';
 import '../data/pool_repository.dart';
 import '../domain/card_customs.dart';
 import '../domain/play_pool.dart';
+import 'card_field_icons.dart';
 import 'pool_actions.dart';
 
 /// Lets the user change any field of [card] for the pool: each field shows
@@ -22,9 +26,10 @@ Future<bool> editCardFields(BuildContext context, {required PlayPool play, requi
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    constraints: const BoxConstraints(maxWidth: 1100),
+    constraints: const BoxConstraints(maxWidth: 1500),
     builder: (context) => SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.85,
+      // Nearly the whole window: the drawn card is as tall as the sheet.
+      height: MediaQuery.sizeOf(context).height * 0.95,
       child: CardEditSheet(play: play, card: card),
     ),
   );
@@ -76,11 +81,39 @@ const multiChoiceFields = {
 /// type, categories, frame and type string all follow its subtypes.
 const derivedFields = {'race', 'categories', 'frameType', 'type'};
 
+/// The fields the editor keeps as they are, without a line of their own:
+/// the rarities and whether the card has an effect.
+const hiddenFields = {'${cardFieldPrefix}rarity', '${cardFieldPrefix}printedRarity', 'hasEffect'};
+
 /// The virtual field standing for a Yu-Gi-Oh! card's type and categories.
 const ygoSubtypesKey = 'subtypes';
 
 /// Whether [key] applies to a [game]'s cards at all: MtG alone colors its
 /// cards by letters on the card itself.
+/// The field keys in the order a card shows them, top to bottom: name,
+/// cost, attribute, level, type line, text, stats, then what is printed
+/// small or not at all (rarity, archetype, set). Keys the order does not
+/// know come last, as they were.
+List<String> orderedFieldKeys(Iterable<String> keys) {
+  const order = [
+    'manaCost', 'manaValue', 'cost', 'attribute', 'level', 'linkRating', 'linkMarkers', 'scale', 'life',
+    '${cardFieldPrefix}colors', 'colors', 'colorIdentity', 'supertypes', 'types', 'type', 'race', ygoSubtypesKey,
+    'categories', 'frameType', 'typeLine', 'text', 'flavor', 'power', 'counter', 'atk', 'toughness', 'def',
+    'defense', 'loyalty', 'keywords', 'producedMana', '${cardFieldPrefix}rarity', '${cardFieldPrefix}printedRarity',
+    'archetype', 'layout', 'hasEffect', 'setCode', 'setName', 'collectorNumber',
+  ];
+  int rank(String key) {
+    // Names first, whatever their language.
+    if (key.startsWith('${cardFieldPrefix}name')) return -1;
+    final at = order.indexOf(key);
+    return at < 0 ? order.length : at;
+  }
+
+  final list = keys.toList();
+  final place = {for (final (i, key) in list.indexed) key: i};
+  return list..sort((a, b) => rank(a) != rank(b) ? rank(a) - rank(b) : place[a]! - place[b]!);
+}
+
 bool fieldAppliesTo(String key, Game game) => key != '${cardFieldPrefix}colors' || game == Game.mtg;
 
 class CardEditSheet extends ConsumerStatefulWidget {
@@ -98,12 +131,19 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   final _controllers = <String, TextEditingController>{};
   final _focuses = <String, FocusNode>{};
 
+  /// The word being typed into each multiple-choice field, apart from the
+  /// field's value (the words picked so far).
+  final _adders = <String, TextEditingController>{};
+
   /// The rarity fields, picked rather than typed.
   late String _rarity;
   late String? _printedRarity;
 
   /// The original values, by key: what a custom field reverts to.
   late final Map<String, Object?> _bases;
+
+  /// The card's original details, `null` when none were downloaded.
+  CardInfo? _baseInfo;
 
   /// The field keys in order: the card's, then its details'.
   late final List<String> _keys;
@@ -121,16 +161,19 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     final base = widget.play.bases[_id] ?? widget.card;
     final infos = ref.read(poolCardInfoProvider(widget.play.pool.id)).value?.infos ?? const {};
     final baseInfo = infos[_id];
+    _baseInfo = baseInfo;
     _bases = {
       for (final key in cardFieldKeys(base))
         if (fieldAppliesTo(key, _game)) key: cardFieldValue(base, key),
       if (baseInfo != null) ...editableInfoFields(baseInfo),
     };
-    // A Yu-Gi-Oh! card's type and categories edit as one subtypes field.
-    if (baseInfo is YgoCardInfo) {
-      _bases[ygoSubtypesKey] = ygoSubtypes(race: baseInfo.race, categories: baseInfo.categories);
+    // A Yu-Gi-Oh! monster has one tribe, a field of its own, and its
+    // categories edit as one subtypes field; a spell or a trap only has
+    // its kind, where a monster has its tribe.
+    if (baseInfo is YgoCardInfo && baseInfo.kind == YgoKind.monster) {
+      _bases[ygoSubtypesKey] = ygoSubtypes(categories: baseInfo.categories);
     }
-    _keys = _bases.keys.toList();
+    _keys = orderedFieldKeys(_bases.keys);
     _poolOptions = {
       for (final key in _keys)
         if (_isChoice(key) || _isMultiChoice(key))
@@ -144,7 +187,9 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     for (final key in _keys) {
       if (key == '${cardFieldPrefix}rarity' || key == '${cardFieldPrefix}printedRarity') continue;
       _controllers[key] = TextEditingController(text: fieldText(current[key]));
-      if (_isChoice(key) || _isMultiChoice(key)) _focuses[key] = FocusNode();
+      // Every field can take the focus: a click on the drawn card sends it.
+      _focuses[key] = FocusNode();
+      if (_isMultiChoice(key)) _adders[key] = TextEditingController();
     }
     _rarity = '${current['${cardFieldPrefix}rarity']}';
     _printedRarity = current['${cardFieldPrefix}printedRarity'] as String?;
@@ -152,7 +197,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) {
+    for (final c in [..._controllers.values, ..._adders.values]) {
       c.dispose();
     }
     for (final f in _focuses.values) {
@@ -172,10 +217,14 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     if (key == '${cardFieldPrefix}rarity') return _rarity;
     if (key == '${cardFieldPrefix}printedRarity') return _printedRarity;
     if (_game == Game.ygo && _controllers.containsKey(ygoSubtypesKey) && _isDerived(key)) {
-      // The type, categories, frame and type string follow the subtypes.
-      final (:race, :categories) = ygoSplitSubtypes(_picked(ygoSubtypesKey));
+      // The categories, frame and type string follow the subtypes: the
+      // known ones in their usual order, then the words of one's own.
+      final picked = _picked(ygoSubtypesKey);
+      final categories = [
+        for (final c in ygoCategoryOrder) if (picked.contains(c)) c,
+        for (final w in picked) if (!ygoCategoryOrder.contains(w)) w,
+      ];
       return switch (key) {
-        'race' => race,
         'categories' => categories,
         'frameType' => ygoFrameFromCategories(categories) ?? _bases[key],
         _ => ygoTypeString(categories, '${_bases[key] ?? ''}'),
@@ -184,16 +233,218 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     return parseFieldText(_controllers[key]!.text, _bases[key]);
   }
 
-  bool _isDerived(String key) => _game == Game.ygo && derivedFields.contains(key);
+  /// The fields told from the subtypes rather than edited; the tribe (or a
+  /// spell's kind) is a field of its own.
+  bool _isDerived(String key) => _game == Game.ygo && derivedFields.contains(key) && key != 'race';
 
   /// The type line the card reads with, from the fields as they are.
+  /// The Yu-Gi-Oh! details as the fields make them now, to draw the card
+  /// as it will be; `null` for another game, a card without details, or
+  /// values that make no card (a level that is no number).
+  YgoCardInfo? get _drawnInfo {
+    final base = _baseInfo;
+    if (base is! YgoCardInfo) return null;
+    final json = base.toJson();
+    for (final key in _keys) {
+      if (key.startsWith(cardFieldPrefix) || key == ygoSubtypesKey) continue;
+      final value = _valueOf(key);
+      value == null ? json.remove(key) : json[key] = value;
+    }
+    try {
+      final info = CardInfo.fromJson(json);
+      return info is YgoCardInfo ? info : null;
+    } on Object {
+      return null;
+    }
+  }
+
+  /// The name typed for [language], else the English one.
+  String _drawnName(String language) {
+    String? typed(String lang) => switch (_controllers['${cardFieldPrefix}name.$lang']?.text.trim()) {
+          final String name when name.isNotEmpty => name,
+          _ => null,
+        };
+    return typed(language) ?? typed('en') ?? widget.card.nameFor(language);
+  }
+
+  /// A click on a part of the drawn card: the attribute and the level are
+  /// picked in a dialog, the other parts send the focus to their field.
+  Future<void> _editPart(YgoCardPart part) async {
+    final language = dataLanguage(ref, context);
+    switch (part) {
+      case YgoCardPart.attribute:
+        await _pickAttribute(language);
+      case YgoCardPart.level:
+        await _pickLevel();
+      case YgoCardPart.name:
+        final own = '${cardFieldPrefix}name.$language';
+        _focusField(_controllers.containsKey(own) ? own : '${cardFieldPrefix}name.en');
+      case YgoCardPart.type:
+        // A monster's tribe is picked among the game's; a spell's kind typed.
+        _ygoMonster ? await _pickTribe() : _focusField('race');
+      case YgoCardPart.text:
+        _focusField('text');
+      case YgoCardPart.atk:
+        _focusField('atk');
+      case YgoCardPart.def:
+        _focusField('def');
+      case YgoCardPart.link:
+        _focusField('linkRating');
+    }
+  }
+
+  /// Sends the focus to the field of [key], which scrolls it into view.
+  void _focusField(String key) => _focuses[key]?.requestFocus();
+
+  /// Picks the attribute among the game's, shown with their symbols.
+  Future<void> _pickAttribute(String language) async {
+    final controller = _controllers['attribute'];
+    if (controller == null) return;
+    final picked = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        key: const Key('pickAttribute'),
+        title: Text(_label('attribute')),
+        children: [
+          for (final attribute in ygoAttributes)
+            SimpleDialogOption(
+              key: ValueKey('attribute-$attribute'),
+              onPressed: () => Navigator.pop(context, attribute),
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/ygo_template/attribute-${attribute.toLowerCase()}${language == 'fr' ? '-fr' : ''}.png',
+                    width: 36,
+                    height: 36,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(attribute)),
+                  if (controller.text.trim().toUpperCase() == attribute) const Icon(Icons.check, size: 18),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+    if (picked != null && mounted) setState(() => controller.text = picked);
+  }
+
+  /// Picks the level (or rank) from none to twelve.
+  Future<void> _pickLevel() async {
+    final controller = _controllers['level'];
+    if (controller == null) return;
+    final current = int.tryParse(controller.text.trim()) ?? 0;
+    final picked = await showDialog<int>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        key: const Key('pickLevel'),
+        title: Text(_label('level')),
+        contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (var level = 0; level <= 12; level++)
+                ChoiceChip(
+                  key: ValueKey('level-$level'),
+                  label: Text(level == 0 ? '—' : '$level'),
+                  selected: level == current,
+                  showCheckmark: false,
+                  onSelected: (_) => Navigator.pop(context, level),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (picked != null && mounted) setState(() => controller.text = picked == 0 ? '' : '$picked');
+  }
+
   String get _typeLine => computedTypeLine(_game, {for (final key in _keys) key: _valueOf(key)});
 
   /// The words picked in a multiple-choice field.
   List<String> _picked(String key) =>
       [for (final w in _controllers[key]!.text.split(',')) if (w.trim().isNotEmpty) w.trim()];
 
-  void _setPicked(String key, List<String> words) => setState(() => _controllers[key]!.text = words.join(', '));
+  void _setPicked(String key, List<String> words) {
+    setState(() => _controllers[key]!.text = words.join(', '));
+    // The list of words still to pick only follows what is typed: tell it
+    // the picked ones changed, so a word taken out is offered again at once.
+    _refreshOptions(key);
+  }
+
+  /// Has the list of words still to pick of [key] worked out again, and
+  /// shown when its field has the focus: it only follows what is typed.
+  void _refreshOptions(String key) {
+    if (_adders[key] case final adder?) {
+      final typed = adder.value;
+      adder.value = typed.copyWith(text: '${typed.text} ');
+      adder.value = typed;
+    }
+  }
+
+  /// Whether the card is a Yu-Gi-Oh! monster (or not known to be a spell
+  /// or a trap): its subtypes are a tribe and categories.
+  bool get _ygoMonster => switch (_baseInfo) {
+        YgoCardInfo(:final kind) => kind == YgoKind.monster,
+        _ => true,
+      };
+
+  bool _isYgoSubtypes(String key) => _game == Game.ygo && key == ygoSubtypesKey;
+
+  /// Adds [word] to the words picked for [key]. A Yu-Gi-Oh! monster's
+  /// subtypes stay in printed order (Synchro, Pendulum, Tuner, Effect),
+  /// words of one's own last.
+  void _addPicked(String key, String word) {
+    final words = [..._picked(key), word];
+    _setPicked(
+      key,
+      _isYgoSubtypes(key)
+          ? [
+              for (final c in ygoPrintOrder) if (words.contains(c)) c,
+              for (final w in words) if (!ygoPrintOrder.contains(w)) w,
+            ]
+          : words,
+    );
+  }
+
+  /// Picks the monster's tribe among the game's, shown with their icons:
+  /// a monster has one, the new one takes the place of the old.
+  Future<void> _pickTribe() async {
+    final controller = _controllers['race'];
+    if (controller == null) return;
+    final current = controller.text.trim();
+    final picked = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        key: const Key('pickTribe'),
+        title: Text(AppLocalizations.of(context).pickTribe),
+        contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        children: [
+          SizedBox(
+            width: 460,
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final tribe in ygoMonsterTypes)
+                  ChoiceChip(
+                    key: ValueKey('tribe-$tribe'),
+                    avatar: valueIconWidget(Game.ygo, 'race', tribe, size: 20),
+                    label: Text(tribe),
+                    selected: tribe == current,
+                    showCheckmark: false,
+                    onSelected: (_) => Navigator.pop(context, tribe),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+    if (picked != null && mounted) setState(() => controller.text = picked);
+  }
 
   void _revert(String key) => setState(() {
         if (key == '${cardFieldPrefix}rarity') {
@@ -223,7 +474,15 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   List<String> _options(String key) {
     final added = ref.watch(customFieldOptionsProvider((_game, key)));
     final base = _bases[key];
-    return {...?_poolOptions[key], if (base is String && base.isNotEmpty) base, ...added}.toList()..sort();
+    return {
+      // Every tribe of the game for a Yu-Gi-Oh! monster, every kind for a
+      // spell or a trap, whatever the pool's cards hold.
+      if (_game == Game.ygo && key == 'race') ...(_ygoMonster ? ygoMonsterTypes : ygoSpellTrapKinds),
+      ...?_poolOptions[key],
+      if (base is String && base.isNotEmpty) base,
+      ...added,
+    }.toList()
+      ..sort();
   }
 
   /// Asks for a new option of [key], kept for good, and picks it.
@@ -238,6 +497,11 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   /// A field's name as the user reads it: `manaCost` as "Mana cost",
   /// `card.name.fr` as "Name (fr)".
   String _label(String key) {
+    // A Yu-Gi-Oh! monster's type is its tribe, a spell's or a trap's its kind.
+    if (_game == Game.ygo && key == 'race') {
+      final l10n = AppLocalizations.of(context);
+      return _ygoMonster ? l10n.fieldTribe : l10n.fieldSpellKind;
+    }
     var name = key.startsWith(cardFieldPrefix) ? key.substring(cardFieldPrefix.length) : key;
     String? suffix;
     if (name.startsWith('name.')) {
@@ -257,14 +521,30 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    Widget row(String key, Widget field) {
+    // What leads a field on its line: its icon and name, then the custom
+    // flag and the way back to the original.
+    List<Widget> leading(String key, {double nameWidth = 150}) {
       final custom = _isCustom(key);
       final base = fieldText(_bases[key]);
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            SizedBox(width: 150, child: Text(_label(key), style: theme.textTheme.bodyMedium)),
+      return [
+            SizedBox(
+              width: nameWidth,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 26,
+                    child: switch (fieldIcon(key)) {
+                      null => null,
+                      final icon => Align(
+                          alignment: Alignment.centerLeft,
+                          child: Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                        ),
+                    },
+                  ),
+                  Expanded(child: Text(_label(key), style: theme.textTheme.bodyMedium)),
+                ],
+              ),
+            ),
             // The custom flag and the way back, right of the name.
             SizedBox(
               width: 32,
@@ -285,36 +565,66 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                   : null,
             ),
             const SizedBox(width: 8),
-            Expanded(child: field),
-          ],
-        ),
-      );
+      ];
     }
 
-    Widget rarityField(String key, String? value, {required bool nullable}) => DropdownButton<String?>(
-          key: ValueKey('field-$key'),
-          isExpanded: true,
-          value: value,
-          items: [
-            if (nullable) DropdownMenuItem(value: null, child: Text(l10n.fieldEmpty)),
-            for (final rarity in Rarity.values) DropdownMenuItem(value: rarity.name, child: Text(rarity.label(l10n))),
-          ],
-          onChanged: (v) => setState(() {
-            if (nullable) {
-              _printedRarity = v;
-            } else if (v != null) {
-              _rarity = v;
-            }
-          }),
+    Widget row(String key, Widget field) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(children: [...leading(key), Expanded(child: field)]),
         );
+
+    // A field typed as plain text.
+    Widget textField(String key) => TextField(
+          key: ValueKey('field-$key'),
+          controller: _controllers[key],
+          focusNode: _focuses[key],
+          maxLines: key == 'text' ? null : 1,
+          decoration: const InputDecoration(isDense: true, border: OutlineInputBorder()),
+          onChanged: (_) => setState(() {}),
+        );
+
+    // A Yu-Gi-Oh! monster's tribe (a spell's or a trap's kind): one among
+    // the game's, picked in a plain list with their icons.
+    Widget tribeField(String key) {
+      final current = _controllers[key]!.text.trim();
+      final options = _options(key);
+      return DropdownButton<String>(
+        key: ValueKey('field-$key'),
+        focusNode: _focuses[key],
+        isExpanded: true,
+        value: current.isEmpty ? null : current,
+        hint: Text(l10n.fieldEmpty),
+        items: [
+          // A value of the card's own that the game does not list stays.
+          for (final option in [if (current.isNotEmpty && !options.contains(current)) current, ...options])
+            DropdownMenuItem(
+              value: option,
+              child: Row(
+                children: [
+                  ValueIcon(_game, key, option, size: 22, key: ValueKey('valueIcon-$key-$option')),
+                  const SizedBox(width: 10),
+                  Flexible(child: Text(option, overflow: TextOverflow.ellipsis)),
+                ],
+              ),
+            ),
+        ],
+        onChanged: (picked) {
+          if (picked != null) setState(() => _controllers[key]!.text = picked);
+        },
+      );
+    }
 
     // A multiple-choice field: the picked words as chips, one more typed
     // with the known words offered as one types.
     Widget multiChoiceField(String key) {
       final picked = _picked(key);
       final options = [
-        for (final option in {...multiChoiceFields[key]!, ...?_poolOptions[key], ...ref.watch(customFieldOptionsProvider((_game, key)))})
-          if (!picked.contains(option)) option,
+        for (final option in {
+          ...multiChoiceFields[key]!,
+          ...?_poolOptions[key],
+          ...ref.watch(customFieldOptionsProvider((_game, key))),
+        })
+          option,
       ]..sort();
       return Wrap(
         spacing: 6,
@@ -324,6 +634,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
           for (final word in picked)
             InputChip(
               key: ValueKey('pick-$key-$word'),
+              avatar: valueIconWidget(_game, key, word, size: 18),
               label: Text(word),
               visualDensity: VisualDensity.compact,
               onDeleted: () => _setPicked(key, [for (final w in picked) if (w != word) w]),
@@ -331,12 +642,24 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
           SizedBox(
             width: 200,
             child: RawAutocomplete<String>(
+              // A focus node comes with its controller, or with neither.
+              textEditingController: _adders[key],
               focusNode: _focuses[key],
               optionsBuilder: (value) {
-                final query = value.text.toLowerCase();
-                return [for (final option in options) if (option.toLowerCase().contains(query)) option];
+                // The words picked as they are now, not as they were when
+                // this list was last built.
+                final now = _picked(key);
+                final query = value.text.trim().toLowerCase();
+                return [
+                  for (final option in options)
+                    if (!now.contains(option) && option.toLowerCase().contains(query)) option,
+                ];
               },
-              onSelected: (option) => _setPicked(key, [...picked, option]),
+              onSelected: (option) {
+                // The picked word becomes a chip: the field is free again.
+                _adders[key]?.clear();
+                _addPicked(key, option);
+              },
               fieldViewBuilder: (context, controller, focusNode, onSubmitted) => TextField(
                 key: ValueKey('field-$key'),
                 controller: controller,
@@ -346,12 +669,15 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                   border: const OutlineInputBorder(),
                   hintText: l10n.addWord,
                 ),
+                // A click on the field shows the words again, also when
+                // it already had the focus.
+                onTap: () => _refreshOptions(key),
                 onSubmitted: (text) {
                   // A word of one's own is kept among the known ones.
                   final word = text.trim();
                   if (word.isNotEmpty && !picked.contains(word)) {
                     ref.read(customFieldOptionsProvider((_game, key)).notifier).add(word);
-                    _setPicked(key, [...picked, word]);
+                    _addPicked(key, word);
                   }
                   controller.clear();
                 },
@@ -367,7 +693,12 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                       shrinkWrap: true,
                       children: [
                         for (final option in options)
-                          ListTile(dense: true, title: Text(option), onTap: () => onSelected(option)),
+                          ListTile(
+                            dense: true,
+                            leading: ValueIcon(_game, key, option, size: 22),
+                            title: Text(option),
+                            onTap: () => onSelected(option),
+                          ),
                       ],
                     ),
                   ),
@@ -406,10 +737,17 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
           key: ValueKey('field-$key'),
           controller: controller,
           focusNode: focusNode,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             isDense: true,
-            border: OutlineInputBorder(),
-            suffixIcon: Icon(Icons.arrow_drop_down),
+            border: const OutlineInputBorder(),
+            prefixIcon: switch (valueIconWidget(_game, key, controller.text,
+                size: 22, key: ValueKey('valueIcon-$key'))) {
+              null => null,
+              // Its own size, not stretched to the field's height.
+              final icon => Padding(padding: const EdgeInsets.all(8), child: icon),
+            },
+            prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+            suffixIcon: const Icon(Icons.arrow_drop_down),
           ),
           onChanged: (_) => setState(() {}),
           onSubmitted: (_) => onSubmitted(),
@@ -428,7 +766,9 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                     ListTile(
                       key: option == _customOption ? ValueKey('customOption-$key') : null,
                       dense: true,
-                      leading: option == _customOption ? const Icon(Icons.add, size: 18) : null,
+                      leading: option == _customOption
+                          ? const Icon(Icons.add, size: 18)
+                          : ValueIcon(_game, key, option, size: 22),
                       title: Text(option == _customOption ? l10n.customOption : option),
                       onTap: () => onSelected(option),
                     ),
@@ -440,7 +780,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       );
     }
 
-    return Column(
+    final form = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
@@ -451,45 +791,75 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Text(l10n.editCardHint, style: theme.textTheme.bodySmall),
         ),
-        // The type line as the fields make it, live.
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: Row(
-            children: [
-              SizedBox(width: 150, child: Text(l10n.typeLine, style: theme.textTheme.bodyMedium)),
-              const SizedBox(width: 80),
-              Expanded(child: Text(_typeLine, key: const Key('typeLine'), style: theme.textTheme.titleSmall)),
-            ],
-          ),
-        ),
         Expanded(
-          child: ListView(
+          child: Builder(builder: (context) {
+          // The last of the fields a type line is made of: it reads under it.
+          final typeLineAfter = _keys
+              .where((k) => const {'supertypes', 'types', 'type', 'subtypes'}.contains(k) && !_isDerived(k))
+              .lastOrNull;
+          // Every row is built, so any field can be focused from the card.
+          final fields = SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final key in _keys)
-                if (_isDerived(key))
+              for (final key in _keys) ...[
+                // Not edited here: what follows other fields, the rarities
+                // (a matter of the pool's tags) and whether the card has
+                // an effect (its subtypes say it). DEF sits on ATK's line.
+                if (_isDerived(key) || hiddenFields.contains(key) || (key == 'def' && _keys.contains('atk')))
                   const SizedBox.shrink()
                 else if (_isMultiChoice(key))
                   row(key, multiChoiceField(key))
-                else if (key == '${cardFieldPrefix}rarity')
-                  row(key, rarityField(key, _rarity, nullable: false))
-                else if (key == '${cardFieldPrefix}printedRarity')
-                  row(key, rarityField(key, _printedRarity, nullable: true))
+                else if (key == 'atk' && _keys.contains('def'))
+                  Padding(
+                    key: const Key('statsRow'),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        ...leading('atk'),
+                        Expanded(child: textField('atk')),
+                        const SizedBox(width: 16),
+                        ...leading('def', nameWidth: 70),
+                        Expanded(child: textField('def')),
+                      ],
+                    ),
+                  )
+                else if (_game == Game.ygo && key == 'race')
+                  row(key, tribeField(key))
                 else if (_isChoice(key))
                   row(key, choiceField(key))
                 else
-                  row(
-                    key,
-                    TextField(
-                      key: ValueKey('field-$key'),
-                      controller: _controllers[key],
-                      maxLines: key == 'text' ? null : 1,
-                      decoration: const InputDecoration(isDense: true, border: OutlineInputBorder()),
-                      onChanged: (_) => setState(() {}),
+                  row(key, textField(key)),
+                // The type line as those fields make it, live, under them.
+                if (key == typeLineAfter)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2, bottom: 10),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 150,
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 26),
+                              Expanded(child: Text(l10n.typeLine, style: theme.textTheme.bodySmall)),
+                            ],
+                          ),
+                        ),
+                        // As wide as a row's custom flag and revert button.
+                        const SizedBox(width: 80),
+                        Expanded(
+                          child: Text(_typeLine, key: const Key('typeLine'), style: theme.textTheme.titleSmall),
+                        ),
+                      ],
                     ),
                   ),
+              ],
             ],
-          ),
+            ),
+          );
+          return fields;
+          }),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -504,5 +874,58 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
         ),
       ],
     );
+
+    // The card as its fields make it, beside them when there is room: as
+    // tall as the sheet, as long as the fields keep enough width.
+    return LayoutBuilder(builder: (context, constraints) {
+      final drawn = constraints.maxWidth >= 760 ? _drawnInfo : null;
+      if (drawn == null) return form;
+      const ratio = YgoCardFace.width / YgoCardFace.height;
+      const hint = 30.0;
+      final height = constraints.maxHeight - 16;
+      final width = ((height - hint) * ratio).clamp(160.0, constraints.maxWidth - 16 - 440);
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 0, 16),
+            child: SizedBox(
+              width: width,
+              height: height,
+              child: Column(
+                children: [
+                  Flexible(
+                    child: AspectRatio(
+                      aspectRatio: ratio,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(width / 22),
+                        child: GeneratedYgoCard(
+                          key: const Key('editDrawnCard'),
+                          card: widget.card,
+                          info: drawn,
+                          name: _drawnName(dataLanguage(ref, context)),
+                          onPart: _editPart,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      l10n.editOnCardHint,
+                      style: theme.textTheme.bodySmall,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(child: form),
+        ],
+      );
+    });
   }
 }

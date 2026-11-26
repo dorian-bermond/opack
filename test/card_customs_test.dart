@@ -55,9 +55,25 @@ void main() {
     expect(dragon.race, 'Dragon');
     expect(dragon.categories, ['Tuner', 'Synchro'], reason: 'abilities before the frame');
     expect(ygoSplitSubtypes(const []).race, isNull);
+    // Printed order: the tribe, the frame, Pendulum, the abilities, Tuner, Effect.
+    expect(ygoSubtypes(race: 'Dragon', categories: ['Effect', 'Tuner', 'Pendulum', 'Synchro']),
+        ['Dragon', 'Synchro', 'Pendulum', 'Tuner', 'Effect']);
+    expect(ygoSubtypes(race: 'Fairy', categories: ['Effect', 'Tuner', 'Flip']), ['Fairy', 'Flip', 'Tuner', 'Effect']);
+    // A new tribe takes the place of the old one; a category joins in its place.
+    expect(ygoWithSubtype(['Zombie', 'Toon', 'Effect'], 'Dragon'), ['Dragon', 'Toon', 'Effect']);
+    expect(ygoWithSubtype(['Zombie', 'Effect'], 'Synchro'), ['Zombie', 'Synchro', 'Effect']);
+    expect(ygoWithSubtype(['Effect'], 'My Own Tribe'), ['My Own Tribe', 'Effect']);
+    // A spell or a trap has one word, its kind, even one a monster knows as a category.
+    expect(ygoSplitSubtypes(['Normal'], monster: false), (race: 'Normal', categories: const <String>[]));
+    expect(ygoWithSubtype(['Normal'], 'Quick-Play', monster: false), ['Quick-Play']);
     expect(ygoTypeString(['Pendulum', 'Tuner', 'Effect'], 'Effect Monster'), 'Pendulum Tuner Effect Monster');
     expect(ygoTypeString(const [], 'Spell Card'), 'Spell Card');
     expect(computedTypeLine(Game.ygo, {'subtypes': ['Zombie', 'Toon', 'Effect']}), 'Zombie / Toon / Effect');
+    // The tribe is a field of its own, ahead of the subtypes.
+    expect(computedTypeLine(Game.ygo, {'race': 'Dragon', 'subtypes': ['Synchro', 'Effect']}),
+        'Dragon / Synchro / Effect');
+    expect(computedTypeLine(Game.ygo, {'race': 'Dragon', 'categories': ['Effect', 'Tuner']}), 'Dragon / Tuner / Effect');
+    expect(computedTypeLine(Game.ygo, {'race': 'Quick-Play'}), 'Quick-Play', reason: "a spell's kind alone");
     expect(computedTypeLine(Game.ygo, {'race': 'Zombie', 'categories': ['Effect']}), 'Zombie / Effect');
     expect(computedTypeLine(Game.mtg, {'supertypes': ['Legendary'], 'types': ['Artifact'], 'subtypes': ['Equipment']}),
         'Legendary Artifact — Equipment');
@@ -101,5 +117,35 @@ void main() {
     final reverted = reloaded.withCustom(card.id, 'atk', null, remove: true).withCustom(card.id, 'card.name.en', null, remove: true);
     expect(reverted.customs, isEmpty, reason: 'a card without custom fields leaves the map');
     expect(reverted.toJson().containsKey('customs'), isFalse);
+  });
+
+  test('an ATK or DEF may be any text; what is no number is worth 0, -1 reads ?', () {
+    expect(YgoCardInfo.readStat(2500), (2500, null));
+    expect(YgoCardInfo.readStat('2500'), (2500, null), reason: 'a number typed is a number');
+    expect(YgoCardInfo.readStat(-1), (0, '?'));
+    expect(YgoCardInfo.readStat('-1'), (0, '?'));
+    expect(YgoCardInfo.readStat('?'), (0, '?'));
+    expect(YgoCardInfo.readStat(' X000 '), (0, 'X000'));
+    expect(YgoCardInfo.readStat(''), (null, null));
+    expect(YgoCardInfo.readStat(null), (null, null));
+
+    final unknown = YgoCardInfo.fromYgoprodeck(const {
+      'id': 1, 'name': 'Kasha', 'type': 'Effect Monster', 'frameType': 'effect', 'race': 'Zombie', 'atk': -1,
+      'def': 1000,
+    });
+    expect(unknown.atk, 0);
+    expect(unknown.atkLabel, '?');
+    expect(unknown.defLabel, '1000');
+    expect(editableInfoFields(unknown)['atk'], '?', reason: 'what the editor shows');
+    // Saved and read back as it reads.
+    final back = CardInfo.fromJson(unknown.toJson()) as YgoCardInfo;
+    expect((back.atk, back.atkLabel, back.def, back.defText), (0, '?', 1000, null));
+
+    // Edited to any text, or back to a number.
+    final typed = customizeInfo(unknown, {'atk': 'X000', 'def': '∞'})! as YgoCardInfo;
+    expect((typed.atk, typed.atkLabel, typed.def, typed.defLabel), (0, 'X000', 0, '∞'));
+    expect(parseFieldText('X000', 2500), 'X000', reason: 'kept as typed where a number was');
+    final number = customizeInfo(unknown, {'atk': parseFieldText('3000', '?')})! as YgoCardInfo;
+    expect((number.atk, number.atkLabel), (3000, '3000'));
   });
 }

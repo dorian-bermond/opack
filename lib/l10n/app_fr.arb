@@ -618,5 +618,14 @@
   "updateInstalling": "Mise à jour vers {version}",
   "updateDownloading": "Téléchargement de la mise à jour…",
   "updateRestarting": "Redémarrage de l'application…",
-  "updateInstallFailed": "La mise à jour n'a pas pu être installée : {error}. Vous pouvez la télécharger et remplacer l'application à la main."
+  "updateInstallFailed": "La mise à jour n'a pas pu être installée : {error}. Vous pouvez la télécharger et remplacer l'application à la main.",
+  "generatedCardsSetting": "Dessiner les cartes Yu-Gi-Oh! modifiées",
+  "generatedCardsHint": "Une carte dont les champs ont été modifiés pour un pool est dessinée d'après ses détails au lieu de son scan.",
+  "editOnCardHint": "Cliquez sur une partie de la carte pour la modifier.",
+  "exportCardList": "Exporter en liste de cartes",
+  "exportCardListHint": "Enregistre les cartes en texte simple, une par ligne avec ses exemplaires (« 3 Nom »), pour un outil de deck ou l'import par lot. Les étiquettes, boosters et formats n'y sont pas.",
+  "exportCardListDone": "Liste de cartes exportée",
+  "pickTribe": "Changer le type du monstre",
+  "fieldTribe": "Tribu",
+  "fieldSpellKind": "Genre"
 }

@@ -118,12 +118,20 @@ String? cardInfoLine(CardInfo? info) => switch (info) {
           ?attribute,
         ].join(' · '),
       MtgCardInfo(:final manaCost, :final typeLine) => [?manaCost, typeLine].join(' · '),
-      YgoCardInfo(kind: YgoKind.monster, :final attribute, :final race, :final level, :final linkRating, :final atk, :final def) =>
+      YgoCardInfo(
+        kind: YgoKind.monster,
+        :final attribute,
+        :final race,
+        :final level,
+        :final linkRating,
+        :final atkLabel,
+        :final defLabel,
+      ) =>
         [
           ?attribute,
           ?race,
           if (linkRating case final link?) 'LINK-$link' else if (level case final lvl?) '★$lvl',
-          if (atk != null || def != null) 'ATK ${atk ?? '?'} / DEF ${def ?? '?'}',
+          if (atkLabel != null || defLabel != null) 'ATK ${atkLabel ?? '?'} / DEF ${defLabel ?? '?'}',
         ].join(' · '),
       YgoCardInfo(:final type, :final race) => [type, ?race].join(' · '),
       null => null,

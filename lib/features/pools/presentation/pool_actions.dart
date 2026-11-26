@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../card_info/presentation/labels.dart';
 import '../../catalog/data/catalog_repository.dart';
@@ -113,6 +115,21 @@ Future<void> exportPool(BuildContext context, WidgetRef ref, Pool pool) async {
   );
   if (saved != null && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.exportPoolDone)));
+  }
+}
+
+/// Saves the cards of [play] as a text list the user names (see
+/// [poolCardList]), their names in the data language.
+Future<void> exportPoolCardList(BuildContext context, WidgetRef ref, PlayPool play) async {
+  final l10n = AppLocalizations.of(context);
+  final list = poolCardList(play, dataLanguage(ref, context));
+  final saved = await FilePicker.saveFile(
+    dialogTitle: l10n.exportCardList,
+    fileName: poolCardListFileName(play.pool),
+    bytes: utf8.encode(list),
+  );
+  if (saved != null && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.exportCardListDone)));
   }
 }
 

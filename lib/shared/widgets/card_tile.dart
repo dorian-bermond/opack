@@ -7,6 +7,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/settings/card_languages.dart';
+import '../../features/card_render/generated_card.dart';
 import '../../features/card_text/presentation/card_details_sheet.dart';
 import '../../features/card_text/data/card_text_repository.dart';
 import '../../features/catalog/domain/models.dart';
@@ -154,9 +155,13 @@ class CardTile extends ConsumerWidget {
     final source = cardImageSource(card, language: pictureLanguage(ref, context));
     final image = revealed && source != null ? ref.watch(cardImageProvider(source)).value : null;
 
+    // A card edited for its pool is drawn from its details, not scanned.
+    final drawn = revealed ? generatedYgoInfo(ref, PoolScope.playOf(context), card) : null;
+    final face = drawn == null ? null : GeneratedYgoCard(card: card, info: drawn);
+
     final previewSize = ref.watch(cardHoverPreviewSizeProvider);
     final preview = revealed &&
-        image != null &&
+        (image != null || face != null) &&
         previewSize != HoverPreviewSize.none &&
         !ref.watch(hoverPreviewSuppressedProvider);
     final marker = hideRarity ? null : ref.watch(rarityMarkerProvider);
@@ -171,6 +176,7 @@ class CardTile extends ConsumerWidget {
         enabled: preview,
         size: previewSize,
         image: image,
+        face: face,
         ratio: cardAspectRatio(card),
         child: _RarityGlow(
         enabled: !revealed,
@@ -214,12 +220,15 @@ class CardTile extends ConsumerWidget {
                       ),
                     ),
                   )
-                : image != null
+                : image != null || face != null
                     ? Stack(
                         key: const ValueKey('picture'),
                         fit: StackFit.expand,
                         children: [
-                          Image.file(image, fit: BoxFit.cover),
+                          if (face != null)
+                            FittedBox(key: ValueKey('drawn-${card.id}'), fit: BoxFit.cover, child: face)
+                          else
+                            Image.file(image!, fit: BoxFit.cover),
                           if (card.foil)
                             Positioned(
                               top: 4,
@@ -311,6 +320,7 @@ class _HoverPreview extends StatefulWidget {
     required this.enabled,
     required this.size,
     required this.image,
+    this.face,
     required this.ratio,
     required this.child,
   });
@@ -318,6 +328,9 @@ class _HoverPreview extends StatefulWidget {
   final bool enabled;
   final HoverPreviewSize size;
   final File? image;
+
+  /// The card drawn rather than scanned, shown in place of [image].
+  final Widget? face;
 
   /// Width over height of the card, so the preview has no bars.
   final double ratio;
@@ -390,7 +403,7 @@ class _HoverPreviewState extends State<_HoverPreview> {
 
   void _show() {
     final image = widget.image;
-    if (!mounted || image == null || _entry != null) return;
+    if (!mounted || (image == null && widget.face == null) || _entry != null) return;
     final overlay = Overlay.of(context);
     _entry = OverlayEntry(builder: (context) {
       final size = MediaQuery.sizeOf(context);
@@ -407,7 +420,10 @@ class _HoverPreviewState extends State<_HoverPreview> {
             child: SizedBox(
               width: width,
               height: width / widget.ratio,
-              child: Image.file(image, fit: BoxFit.cover),
+              child: switch (widget.face) {
+                final face? => FittedBox(fit: BoxFit.cover, child: face),
+                null => Image.file(image!, fit: BoxFit.cover),
+              },
             ),
           );
       if (widget.size == HoverPreviewSize.fullscreen) {

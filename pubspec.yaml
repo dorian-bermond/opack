@@ -75,6 +75,29 @@ flutter:
     - assets/sets/opc/
     - assets/cards/
     - assets/images/
+    - assets/ygo_template/
+    - assets/ygo_types/
+
+  # The fonts Yu-Gi-Oh! cards are drawn with (see YgoCardFace).
+  fonts:
+    - family: YgoName
+      fonts:
+        - asset: assets/fonts/ygo/name.ttf
+    - family: YgoText
+      fonts:
+        - asset: assets/fonts/ygo/text.ttf
+    - family: YgoFlavor
+      fonts:
+        - asset: assets/fonts/ygo/flavor.ttf
+    - family: YgoType
+      fonts:
+        - asset: assets/fonts/ygo/type.ttf
+    - family: YgoStats
+      fonts:
+        - asset: assets/fonts/ygo/stats.otf
+    - family: YgoSmall
+      fonts:
+        - asset: assets/fonts/ygo/small.otf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

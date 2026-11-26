@@ -2929,6 +2929,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The update could not be installed: {error}. You can download it and replace the app by hand.'**
   String updateInstallFailed(String error);
+
+  /// No description provided for @generatedCardsSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw edited Yu-Gi-Oh! cards'**
+  String get generatedCardsSetting;
+
+  /// No description provided for @generatedCardsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A card whose fields were edited for a pool is drawn from its details instead of shown as its scan.'**
+  String get generatedCardsHint;
+
+  /// No description provided for @editOnCardHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Click a part of the card to edit it.'**
+  String get editOnCardHint;
+
+  /// No description provided for @exportCardList.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as a card list'**
+  String get exportCardList;
+
+  /// No description provided for @exportCardListHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves the cards as plain text, one per line with its copies (\"3 Name\"), for a deck tool or the batch import. Tags, boosters and formats are not in it.'**
+  String get exportCardListHint;
+
+  /// No description provided for @exportCardListDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Card list exported'**
+  String get exportCardListDone;
+
+  /// No description provided for @pickTribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the monster type'**
+  String get pickTribe;
+
+  /// No description provided for @fieldTribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Tribe'**
+  String get fieldTribe;
+
+  /// No description provided for @fieldSpellKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get fieldSpellKind;
 }
 
 class _AppLocalizationsDelegate

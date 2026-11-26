@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/settings/card_languages.dart';
 import '../../core/settings/locale_controller.dart';
 import '../../core/settings/ygo_settings.dart';
+import '../../features/card_render/generated_card.dart';
 import '../../features/card_text/data/card_text_repository.dart';
 import '../../features/card_text/domain/card_text.dart';
 import '../../features/packs/presentation/opening_mode.dart';
@@ -110,6 +111,13 @@ class SettingsScreen extends ConsumerWidget {
                     title: Text(l10n.cardImagesOnline),
                     value: images,
                     onChanged: ref.read(cardImagesEnabledProvider.notifier).set,
+                  ),
+                  SwitchListTile(
+                    key: const Key('settingGeneratedCards'),
+                    title: Text(l10n.generatedCardsSetting),
+                    subtitle: Text(l10n.generatedCardsHint),
+                    value: ref.watch(generatedCardsProvider),
+                    onChanged: ref.read(generatedCardsProvider.notifier).set,
                   ),
                 ],
               ),

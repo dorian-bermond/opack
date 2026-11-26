@@ -698,5 +698,14 @@
   "updateDownloading": "Downloading the update…",
   "updateRestarting": "Restarting the app…",
   "updateInstallFailed": "The update could not be installed: {error}. You can download it and replace the app by hand.",
-  "@updateInstallFailed": {"placeholders": {"error": {"type": "String"}}}
+  "@updateInstallFailed": {"placeholders": {"error": {"type": "String"}}},
+  "generatedCardsSetting": "Draw edited Yu-Gi-Oh! cards",
+  "generatedCardsHint": "A card whose fields were edited for a pool is drawn from its details instead of shown as its scan.",
+  "editOnCardHint": "Click a part of the card to edit it.",
+  "exportCardList": "Export as a card list",
+  "exportCardListHint": "Saves the cards as plain text, one per line with its copies (\"3 Name\"), for a deck tool or the batch import. Tags, boosters and formats are not in it.",
+  "exportCardListDone": "Card list exported",
+  "pickTribe": "Change the monster type",
+  "fieldTribe": "Tribe",
+  "fieldSpellKind": "Kind"
 }

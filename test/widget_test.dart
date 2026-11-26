@@ -258,6 +258,15 @@ void main() {
     tester.binding.focusManager.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
 
+    // The pencil on a row opens that editor directly.
+    await tester.tap(
+        find.descendant(of: find.byType(PoolListSliver), matching: find.byIcon(Icons.edit_outlined)).first);
+    await settleLoading(tester);
+    expect(find.byKey(const Key('applyCardEdit')), findsOneWidget);
+    Navigator.of(tester.element(find.byKey(const Key('applyCardEdit')))).pop();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('applyCardEdit')), findsNothing);
+
     // A right-click on the header selects the group and opens its operations.
     await tester.scrollUntilVisible(find.text('mine · 1'), 400,
         scrollable: find.descendant(of: find.byType(CustomScrollView), matching: find.byType(Scrollable)).first);

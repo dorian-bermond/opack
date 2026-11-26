@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/settings/card_languages.dart';
 import '../../pools/domain/card_customs.dart';
 import '../../pools/domain/play_pool.dart';
+import '../../card_render/generated_card.dart';
 import '../../pools/presentation/card_edit_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/images/artwork_picker.dart';
@@ -116,6 +117,8 @@ class CardDetailsSheet extends ConsumerWidget {
       ),
     );
 
+    // A card edited for its pool is drawn from its details.
+    final drawn = generatedYgoInfo(ref, play, card);
     return LayoutBuilder(builder: (context, constraints) {
       final height = constraints.maxHeight - 16;
       final ratio = cardAspectRatio(card);
@@ -128,7 +131,13 @@ class CardDetailsSheet extends ConsumerWidget {
             child: SizedBox(
               width: width,
               height: width / ratio,
-              child: image != null
+              child: drawn != null
+                  ? ClipRRect(
+                      key: const Key('detailsDrawnCard'),
+                      borderRadius: BorderRadius.circular(width / 22),
+                      child: GeneratedYgoCard(card: card, info: drawn),
+                    )
+                  : image != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(width / 22),
                       child: Image.file(image, fit: BoxFit.contain),

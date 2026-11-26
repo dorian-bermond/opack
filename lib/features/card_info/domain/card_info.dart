@@ -381,6 +381,17 @@ const ygoCategories = [
   'Tuner', 'Flip', 'Gemini', 'Spirit', 'Toon', 'Union', 'Token',
 ];
 
+/// The types (tribes) a Yu-Gi-Oh! monster is of.
+const ygoMonsterTypes = [
+  'Aqua', 'Beast', 'Beast-Warrior', 'Creator-God', 'Cyberse', 'Dinosaur', 'Divine-Beast', 'Dragon', 'Fairy', 'Fiend',
+  'Fish', 'Illusion', 'Insect', 'Machine', 'Plant', 'Psychic', 'Pyro', 'Reptile', 'Rock', 'Sea Serpent',
+  'Spellcaster', 'Thunder', 'Warrior', 'Winged Beast', 'Wyrm', 'Zombie',
+];
+
+/// The kinds a Yu-Gi-Oh! spell or trap is of (a trap is never an Equip,
+/// Field, Quick-Play or Ritual one, a spell never a Counter one).
+const ygoSpellTrapKinds = ['Normal', 'Continuous', 'Counter', 'Equip', 'Field', 'Quick-Play', 'Ritual'];
+
 /// The categories that are abilities rather than frames: they count as
 /// types of the monster next to its own (Dragon, Tuner, Pendulum…).
 const ygoAbilities = ['Pendulum', 'Tuner', 'Flip', 'Gemini', 'Spirit', 'Toon', 'Union'];
@@ -400,12 +411,31 @@ class YgoCardInfo extends CardInfo {
     this.scale,
     this.atk,
     this.def,
+    this.atkText,
+    this.defText,
     this.archetype,
     this.text,
     this.hasEffect,
     this.setCode,
     this.setName,
   });
+
+  /// An ATK or DEF as data gives it: what it is worth and, when it is not
+  /// a plain number, the text it reads. A number is itself; `-1` (how the
+  /// sources write an unknown stat) reads `?`; any other text reads as
+  /// typed (`X000`, `∞`); and whatever is not a number is worth 0.
+  static (int? worth, String? text) readStat(Object? value) => switch (value) {
+        null => (null, null),
+        final int n when n < 0 => (0, '?'),
+        final int n => (n, null),
+        final num n => readStat(n.round()),
+        final String s when s.trim().isEmpty => (null, null),
+        final String s => switch (int.tryParse(s.trim())) {
+            final n? => readStat(n),
+            null => (0, s.trim()),
+          },
+        _ => (null, null),
+      };
 
   factory YgoCardInfo.fromJson(Map<String, dynamic> json) => YgoCardInfo(
         name: json['name'] as String,
@@ -419,8 +449,10 @@ class YgoCardInfo extends CardInfo {
         linkRating: json['linkRating'] as int?,
         linkMarkers: (json['linkMarkers'] as List? ?? const []).cast<String>(),
         scale: json['scale'] as int?,
-        atk: json['atk'] as int?,
-        def: json['def'] as int?,
+        atk: readStat(json['atk']).$1,
+        def: readStat(json['def']).$1,
+        atkText: readStat(json['atk']).$2,
+        defText: readStat(json['def']).$2,
         archetype: json['archetype'] as String?,
         text: json['text'] as String?,
         hasEffect: json['hasEffect'] as bool?,
@@ -455,8 +487,10 @@ class YgoCardInfo extends CardInfo {
       linkRating: json['linkval'] as int?,
       linkMarkers: (json['linkmarkers'] as List? ?? const []).cast<String>(),
       scale: json['scale'] as int?,
-      atk: json['atk'] as int?,
-      def: json['def'] as int?,
+      atk: readStat(json['atk']).$1,
+      def: readStat(json['def']).$1,
+      atkText: readStat(json['atk']).$2,
+      defText: readStat(json['def']).$2,
       archetype: json['archetype'] as String?,
       text: json['desc'] as String?,
       hasEffect: misc == null ? null : misc['has_effect'] == 1,
@@ -485,8 +519,9 @@ class YgoCardInfo extends CardInfo {
         'linkRating': ?linkRating,
         'linkMarkers': linkMarkers,
         'scale': ?scale,
-        'atk': ?atk,
-        'def': ?def,
+        // The text when the stat is no plain number, to read it back as is.
+        'atk': ?(atkText ?? atk),
+        'def': ?(defText ?? def),
         'archetype': ?archetype,
         'text': ?text,
         'hasEffect': ?hasEffect,
@@ -522,8 +557,19 @@ class YgoCardInfo extends CardInfo {
   final int? linkRating;
   final List<String> linkMarkers;
   final int? scale;
+  /// What the ATK and DEF are worth (to sort, filter and count): a stat
+  /// that is no number is worth 0. `null` when the card has none.
   final int? atk;
   final int? def;
+
+  /// The ATK and DEF as they read when they are no plain number (`?`,
+  /// `X000`); `null` for a number, which reads as itself.
+  final String? atkText;
+  final String? defText;
+
+  /// The ATK and DEF as printed; `null` when the card has none.
+  String? get atkLabel => atkText ?? atk?.toString();
+  String? get defLabel => defText ?? def?.toString();
   final String? archetype;
   final String? text;
   final bool? hasEffect;

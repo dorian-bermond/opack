@@ -113,22 +113,50 @@ Object? parseFieldText(String text, Object? base) {
   };
 }
 
-/// A Yu-Gi-Oh! card's subtypes as one list: its type (Zombie, Spellcaster…)
-/// first, then its categories (Toon, Tuner, Effect…), what the editor
-/// shows as one field.
+/// A Yu-Gi-Oh! card's subtypes as one list, in the order a card prints
+/// them: its type (the tribe: Zombie, Spellcaster…) first, then its
+/// categories as [ygoPrintOrder] has them (`Dragon / Synchro / Pendulum /
+/// Tuner / Effect`). It is what the editor shows as one field.
 List<String> ygoSubtypes({String? race, List<String> categories = const []}) =>
-    [?race, for (final c in ygoCategoryOrder) if (categories.contains(c)) c];
+    [?race, for (final c in ygoPrintOrder) if (categories.contains(c)) c];
+
+/// The categories in the order a type line prints them, after the tribe:
+/// the card's frame (Ritual, Fusion, Synchro, Xyz, Link), Pendulum, the
+/// abilities (Flip, Toon, Spirit, Union, Gemini, then Tuner), and last
+/// whether it has an effect.
+const ygoPrintOrder = [
+  'Ritual', 'Fusion', 'Synchro', 'Xyz', 'Link', 'Pendulum', 'Flip', 'Toon', 'Spirit', 'Union', 'Gemini', 'Tuner',
+  'Effect', 'Normal', 'Token',
+];
+
+/// [subtypes] with [word] picked: a category joins the others, any other
+/// word is the tribe and takes the place of the one there was. A spell or
+/// a trap (not a [monster]) has one word, its kind. The result is in
+/// printed order (see [ygoSubtypes]).
+List<String> ygoWithSubtype(List<String> subtypes, String word, {bool monster = true}) {
+  if (!monster) return [word];
+  if (ygoCategories.contains(word)) {
+    final (:race, :categories) = ygoSplitSubtypes(subtypes);
+    return ygoSubtypes(race: race, categories: [...categories, word]);
+  }
+  return ygoSubtypes(race: word, categories: ygoSplitSubtypes(subtypes).categories);
+}
 
 /// The categories as a type string orders them: the abilities (Pendulum,
 /// Tuner…) before the frame words (Effect, Fusion…).
 final ygoCategoryOrder = [...ygoAbilities, for (final c in ygoCategories) if (!ygoAbilities.contains(c)) c];
 
 /// The type and categories [subtypes] hold: the first word that is no
-/// category is the type, the categories come in their usual order.
-({String? race, List<String> categories}) ygoSplitSubtypes(List<String> subtypes) => (
-      race: subtypes.where((w) => !ygoCategories.contains(w)).firstOrNull,
-      categories: [for (final c in ygoCategoryOrder) if (subtypes.contains(c)) c],
-    );
+/// category is the type (the tribe), the categories come in their usual
+/// order. For a spell or a trap (not a [monster]) the first word is its
+/// kind, whatever it is (Normal and Ritual are categories of monsters),
+/// and it has no category.
+({String? race, List<String> categories}) ygoSplitSubtypes(List<String> subtypes, {bool monster = true}) => monster
+    ? (
+        race: subtypes.where((w) => !ygoCategories.contains(w)).firstOrNull,
+        categories: [for (final c in ygoCategoryOrder) if (subtypes.contains(c)) c],
+      )
+    : (race: subtypes.firstOrNull, categories: const []);
 
 /// YGOPRODeck's type string for [categories] (`Pendulum Tuner Effect
 /// Monster`); [base] stays for a spell or a trap.
@@ -146,10 +174,11 @@ String computedTypeLine(Game game, Map<String, Object?> fields) {
       };
   switch (game) {
     case Game.ygo:
+      // The tribe, then the subtypes as picked, else as the categories say.
+      final race = fields['race'];
       final subtypes = words('subtypes');
-      if (subtypes.isNotEmpty) return subtypes.join(' / ');
-      final (:race, :categories) = (race: fields['race'] as String?, categories: words('categories'));
-      return ygoSubtypes(race: race, categories: categories).join(' / ');
+      final rest = subtypes.isNotEmpty ? subtypes : ygoSubtypes(categories: words('categories'));
+      return [if (race is String && race.isNotEmpty && !rest.contains(race)) race, ...rest].join(' / ');
     case Game.mtg:
       final left = [...words('supertypes'), ...words('types')].join(' ');
       final sub = words('subtypes');

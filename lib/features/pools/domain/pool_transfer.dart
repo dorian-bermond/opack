@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'play_pool.dart';
 import 'pool.dart';
 
 /// A pool as a file: its sources, tags, boosters, formats, copies and
@@ -12,6 +13,25 @@ const poolFileVersion = 1;
 String poolFileName(Pool pool) {
   final stem = pool.name.replaceAll(RegExp(r'[<>:"/\\|?*\x00-\x1F]'), ' ').trim();
   return '${stem.isEmpty ? 'pool' : stem}.opack.json';
+}
+
+/// The file name a pool's card list exports under.
+String poolCardListFileName(Pool pool) => poolFileName(pool).replaceFirst(RegExp(r'\.opack\.json$'), '.txt');
+
+/// The pool's cards as a plain list, one per line as `3 Name`, in
+/// [language] where a card has that name (else English), sorted by name:
+/// what any deck tool reads, the batch import included. The number is the
+/// card's copies in the pool; a card with unlimited copies counts once,
+/// one left out of the pool (no copy) is not listed.
+String poolCardList(PlayPool play, String language) {
+  final lines = <(String, int)>[];
+  for (final (:card, :listed) in play.entries) {
+    final copies = play.pool.copiesOf(card.id, listed: listed);
+    if (copies == 0) continue;
+    lines.add((card.nameFor(language), copies ?? 1));
+  }
+  lines.sort((a, b) => a.$1.toLowerCase().compareTo(b.$1.toLowerCase()));
+  return [for (final (name, copies) in lines) '$copies $name', ''].join('\n');
 }
 
 Uint8List encodePool(Pool pool) => utf8.encode(const JsonEncoder.withIndent(' ').convert({

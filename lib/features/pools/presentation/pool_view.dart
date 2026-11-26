@@ -11,6 +11,7 @@ import '../../card_text/data/card_text_repository.dart';
 import '../../card_text/presentation/card_details_sheet.dart';
 import '../../catalog/domain/models.dart';
 import '../domain/pool.dart';
+import 'card_edit_sheet.dart';
 import 'marquee_selection.dart';
 import 'pool_loader.dart';
 import 'pool_widgets.dart';
@@ -867,6 +868,26 @@ class PoolStacksSliver extends StatelessWidget {
   }
 }
 
+/// A pencil opening the card's fields to edit them for the pool (see
+/// [editCardFields]); nothing outside of a pool screen.
+class _EditCardButton extends StatelessWidget {
+  const _EditCardButton({required this.card});
+
+  final CardData card;
+
+  @override
+  Widget build(BuildContext context) {
+    final play = PoolScope.playOf(context);
+    if (play == null) return const SizedBox.shrink();
+    return IconButton(
+      key: ValueKey('editCard-${card.id}'),
+      tooltip: AppLocalizations.of(context).editCard,
+      icon: const Icon(Icons.edit_outlined, size: 20),
+      onPressed: () => editCardFields(context, play: play, card: card),
+    );
+  }
+}
+
 /// Each card with its picture, name, details and full text.
 class PoolSpoilerSliver extends ConsumerWidget {
   const PoolSpoilerSliver({
@@ -970,6 +991,7 @@ class PoolSpoilerSliver extends ConsumerWidget {
                         icon: const Icon(Icons.label_outline, size: 20),
                         onPressed: () => actions.onTags(card),
                       ),
+                      _EditCardButton(card: card),
                     ],
                   ),
             ],
@@ -1036,6 +1058,7 @@ class PoolListSliver extends ConsumerWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  _EditCardButton(card: card),
                   IconButton(
                     tooltip: l10n.cardTags,
                     icon: const Icon(Icons.label_outline, size: 20),

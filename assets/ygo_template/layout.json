@@ -1,0 +1,567 @@
+{
+ "card": [
+  1389,
+  2026
+ ],
+ "pictures": {
+  "frame-normal": {
+   "file": "frame-normal.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-effect": {
+   "file": "frame-effect.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-ritual": {
+   "file": "frame-ritual.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-fusion": {
+   "file": "frame-fusion.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-synchro": {
+   "file": "frame-synchro.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-xyz": {
+   "file": "frame-xyz.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-link": {
+   "file": "frame-link.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-spell": {
+   "file": "frame-spell.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-trap": {
+   "file": "frame-trap.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "frame-token": {
+   "file": "frame-token.jpg",
+   "box": [
+    0,
+    0,
+    1389,
+    2026
+   ]
+  },
+  "attribute-dark": {
+   "file": "attribute-dark.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-divine": {
+   "file": "attribute-divine.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-earth": {
+   "file": "attribute-earth.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-fire": {
+   "file": "attribute-fire.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-light": {
+   "file": "attribute-light.png",
+   "box": [
+    1162,
+    87,
+    133,
+    133
+   ]
+  },
+  "attribute-water": {
+   "file": "attribute-water.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-wind": {
+   "file": "attribute-wind.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-spell": {
+   "file": "attribute-spell.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-trap": {
+   "file": "attribute-trap.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-dark-fr": {
+   "file": "attribute-dark-fr.png",
+   "box": [
+    1162,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-divine-fr": {
+   "file": "attribute-divine-fr.png",
+   "box": [
+    1164,
+    90,
+    130,
+    131
+   ]
+  },
+  "attribute-earth-fr": {
+   "file": "attribute-earth-fr.png",
+   "box": [
+    1163,
+    88,
+    133,
+    133
+   ]
+  },
+  "attribute-fire-fr": {
+   "file": "attribute-fire-fr.png",
+   "box": [
+    1162,
+    89,
+    133,
+    133
+   ]
+  },
+  "attribute-light-fr": {
+   "file": "attribute-light-fr.png",
+   "box": [
+    1162,
+    88,
+    134,
+    133
+   ]
+  },
+  "attribute-water-fr": {
+   "file": "attribute-water-fr.png",
+   "box": [
+    1164,
+    91,
+    130,
+    130
+   ]
+  },
+  "attribute-wind-fr": {
+   "file": "attribute-wind-fr.png",
+   "box": [
+    1164,
+    88,
+    133,
+    133
+   ]
+  },
+  "level": {
+   "file": "level.png",
+   "box": [
+    142,
+    244,
+    1101,
+    89
+   ],
+   "count": 12
+  },
+  "rank": {
+   "file": "rank.png",
+   "box": [
+    142,
+    244,
+    1101,
+    89
+   ],
+   "count": 12
+  },
+  "icon-continuous": {
+   "file": "icon-continuous.png",
+   "box": [
+    1146,
+    256,
+    77,
+    77
+   ]
+  },
+  "icon-counter": {
+   "file": "icon-counter.png",
+   "box": [
+    1146,
+    256,
+    77,
+    77
+   ]
+  },
+  "icon-equip": {
+   "file": "icon-equip.png",
+   "box": [
+    1146,
+    256,
+    77,
+    77
+   ]
+  },
+  "icon-field": {
+   "file": "icon-field.png",
+   "box": [
+    1146,
+    256,
+    77,
+    77
+   ]
+  },
+  "icon-quick-play": {
+   "file": "icon-quick-play.png",
+   "box": [
+    1146,
+    256,
+    77,
+    77
+   ]
+  },
+  "icon-ritual": {
+   "file": "icon-ritual.png",
+   "box": [
+    1146,
+    256,
+    77,
+    77
+   ]
+  },
+  "link-top-inactive": {
+   "file": "link-top-inactive.png",
+   "box": [
+    542,
+    274,
+    305,
+    97
+   ]
+  },
+  "link-top-active": {
+   "file": "link-top-active.png",
+   "box": [
+    542,
+    274,
+    305,
+    97
+   ]
+  },
+  "link-top-left-inactive": {
+   "file": "link-top-left-inactive.png",
+   "box": [
+    92,
+    296,
+    165,
+    165
+   ]
+  },
+  "link-top-left-active": {
+   "file": "link-top-left-active.png",
+   "box": [
+    92,
+    296,
+    165,
+    165
+   ]
+  },
+  "link-top-right-inactive": {
+   "file": "link-top-right-inactive.png",
+   "box": [
+    1132,
+    296,
+    165,
+    165
+   ]
+  },
+  "link-top-right-active": {
+   "file": "link-top-right-active.png",
+   "box": [
+    1132,
+    296,
+    165,
+    165
+   ]
+  },
+  "link-bottom-inactive": {
+   "file": "link-bottom-inactive.png",
+   "box": [
+    542,
+    1426,
+    305,
+    79
+   ]
+  },
+  "link-bottom-active": {
+   "file": "link-bottom-active.png",
+   "box": [
+    542,
+    1426,
+    305,
+    79
+   ]
+  },
+  "link-right-inactive": {
+   "file": "link-right-inactive.png",
+   "box": [
+    1222,
+    746,
+    97,
+    305
+   ]
+  },
+  "link-right-active": {
+   "file": "link-right-active.png",
+   "box": [
+    1222,
+    746,
+    97,
+    305
+   ]
+  },
+  "link-left-inactive": {
+   "file": "link-left-inactive.png",
+   "box": [
+    70,
+    746,
+    97,
+    305
+   ]
+  },
+  "link-left-active": {
+   "file": "link-left-active.png",
+   "box": [
+    70,
+    746,
+    97,
+    305
+   ]
+  },
+  "link-bottom-right-inactive": {
+   "file": "link-bottom-right-inactive.png",
+   "box": [
+    1132,
+    1336,
+    165,
+    165
+   ]
+  },
+  "link-bottom-right-active": {
+   "file": "link-bottom-right-active.png",
+   "box": [
+    1132,
+    1336,
+    165,
+    165
+   ]
+  },
+  "link-bottom-left-inactive": {
+   "file": "link-bottom-left-inactive.png",
+   "box": [
+    92,
+    1336,
+    165,
+    165
+   ]
+  },
+  "link-bottom-left-active": {
+   "file": "link-bottom-left-active.png",
+   "box": [
+    92,
+    1336,
+    165,
+    165
+   ]
+  },
+  "link-label": {
+   "file": "link-label.png",
+   "box": [
+    1030,
+    1854,
+    197,
+    41
+   ]
+  }
+ },
+ "boxes": {
+  "artwork": [
+   168,
+   372,
+   1053,
+   1053
+  ],
+  "name": [
+   108,
+   113,
+   1038,
+   99
+  ],
+  "attribute": [
+   1162,
+   88,
+   133,
+   133
+  ],
+  "levels": [
+   142,
+   244,
+   1101,
+   89
+  ],
+  "monsterType": [
+   107,
+   1526,
+   1170,
+   54
+  ],
+  "monsterText": [
+   105,
+   1590,
+   1172,
+   251
+  ],
+  "spellText": [
+   106,
+   1532,
+   1175,
+   360
+  ],
+  "spellType": [
+   321,
+   262,
+   925,
+   66
+  ],
+  "spellIcon": [
+   1146,
+   256,
+   77,
+   77
+  ],
+  "statsLine": [
+   104,
+   1842,
+   1177,
+   5
+  ],
+  "atk": [
+   754,
+   1855,
+   244,
+   38
+  ],
+  "def": [
+   1047,
+   1853,
+   234,
+   42
+  ],
+  "linkNumber": [
+   1246,
+   1855,
+   24,
+   39
+  ],
+  "setNumber": [
+   1013,
+   1463,
+   232,
+   29
+  ],
+  "setNumberLink": [
+   897,
+   1463,
+   243,
+   29
+  ],
+  "code": [
+   65,
+   1937,
+   192,
+   30
+  ]
+ }
+}
