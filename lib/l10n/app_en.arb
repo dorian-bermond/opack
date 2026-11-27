@@ -384,6 +384,7 @@
   "@revertField": { "placeholders": { "value": { "type": "String" } } },
   "fieldEmpty": "(none)",
   "customOption": "Custom…",
+  "searchChoice": "Search…",
   "prefillFromVersion": "Prefill from a version",
   "prefillField": "Take this field from another version",
   "prefillTitle": "Prefill from a version",

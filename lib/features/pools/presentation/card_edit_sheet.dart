@@ -18,6 +18,7 @@ import '../domain/play_pool.dart';
 import '../../packs/domain/best_versions.dart';
 import 'card_field_icons.dart';
 import 'card_prefill_dialog.dart';
+import 'choice_picker.dart';
 import 'pool_actions.dart';
 
 /// Lets the user change any field of [card] for the pool: each field shows
@@ -428,8 +429,32 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     }
   }
 
-  /// Sends the focus to the field of [key], which scrolls it into view.
-  void _focusField(String key) => _focuses[key]?.requestFocus();
+  /// Sends the focus to the field of [key], which scrolls it into view; a
+  /// choice field opens its list.
+  void _focusField(String key) {
+    _focuses[key]?.requestFocus();
+    if (_isChoice(key)) _pickChoice(key);
+  }
+
+  /// Opens the list of [key]'s options and takes the one picked; "Custom…"
+  /// asks for a value of the user's own.
+  Future<void> _pickChoice(String key) async {
+    final picked = await pickChoice(
+      context,
+      title: _label(key),
+      game: _game,
+      fieldKey: key,
+      options: _options(key),
+      current: _controllers[key]!.text,
+      iconValue: (option) => _kept(key, option),
+    );
+    if (picked == null || !mounted) return;
+    if (picked == customChoice) {
+      await _addOption(key);
+    } else {
+      setState(() => _controllers[key]!.text = picked);
+    }
+  }
 
   /// Picks the level (or rank) from none to twelve.
   Future<void> _pickLevel() async {
@@ -556,7 +581,12 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       // Every attribute and supertype of the game.
       if (_game == Game.ygo && key == 'attribute') ...ygoAttributes,
       if (key == ygoSupertypeKey) ...ygoSupertypes,
-      ...?_poolOptions[key],
+      // The pool's own values, a spell's kind kept out of a monster's tribes
+      // (and the other way round).
+      for (final option in _poolOptions[key] ?? const <String>{})
+        if (!(_game == Game.ygo && key == 'race') ||
+            (_ygoMonster ? !ygoSpellTrapKinds.contains(option) : !ygoMonsterTypes.contains(option)))
+          option,
       if (base is String && base.isNotEmpty) base,
       ...added,
     }.map((option) => _shown(key, option)).toSet().toList()..sort();
@@ -590,9 +620,6 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     final label = words[0].toUpperCase() + words.substring(1);
     return suffix == null ? label : '$label ($suffix)';
   }
-
-  /// The marker of a custom option in the choice lists.
-  static const _customOption = '\u0000custom';
 
   @override
   Widget build(BuildContext context) {
@@ -763,7 +790,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                         for (final option in options)
                           ListTile(
                             dense: true,
-                            leading: ValueIcon(_game, key, option, size: 22),
+                            leading: ValueIcon(_game, key, _kept(key, option), size: 22),
                             title: Text(option),
                             onTap: () => onSelected(option),
                           ),
@@ -778,80 +805,33 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       );
     }
 
-    // A choice field: the known values filtered as one types, then "Custom…".
-    Widget choiceField(String key) {
-      final options = _options(key);
-      return RawAutocomplete<String>(
-        textEditingController: _controllers[key],
-        focusNode: _focuses[key],
-        optionsBuilder: (value) {
-          final query = value.text.toLowerCase();
-          return [
-            for (final option in options)
-              if (option.toLowerCase().contains(query)) option,
-            _customOption,
-          ];
+    // A choice field: what it reads, the list opened by a click on it, with
+    // a search box over it.
+    Widget choiceField(String key) => TextField(
+      key: ValueKey('field-$key'),
+      controller: _controllers[key],
+      focusNode: _focuses[key],
+      readOnly: true,
+      mouseCursor: SystemMouseCursors.click,
+      decoration: InputDecoration(
+        isDense: true,
+        border: const OutlineInputBorder(),
+        prefixIcon: switch (valueIconWidget(
+          _game,
+          key,
+          _kept(key, _controllers[key]!.text),
+          size: 22,
+          key: ValueKey('valueIcon-$key'),
+        )) {
+          null => null,
+          // Its own size, not stretched to the field's height.
+          final icon => Padding(padding: const EdgeInsets.all(8), child: icon),
         },
-        displayStringForOption: (option) => option == _customOption ? l10n.customOption : option,
-        onSelected: (option) {
-          if (option == _customOption) {
-            _controllers[key]!.text = fieldText(_valueOf(key));
-            _addOption(key);
-          } else {
-            setState(() {});
-          }
-        },
-        fieldViewBuilder: (context, controller, focusNode, onSubmitted) => TextField(
-          key: ValueKey('field-$key'),
-          controller: controller,
-          focusNode: focusNode,
-          decoration: InputDecoration(
-            isDense: true,
-            border: const OutlineInputBorder(),
-            prefixIcon: switch (valueIconWidget(
-              _game,
-              key,
-              _kept(key, controller.text),
-              size: 22,
-              key: ValueKey('valueIcon-$key'),
-            )) {
-              null => null,
-              // Its own size, not stretched to the field's height.
-              final icon => Padding(padding: const EdgeInsets.all(8), child: icon),
-            },
-            prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-            suffixIcon: const Icon(Icons.arrow_drop_down),
-          ),
-          onChanged: (_) => setState(() {}),
-          onSubmitted: (_) => onSubmitted(),
-        ),
-        optionsViewBuilder: (context, onSelected, options) => Align(
-          alignment: Alignment.topLeft,
-          child: Material(
-            elevation: 4,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 240, maxWidth: 360),
-              child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children: [
-                  for (final option in options)
-                    ListTile(
-                      key: option == _customOption ? ValueKey('customOption-$key') : null,
-                      dense: true,
-                      leading: option == _customOption
-                          ? const Icon(Icons.add, size: 18)
-                          : ValueIcon(_game, key, option, size: 22),
-                      title: Text(option == _customOption ? l10n.customOption : option),
-                      onTap: () => onSelected(option),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+        prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+        suffixIcon: const Icon(Icons.arrow_drop_down),
+      ),
+      onTap: () => _pickChoice(key),
+    );
 
     final form = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

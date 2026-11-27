@@ -938,6 +938,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customOption => 'Custom…';
 
   @override
+  String get searchChoice => 'Search…';
+
+  @override
   String get prefillFromVersion => 'Prefill from a version';
 
   @override

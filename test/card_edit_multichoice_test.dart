@@ -94,16 +94,20 @@ void main() {
       expect(find.byKey(ValueKey('field-$key')), findsNothing, reason: key);
     }
 
-    // The drawn card is edited by clicking it: the attribute sends the
-    // focus to its field, an autocomplete list like the other choices...
+    // The drawn card is edited by clicking it: the attribute opens its
+    // list, the whole of it with a search box over it, like the other
+    // choices...
     await tester.tap(find.byKey(const ValueKey('ygoPart-attribute')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('pickAttribute')), findsNothing);
-    expect(tester.widget<TextField>(find.byKey(const ValueKey('field-attribute'))).focusNode!.hasFocus, isTrue);
-    await tester.enterText(find.byKey(const ValueKey('field-attribute')), 'FI');
+    expect(find.byKey(const ValueKey('choicePicker-attribute')), findsOneWidget);
+    expect(find.byKey(const ValueKey('choice-attribute-WIND')), findsOneWidget, reason: 'every attribute listed');
+    expect(tester.widget<ListTile>(find.byKey(const ValueKey('choice-attribute-EARTH'))).selected, isTrue);
+    await tester.enterText(find.byKey(const Key('choiceSearch')), 'FI');
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'FIRE'));
+    expect(find.byKey(const ValueKey('choice-attribute-WIND')), findsNothing, reason: 'narrowed as one types');
+    await tester.tap(find.byKey(const ValueKey('choice-attribute-FIRE')));
     await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('choicePicker-attribute')), findsNothing);
     expect(tester.widget<TextField>(find.byKey(const ValueKey('field-attribute'))).controller!.text, 'FIRE');
     tester.binding.focusManager.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
@@ -161,33 +165,31 @@ void main() {
     expect(line, greaterThan(tester.getTopLeft(subtypes).dy));
     expect(line, lessThan(tester.getTopLeft(find.byKey(const ValueKey('field-text'))).dy));
 
-    // The tribe is changed in its field, an autocomplete list of every
-    // tribe of the game, filtered as one types...
+    // The tribe is changed in its field: a click lists every tribe of the
+    // game, a search box narrowing them...
     await tester.ensureVisible(tribe);
-    await tester.enterText(tribe, 'winged');
+    await tester.tap(tribe);
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(ListTile, 'Winged Beast'), findsOneWidget,
+    await tester.enterText(find.byKey(const Key('choiceSearch')), 'winged');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('choice-race-Winged Beast')), findsOneWidget,
         reason: 'every tribe, also one no card of the pool has');
-    await tester.enterText(tribe, 'Drag');
+    await tester.enterText(find.byKey(const Key('choiceSearch')), 'Drag');
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Dragon'));
+    await tester.tap(find.byKey(const ValueKey('choice-race-Dragon')));
     await tester.pumpAndSettle();
     expect(tribeNow(), 'Dragon');
     expect(chips(), ['Synchro', 'Tuner', 'Effect'], reason: 'the subtypes stay');
     expect(tester.widget<Text>(find.byKey(const Key('typeLine'))).data, 'Dragon / Synchro / Tuner / Effect');
     expect(find.descendant(of: find.byKey(const Key('editDrawnCard')), matching: find.textContaining('Dragon')),
         findsOneWidget, reason: 'the drawn type line follows');
-    // ...or by a click on the drawn card's type line, which sends the focus
-    // to the tribe field, an autocomplete list too.
+    // ...or by a click on the drawn card's type line, which opens that list.
     tester.binding.focusManager.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('ygoPart-type')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('pickTribe')), findsNothing);
-    expect(tester.widget<TextField>(tribe).focusNode!.hasFocus, isTrue);
-    await tester.enterText(tribe, 'Zom');
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Zombie'));
+    expect(find.byKey(const ValueKey('choicePicker-race')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('choice-race-Zombie')));
     await tester.pumpAndSettle();
     expect(tribeNow(), 'Zombie');
     tester.binding.focusManager.primaryFocus?.unfocus();
@@ -428,19 +430,28 @@ void main() {
     expect(reads('race'), 'Magicien');
     expect(find.byKey(const ValueKey('custom-attribute')), findsNothing, reason: 'the French word is no change');
 
-    // A French word typed is the English one kept: the icon follows it.
-    await tester.enterText(find.byKey(const ValueKey('field-attribute')), 'fe');
+    // A French word picked is the English one kept: the icon follows it.
+    await tester.tap(find.byKey(const ValueKey('field-attribute')));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'FEU'));
+    await tester.enterText(find.byKey(const Key('choiceSearch')), 'fe');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('choice-attribute-FEU')));
     await tester.pumpAndSettle();
     expect(reads('attribute'), 'FEU');
     expect(find.byKey(const ValueKey('custom-attribute')), findsOneWidget);
     expect((tester.widget<Image>(find.byKey(const ValueKey('valueIcon-attribute'))).image as AssetImage).assetName,
         'assets/ygo_template/attribute-fire.png');
-    // The tribe list reads in French too, and the type line follows.
-    await tester.enterText(find.byKey(const ValueKey('field-race')), 'zom');
+    // The tribe list reads in French too, with its icons, and the type
+    // line follows.
+    await tester.tap(find.byKey(const ValueKey('field-race')));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Zombie'));
+    expect(find.byKey(const ValueKey('choice-race-Bête Ailée')), findsOneWidget);
+    expect(
+      find.descendant(of: find.byKey(const ValueKey('choice-race-Magicien')), matching: find.byType(Image)),
+      findsOneWidget,
+      reason: 'the icon is found behind the French word',
+    );
+    await tester.tap(find.byKey(const ValueKey('choice-race-Zombie')));
     await tester.pumpAndSettle();
     expect(tester.widget<Text>(find.byKey(const Key('typeLine'))).data, 'Zombie / Effet');
   });

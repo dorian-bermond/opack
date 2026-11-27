@@ -324,6 +324,7 @@
   "revertField": "Revenir à l'original : {value}",
   "fieldEmpty": "(aucun)",
   "customOption": "Personnalisé…",
+  "searchChoice": "Rechercher…",
   "prefillFromVersion": "Préremplir depuis une version",
   "prefillField": "Prendre ce champ d'une autre version",
   "prefillTitle": "Préremplir depuis une version",

@@ -1646,6 +1646,12 @@ abstract class AppLocalizations {
   /// **'Custom…'**
   String get customOption;
 
+  /// No description provided for @searchChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Search…'**
+  String get searchChoice;
+
   /// No description provided for @prefillFromVersion.
   ///
   /// In en, this message translates to:

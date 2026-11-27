@@ -943,6 +943,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get customOption => 'Personnalisé…';
 
   @override
+  String get searchChoice => 'Rechercher…';
+
+  @override
   String get prefillFromVersion => 'Préremplir depuis une version';
 
   @override
