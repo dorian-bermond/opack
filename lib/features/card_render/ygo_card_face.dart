@@ -38,7 +38,12 @@ class YgoCardFace extends StatelessWidget {
     this.artwork,
     this.language = 'en',
     this.onPart,
+    this.sharp = false,
   });
+
+  /// Drawn as printed whatever its size on screen: no thickening of the
+  /// thin texts, for a picture taken of it at full size.
+  final bool sharp;
 
   /// The name printed, in the language shown.
   final String name;
@@ -162,7 +167,7 @@ class YgoCardFace extends StatelessWidget {
       );
 
   Widget _face(BuildContext context, double scale) {
-    final thick = thickeningAt(scale, Colors.black);
+    final thick = sharp ? null : thickeningAt(scale, Colors.black);
     final frame = frameOf(info);
     final monster = info.kind == YgoKind.monster;
     final link = frame == 'link';
@@ -170,6 +175,7 @@ class YgoCardFace extends StatelessWidget {
     // Names read white on the dark frames, as printed.
     final nameColor = (xyz || link || !monster) ? Colors.white : Colors.black;
     final frameInk = xyz ? Colors.white : Colors.black;
+    final inkThick = sharp ? null : thickeningAt(scale, frameInk);
     final attribute = switch (info.kind) {
       YgoKind.spell => 'spell',
       YgoKind.trap => 'trap',
@@ -322,7 +328,7 @@ class YgoCardFace extends StatelessWidget {
                       (YgoCardPart.code, splitPrintCode(code).code),
                     ]) ...[
                       if (part == YgoCardPart.code && splitPrintCode(code).code.isNotEmpty)
-                        Text('-', style: _smallStyle(frameInk).copyWith(shadows: thickeningAt(scale, frameInk))),
+                        Text('-', style: _smallStyle(frameInk).copyWith(shadows: inkThick)),
                       _PartButton(
                         key: ValueKey('ygoPart-${part.name}'),
                         onTap: switch (onPart) { null => null, final on => () => on(part) },
@@ -331,7 +337,7 @@ class YgoCardFace extends StatelessWidget {
                           text.isEmpty && onPart != null ? '    ' : text,
                           maxLines: 1,
                           softWrap: false,
-                          style: _smallStyle(frameInk).copyWith(shadows: thickeningAt(scale, frameInk)),
+                          style: _smallStyle(frameInk).copyWith(shadows: inkThick),
                         ),
                       ),
                     ],
@@ -347,7 +353,7 @@ class YgoCardFace extends StatelessWidget {
                     passcode.padLeft(8, '0'),
                     maxLines: 1,
                     softWrap: false,
-                    style: _smallStyle(frameInk).copyWith(letterSpacing: 4, shadows: thickeningAt(scale, frameInk)),
+                    style: _smallStyle(frameInk).copyWith(letterSpacing: 4, shadows: inkThick),
                   ),
                 ),
               ),

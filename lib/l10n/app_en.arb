@@ -385,6 +385,8 @@
   "@revertField": { "placeholders": { "value": { "type": "String" } } },
   "fieldEmpty": "(none)",
   "customOption": "Custom…",
+  "saveRender": "Save the render",
+  "saveRenderHint": "Keeps the fields and a picture of the drawn card as this card's picture; its own print comes back from the artwork picker.",
   "searchChoice": "Search…",
   "prefillFromVersion": "Prefill from a version",
   "prefillField": "Take this field from another version",

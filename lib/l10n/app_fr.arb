@@ -325,6 +325,8 @@
   "revertField": "Revenir à l'original : {value}",
   "fieldEmpty": "(aucun)",
   "customOption": "Personnalisé…",
+  "saveRender": "Enregistrer le rendu",
+  "saveRenderHint": "Garde les champs et une image de la carte dessinée comme image de cette carte ; son impression revient depuis le choix d'illustration.",
   "searchChoice": "Rechercher…",
   "prefillFromVersion": "Préremplir depuis une version",
   "prefillField": "Prendre ce champ d'une autre version",

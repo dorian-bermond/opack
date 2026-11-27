@@ -946,6 +946,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get customOption => 'Personnalisé…';
 
   @override
+  String get saveRender => 'Enregistrer le rendu';
+
+  @override
+  String get saveRenderHint =>
+      'Garde les champs et une image de la carte dessinée comme image de cette carte ; son impression revient depuis le choix d\'illustration.';
+
+  @override
   String get searchChoice => 'Rechercher…';
 
   @override

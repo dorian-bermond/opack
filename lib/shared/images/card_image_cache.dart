@@ -119,6 +119,10 @@ ImageSource opcImageSource(String id, {String language = 'en'}) {
 /// YGOPRODeck's image for Yu-Gi-Oh!. With [small], the thumbnail instead
 /// (for choosing among scans).
 ImageSource artworkImageSource(CardData card, String artwork, {bool small = false}) {
+  if (renderedArtworkKey(artwork) case final key?) {
+    // A render the app saved: in the cache already, nothing to download.
+    return ImageSource(key, Uri(scheme: 'render', host: 'local', path: '/$key'), extension: 'png');
+  }
   if (isOnePieceId(artwork)) return opcImageSource(artwork);
   if (artwork.startsWith('http')) {
     final url = Uri.parse(artwork);
@@ -144,6 +148,14 @@ ImageSource artworkImageSource(CardData card, String artwork, {bool small = fals
     Uri.https('images.ygoprodeck.com', '/images/cards${small ? '_small' : ''}/$artwork.jpg'),
   );
 }
+
+/// The artwork value a card takes to be shown as a render the app saved
+/// (see [CardImageCache.store]): `render:` and the cache key.
+String renderedArtwork(String key) => 'render:$key';
+
+/// The cache key of a rendered [artwork], `null` for any other artwork.
+String? renderedArtworkKey(String? artwork) =>
+    artwork != null && artwork.startsWith('render:') ? artwork.substring(7) : null;
 
 /// The picture of a set's booster pack, in [language] when the wiki has that
 /// region's pack, else English. Yu-Gi-Oh!: wiki `SET-BoosterFR.png` scans,
@@ -332,6 +344,16 @@ class CardImageCache {
 
   static Future<Directory> defaultDirectory() async =>
       Directory('${(await getApplicationSupportDirectory()).path}/images');
+
+  /// Keeps [bytes] as the picture of [key] (a render the app made), as
+  /// the cached file [fetch] answers for that key from now on.
+  Future<File> store(String key, List<int> bytes, {String extension = 'png'}) async {
+    final file = File('${(await _directory).path}/$key.$extension');
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes(bytes, flush: true);
+    _failed.remove(key);
+    return file;
+  }
 
   /// The cached file for [key], downloading [url] first if needed. When that
   /// is unavailable and a [fallback] is given, its own cached file instead;

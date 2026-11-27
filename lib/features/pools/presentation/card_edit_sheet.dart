@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/images/card_image_cache.dart';
 import '../../card_info/data/card_info_repository.dart';
 import '../../card_info/domain/card_info.dart';
 import '../../card_info/domain/ygo_words.dart';
@@ -15,6 +18,7 @@ import '../../catalog/domain/models.dart';
 import '../data/pool_repository.dart';
 import '../domain/card_customs.dart';
 import '../domain/play_pool.dart';
+import '../domain/pool.dart';
 import '../../packs/domain/best_versions.dart';
 import 'card_field_icons.dart';
 import 'card_prefill_dialog.dart';
@@ -220,6 +224,10 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   /// known from the widget tree: the data keeps the English ones.
   String _language = 'en';
   bool _languageKnown = false;
+
+  /// The drawn card, to take a picture of; drawn sharp while one is taken.
+  final _renderKey = GlobalKey();
+  bool _capturing = false;
 
   /// The fields whose words read in [_language].
   static const _wordFields = {'attribute', 'race', ygoSupertypeKey};
@@ -604,7 +612,8 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     }
   });
 
-  Future<void> _apply() async {
+  /// The pool with the fields as they read now kept as customs.
+  Pool _customized() {
     var pool = widget.play.pool;
     for (final key in _keys) {
       // The subtypes field is the editor's own: its parts are what is kept.
@@ -612,10 +621,43 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       final custom = _isCustom(key);
       pool = pool.withCustom(_id, key, custom ? _valueOf(key) : null, remove: !custom);
     }
+    return pool;
+  }
+
+  Future<void> _apply() async {
+    final pool = _customized();
     if (pool.customs != widget.play.pool.customs) {
       await ref.read(poolsProvider.notifier).save(pool);
     }
     if (mounted) Navigator.pop(context, true);
+  }
+
+  /// Keeps the fields, and a picture of the drawn card at its printed
+  /// size as the card's picture from now on (its own print comes back
+  /// from the artwork picker).
+  Future<void> _saveRender() async {
+    final cache = ref.read(cardImageCacheProvider);
+    if (cache == null) return;
+    // Drawn sharp for the picture, then as before.
+    setState(() => _capturing = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    try {
+      final boundary = _renderKey.currentContext?.findRenderObject();
+      if (boundary is! RenderRepaintBoundary) return;
+      final image = await boundary.toImage(pixelRatio: YgoCardFace.width / boundary.size.width);
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+      image.dispose();
+      if (bytes == null || !mounted) return;
+      final key = 'render-${widget.play.pool.id}-$_id-${DateTime.now().millisecondsSinceEpoch}'
+          .replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+      await cache.store(key, bytes.buffer.asUint8List());
+      final pool = _customized().withArtwork(_id, renderedArtwork(key));
+      await ref.read(poolsProvider.notifier).save(pool);
+      if (mounted) Navigator.pop(context, true);
+    } finally {
+      if (mounted) setState(() => _capturing = false);
+    }
   }
 
   /// Every option of a choice field: the pool's values and the user's, sorted.
@@ -901,16 +943,30 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (_versions.isNotEmpty)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton.icon(
-                          key: const Key('prefillCard'),
-                          onPressed: _prefill,
-                          icon: const Icon(Icons.file_download_outlined, size: 18),
-                          label: Text(l10n.prefillFromVersion),
-                        ),
-                      ),
+                    // What can be done with the whole card: prefilled from
+                    // another printing, kept as a picture.
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        if (_versions.isNotEmpty)
+                          TextButton.icon(
+                            key: const Key('prefillCard'),
+                            onPressed: _prefill,
+                            icon: const Icon(Icons.file_download_outlined, size: 18),
+                            label: Text(l10n.prefillFromVersion),
+                          ),
+                        if (_drawnInfo != null && ref.watch(cardImageCacheProvider) != null)
+                          Tooltip(
+                            message: l10n.saveRenderHint,
+                            child: TextButton.icon(
+                              key: const Key('saveRender'),
+                              onPressed: _capturing ? null : _saveRender,
+                              icon: const Icon(Icons.photo_camera_outlined, size: 18),
+                              label: Text(l10n.saveRender),
+                            ),
+                          ),
+                      ],
+                    ),
                     for (final key in _keys) ...[
                       // Not edited here: what follows other fields, the rarities
                       // (a matter of the pool's tags) and whether the card has
@@ -974,8 +1030,8 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              const Spacer(),
               TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.cancel)),
               const SizedBox(width: 8),
               FilledButton(key: const Key('applyCardEdit'), onPressed: _apply, child: Text(l10n.apply)),
@@ -1010,13 +1066,17 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                         aspectRatio: ratio,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(width / 22),
-                          child: GeneratedYgoCard(
-                            key: const Key('editDrawnCard'),
-                            card: widget.card,
-                            info: drawn,
-                            name: _drawnName,
-                            code: _valueOf('setCode') as String? ?? '',
-                            onPart: _editPart,
+                          child: RepaintBoundary(
+                            key: _renderKey,
+                            child: GeneratedYgoCard(
+                              key: const Key('editDrawnCard'),
+                              card: widget.card,
+                              info: drawn,
+                              name: _drawnName,
+                              code: _valueOf('setCode') as String? ?? '',
+                              onPart: _editPart,
+                              sharp: _capturing,
+                            ),
                           ),
                         ),
                       ),

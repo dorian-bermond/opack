@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:opack/features/card_info/data/card_info_repository.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_text/data/card_text_repository.dart';
 import 'package:opack/features/catalog/domain/models.dart';
 import 'package:opack/features/pools/domain/play_pool.dart';
+import 'package:opack/features/pools/data/pool_repository.dart';
 import 'package:opack/features/pools/domain/pool.dart';
 import 'package:opack/features/pools/presentation/card_edit_sheet.dart';
 import 'package:opack/features/pools/presentation/card_field_icons.dart';
@@ -13,7 +18,7 @@ import 'package:opack/l10n/app_localizations.dart';
 import 'package:opack/shared/images/card_image_cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'widget_test.dart' show MemoryCardInfoStore;
+import 'widget_test.dart' show MemoryCardInfoStore, MemoryPoolStore;
 
 void main() {
   testWidgets('a card with details opens in the editor, its subtypes picked by word', (tester) async {
@@ -493,5 +498,70 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('choice-race-Zombie')));
     await tester.pumpAndSettle();
     expect(tester.widget<Text>(find.byKey(const Key('typeLine'))).data, 'Zombie / Effet');
+  });
+
+  testWidgets('the render is saved as the card picture, the fields kept with it', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    const card = CardData(id: 'X-1', names: {'en': 'Mezuki'}, rarity: Rarity.common);
+    final pool = Pool.empty(Game.ygo, name: 'p', id: 'p').withSource(const CardsSource([card]), cards: [card]);
+    final store = MemoryCardInfoStore();
+    await store.save('p', {
+      'X-1': YgoCardInfo.fromYgoprodeck(const {
+        'name': 'Mezuki', 'type': 'Effect Monster', 'frameType': 'effect', 'race': 'Zombie',
+        'attribute': 'EARTH', 'level': 4, 'atk': 1700, 'def': 800, 'desc': 'Text.',
+      }),
+    });
+    // Real files: outside the test's fake time.
+    final dir = (await tester.runAsync(() => Directory.systemTemp.createTemp('opack-render')))!;
+    addTearDown(() => dir.delete(recursive: true));
+    final pools = MemoryPoolStore();
+    await pools.save(pool);
+    final container = ProviderContainer(overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      cardInfoStoreProvider.overrideWithValue(store),
+      cardInfoFetcherProvider.overrideWithValue(null),
+      poolStoreProvider.overrideWithValue(pools),
+      cardImageCacheProvider.overrideWithValue(
+          CardImageCache(Future.value(dir), client: MockClient((_) async => http.Response('', 404)))),
+    ]);
+    addTearDown(container.dispose);
+    await tester.runAsync(() => container.read(poolCardInfoProvider('p').future));
+    await tester.runAsync(() => container.read(poolsProvider.future));
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: CardEditSheet(play: PlayPool.resolve(pool, sets: const {}, cubes: const {}), card: card),
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const ValueKey('field-atk')), '2400');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('saveRender')), findsOneWidget);
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const Key('saveRender')));
+      // The picture is taken over a few frames and written to a real file.
+      for (var i = 0; i < 100 && container.read(poolsProvider).value!.single.artworks.isEmpty; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+    });
+    await tester.pumpAndSettle();
+    final saved = container.read(poolsProvider).value!.single;
+    expect(saved.customsOf('X-1')['atk'], 2400, reason: 'the fields are kept with the picture');
+    final artwork = saved.artworks['X-1']!;
+    expect(artwork, startsWith('render:render-p-X-1-'));
+    final file = File('${dir.path}/${renderedArtworkKey(artwork)}.png');
+    expect(await tester.runAsync(file.exists), isTrue);
+    expect(await tester.runAsync(file.length), greaterThan(100), reason: 'a PNG of the card');
   });
 }

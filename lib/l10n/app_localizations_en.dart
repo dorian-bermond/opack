@@ -941,6 +941,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customOption => 'Custom…';
 
   @override
+  String get saveRender => 'Save the render';
+
+  @override
+  String get saveRenderHint =>
+      'Keeps the fields and a picture of the drawn card as this card\'s picture; its own print comes back from the artwork picker.';
+
+  @override
   String get searchChoice => 'Search…';
 
   @override

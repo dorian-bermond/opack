@@ -33,6 +33,8 @@ class GeneratedCardsSetting extends Notifier<bool> {
 /// fields, whose details are known. `null` otherwise.
 YgoCardInfo? generatedYgoInfo(WidgetRef ref, PlayPool? play, CardData card) {
   if (play == null || play.pool.game != Game.ygo || card.customFields.isEmpty) return null;
+  // A render the app saved is the card's picture: shown as it is.
+  if (renderedArtworkKey(card.artwork) != null) return null;
   if (!ref.watch(generatedCardsProvider)) return null;
   final infos = ref.watch(poolCardInfoProvider(play.pool.id)).value?.infos;
   final info = play.customizedInfo(card.id, infos?[card.id]);
@@ -42,7 +44,18 @@ YgoCardInfo? generatedYgoInfo(WidgetRef ref, PlayPool? play, CardData card) {
 /// [card] drawn from [info] (see [YgoCardFace]) in the data language, with
 /// its artwork once downloaded.
 class GeneratedYgoCard extends ConsumerWidget {
-  const GeneratedYgoCard({super.key, required this.card, required this.info, this.name, this.code, this.onPart});
+  const GeneratedYgoCard({
+    super.key,
+    required this.card,
+    required this.info,
+    this.name,
+    this.code,
+    this.onPart,
+    this.sharp = false,
+  });
+
+  /// Drawn as printed whatever its size on screen (see [YgoCardFace.sharp]).
+  final bool sharp;
 
   final CardData card;
   final YgoCardInfo info;
@@ -69,6 +82,7 @@ class GeneratedYgoCard extends ConsumerWidget {
       artwork: artwork == null ? null : FileImage(artwork),
       language: language,
       onPart: onPart,
+      sharp: sharp,
     );
   }
 }

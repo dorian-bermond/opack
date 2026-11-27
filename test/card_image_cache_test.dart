@@ -123,6 +123,20 @@ void main() {
     expect(Uri.parse(partial!).queryParameters['titles'], 'File:Lord of the Rings.png');
   });
 
+  test('a render the app stored is fetched from the cache, never downloaded', () async {
+    final cache = CardImageCache(Future.value(dir), client: MockClient((_) async => throw StateError('offline')));
+    final stored = await cache.store('render-p-X-1-7', [1, 2, 3]);
+    expect(stored.path, endsWith('render-p-X-1-7.png'));
+    const card = CardData(id: 'X-1', names: {'en': 'X'}, rarity: Rarity.common, artwork: 'render:render-p-X-1-7');
+    final source = cardImageSource(card)!;
+    expect(source.key, 'render-p-X-1-7');
+    expect(source.extension, 'png');
+    expect(renderedArtworkKey(card.artwork), 'render-p-X-1-7');
+    expect(renderedArtworkKey('12345'), isNull);
+    final file = await cache.fetch(source.key, source.url, extension: source.extension);
+    expect(await file!.readAsBytes(), [1, 2, 3]);
+  });
+
   test('a failed on-demand thumbnail falls back to the full file', () async {
     final seen = <String>[];
     final cache = CardImageCache(Future.value(dir), client: MockClient((request) async {

@@ -1652,6 +1652,18 @@ abstract class AppLocalizations {
   /// **'Custom…'**
   String get customOption;
 
+  /// No description provided for @saveRender.
+  ///
+  /// In en, this message translates to:
+  /// **'Save the render'**
+  String get saveRender;
+
+  /// No description provided for @saveRenderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps the fields and a picture of the drawn card as this card\'s picture; its own print comes back from the artwork picker.'**
+  String get saveRenderHint;
+
   /// No description provided for @searchChoice.
   ///
   /// In en, this message translates to:
