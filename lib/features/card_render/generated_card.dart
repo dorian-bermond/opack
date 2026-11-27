@@ -42,13 +42,16 @@ YgoCardInfo? generatedYgoInfo(WidgetRef ref, PlayPool? play, CardData card) {
 /// [card] drawn from [info] (see [YgoCardFace]) in the data language, with
 /// its artwork once downloaded.
 class GeneratedYgoCard extends ConsumerWidget {
-  const GeneratedYgoCard({super.key, required this.card, required this.info, this.name, this.onPart});
+  const GeneratedYgoCard({super.key, required this.card, required this.info, this.name, this.code, this.onPart});
 
   final CardData card;
   final YgoCardInfo info;
 
   /// The name printed, when not the card's shown one (a name being typed).
   final String? name;
+
+  /// The print code printed, when not the card's own (one being typed).
+  final String? code;
 
   /// Makes the card's parts clickable (see [YgoCardFace.onPart]).
   final void Function(YgoCardPart part)? onPart;
@@ -61,7 +64,7 @@ class GeneratedYgoCard extends ConsumerWidget {
     return YgoCardFace(
       name: name ?? shownName(ref, card, language),
       info: info,
-      code: card.id,
+      code: code ?? card.id,
       passcode: int.tryParse(card.passcode ?? '') == null ? null : card.passcode,
       artwork: artwork == null ? null : FileImage(artwork),
       language: language,

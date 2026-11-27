@@ -69,7 +69,9 @@ void main() {
     expect(inStat('ygoDef', '800'), findsOneWidget);
     // The label against the left of its box, the number against the right.
     expect(tester.getTopLeft(inStat('ygoAtk', 'ATK/')).dx, lessThan(tester.getTopLeft(inStat('ygoAtk', '1700')).dx));
-    expect(find.text('TEST-EN001'), findsOneWidget);
+    // The print code in its two parts, the set and the number.
+    expect(find.text('TEST'), findsOneWidget);
+    expect(find.text('EN001'), findsOneWidget);
     expect(find.text('02204140'), findsOneWidget, reason: 'the passcode in eight digits');
     expect(find.byKey(const Key('ygoSpellType')), findsNothing);
   });

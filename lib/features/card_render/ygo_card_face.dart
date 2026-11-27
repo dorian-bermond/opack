@@ -6,7 +6,18 @@ import '../pools/domain/card_customs.dart';
 
 /// The parts of a drawn card that stand for a field: what a click on the
 /// card can ask to edit.
-enum YgoCardPart { name, attribute, level, type, text, atk, def, link }
+enum YgoCardPart { name, attribute, level, type, text, atk, def, link, set, code }
+
+/// A print code (`CIBR-FR077`) in its two parts: the set (`CIBR`) and the
+/// number (`FR077`); the whole as the set when there is no dash.
+({String set, String code}) splitPrintCode(String printCode) {
+  final at = printCode.indexOf('-');
+  return at < 0 ? (set: printCode, code: '') : (set: printCode.substring(0, at), code: printCode.substring(at + 1));
+}
+
+/// A set and a number as one print code, empty parts left out.
+String joinPrintCode(String set, String code) =>
+    [if (set.trim().isNotEmpty) set.trim(), if (code.trim().isNotEmpty) code.trim()].join('-');
 
 /// A Yu-Gi-Oh! card drawn from its details rather than scanned: the frame
 /// of its kind, its artwork, attribute, level or rank stars, link arrows,
@@ -302,14 +313,29 @@ class YgoCardFace extends StatelessWidget {
             if (code case final code?)
               Positioned.fromRect(
                 rect: link ? _setNumberLink : _setNumber,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    code,
-                    maxLines: 1,
-                    softWrap: false,
-                    style: _smallStyle(frameInk).copyWith(shadows: thickeningAt(scale, frameInk)),
-                  ),
+                // The set and the number, each a part of its own to click.
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    for (final (part, text) in [
+                      (YgoCardPart.set, splitPrintCode(code).set),
+                      (YgoCardPart.code, splitPrintCode(code).code),
+                    ]) ...[
+                      if (part == YgoCardPart.code && splitPrintCode(code).code.isNotEmpty)
+                        Text('-', style: _smallStyle(frameInk).copyWith(shadows: thickeningAt(scale, frameInk))),
+                      _PartButton(
+                        key: ValueKey('ygoPart-${part.name}'),
+                        onTap: switch (onPart) { null => null, final on => () => on(part) },
+                        child: Text(
+                          // Room to click an empty part.
+                          text.isEmpty && onPart != null ? '    ' : text,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: _smallStyle(frameInk).copyWith(shadows: thickeningAt(scale, frameInk)),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             if (passcode case final passcode?)
@@ -359,9 +385,11 @@ class YgoCardFace extends StatelessWidget {
 /// A part of the card that can be clicked: outlined while the pointer is
 /// over it.
 class _PartButton extends StatefulWidget {
-  const _PartButton({super.key, required this.onTap});
+  const _PartButton({super.key, required this.onTap, this.child});
 
-  final VoidCallback onTap;
+  /// Nothing to do: the part is only drawn.
+  final VoidCallback? onTap;
+  final Widget? child;
 
   @override
   State<_PartButton> createState() => _PartButtonState();
@@ -371,7 +399,9 @@ class _PartButtonState extends State<_PartButton> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => MouseRegion(
+  Widget build(BuildContext context) {
+    if (widget.onTap == null) return widget.child ?? const SizedBox.shrink();
+    return MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
@@ -385,9 +415,11 @@ class _PartButtonState extends State<_PartButton> {
               borderRadius: BorderRadius.circular(10),
               boxShadow: _hovered ? const [BoxShadow(color: Colors.black54, blurRadius: 8)] : null,
             ),
+            child: widget.child,
           ),
         ),
       );
+  }
 }
 
 /// ATK, DEF or the link rating in bold small caps: the [label] against

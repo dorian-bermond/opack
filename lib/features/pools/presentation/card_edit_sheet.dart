@@ -93,15 +93,21 @@ const multiChoiceFields = {
 
 /// The fields told from others rather than edited: a Yu-Gi-Oh! card's
 /// type, categories, frame and type string all follow its subtypes.
-const derivedFields = {'race', 'categories', 'frameType', 'type'};
+const derivedFields = {'race', 'categories', 'frameType', 'type', 'setCode'};
 
 /// The fields the editor keeps as they are, without a line of their own:
 /// the rarities and whether the card has an effect.
-// The details' own name is the card's: the card's name field edits it.
-const hiddenFields = {'${cardFieldPrefix}rarity', '${cardFieldPrefix}printedRarity', 'hasEffect', 'name'};
+// The details' own name is the card's: the card's name field edits it;
+// the set name follows the set.
+const hiddenFields = {'${cardFieldPrefix}rarity', '${cardFieldPrefix}printedRarity', 'hasEffect', 'name', 'setName'};
 
 /// The virtual field standing for a Yu-Gi-Oh! card's type and categories.
 const ygoSubtypesKey = 'subtypes';
+
+/// The virtual fields a Yu-Gi-Oh! card's set code (`CIBR-FR077`) edits
+/// as: its set (`CIBR`) and its number (`FR077`).
+const ygoSetKey = 'set';
+const ygoCodeKey = 'code';
 
 /// Whether [key] applies to a [game]'s cards at all: MtG alone colors its
 /// cards by letters on the card itself.
@@ -127,6 +133,8 @@ List<String> orderedFieldKeys(Iterable<String> keys) {
     'supertypes',
     'types',
     'type',
+    ygoSetKey,
+    ygoCodeKey,
     'race',
     ygoSubtypesKey,
     'categories',
@@ -248,6 +256,12 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     if (baseInfo is YgoCardInfo && baseInfo.kind == YgoKind.monster) {
       _bases[ygoSubtypesKey] = ygoSubtypes(categories: baseInfo.categories);
     }
+    // Its set code edits as its set and its number.
+    if (baseInfo is YgoCardInfo) {
+      final (:set, :code) = splitPrintCode(baseInfo.setCode ?? '');
+      _bases[ygoSetKey] = set;
+      _bases[ygoCodeKey] = code;
+    }
     _keys = orderedFieldKeys(_bases.keys);
     _poolOptions = {
       for (final key in _keys)
@@ -308,6 +322,10 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
         for (final MapEntry(:key, :value) in editableInfoFields(info).entries) key: _shown(key, value),
         if (info is YgoCardInfo && info.kind == YgoKind.monster)
           ygoSubtypesKey: fieldText(ygoSubtypes(categories: info.categories)),
+        if (info is YgoCardInfo) ...{
+          ygoSetKey: splitPrintCode(info.setCode ?? '').set,
+          ygoCodeKey: splitPrintCode(info.setCode ?? '').code,
+        },
       };
       final edited = {
         for (final key in _keys)
@@ -370,6 +388,11 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   Object? _valueOf(String key) {
     if (key == '${cardFieldPrefix}rarity') return _rarity;
     if (key == '${cardFieldPrefix}printedRarity') return _printedRarity;
+    if (key == 'setCode' && _controllers.containsKey(ygoSetKey)) {
+      // The set code follows its set and number; none when both are empty.
+      final code = joinPrintCode(_controllers[ygoSetKey]!.text, _controllers[ygoCodeKey]!.text);
+      return code.isEmpty ? null : code;
+    }
     if (_game == Game.ygo && _controllers.containsKey(ygoSubtypesKey) && _isDerived(key)) {
       // The categories, frame and type string follow the subtypes: the
       // known ones in their usual order, then the words of one's own.
@@ -402,7 +425,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     if (base is! YgoCardInfo) return null;
     final json = base.toJson();
     for (final key in _keys) {
-      if (key.startsWith(cardFieldPrefix) || key == ygoSubtypesKey) continue;
+      if (key.startsWith(cardFieldPrefix) || key == ygoSubtypesKey || key == ygoSetKey || key == ygoCodeKey) continue;
       final value = _valueOf(key);
       value == null ? json.remove(key) : json[key] = value;
     }
@@ -434,6 +457,10 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
         _focusField('def');
       case YgoCardPart.link:
         _focusField('linkRating');
+      case YgoCardPart.set:
+        _focusField(ygoSetKey);
+      case YgoCardPart.code:
+        _focusField(ygoCodeKey);
     }
   }
 
@@ -581,7 +608,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     var pool = widget.play.pool;
     for (final key in _keys) {
       // The subtypes field is the editor's own: its parts are what is kept.
-      if (key == ygoSubtypesKey && _game == Game.ygo) continue;
+      if ((key == ygoSubtypesKey || key == ygoSetKey || key == ygoCodeKey) && _game == Game.ygo) continue;
       final custom = _isCustom(key);
       pool = pool.withCustom(_id, key, custom ? _valueOf(key) : null, remove: !custom);
     }
@@ -988,6 +1015,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                             card: widget.card,
                             info: drawn,
                             name: _drawnName,
+                            code: _valueOf('setCode') as String? ?? '',
                             onPart: _editPart,
                           ),
                         ),

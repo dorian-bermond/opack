@@ -147,7 +147,28 @@ void main() {
     String? tribeNow() => tester.widget<TextField>(tribe).controller!.text;
     expect(find.text('Tribe'), findsOneWidget);
     expect(tribeNow(), 'Zombie');
-    expect(top('level'), lessThan(top('race')));
+    // The set and its number sit above the tribe; the set name is not edited.
+    expect(top('level'), lessThan(top('set')));
+    expect(top('set'), lessThan(top('code')));
+    expect(top('code'), lessThan(top('race')));
+    expect(find.byKey(const ValueKey('field-setName')), findsNothing);
+    expect(find.byKey(const ValueKey('field-setCode')), findsNothing, reason: 'edited as its two parts');
+    // A click on either part of the drawn print code sends the focus there,
+    // and what is typed is printed.
+    await tester.tap(find.byKey(const ValueKey('ygoPart-set')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(find.byKey(const ValueKey('field-set'))).focusNode!.hasFocus, isTrue);
+    await tester.enterText(find.byKey(const ValueKey('field-set')), 'SR08');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('ygoPart-code')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(find.byKey(const ValueKey('field-code'))).focusNode!.hasFocus, isTrue);
+    await tester.enterText(find.byKey(const ValueKey('field-code')), 'EN015');
+    await tester.pumpAndSettle();
+    expect(find.descendant(of: find.byKey(const Key('editDrawnCard')), matching: find.text('SR08')), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const Key('editDrawnCard')), matching: find.text('EN015')), findsOneWidget);
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     expect(top('race'), lessThan(top(ygoSubtypesKey)));
 
     // The subtypes hold the rest, in printed order (Tuner before Effect).
