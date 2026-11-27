@@ -283,6 +283,7 @@
   "kindTrap": "Piège",
   "kindSkill": "Compétence",
   "fieldSupertype": "Supertype",
+  "fieldName": "Nom",
   "noArchetype": "Sans archétype",
   "nonFoil": "Non premium",
   "advancedSearch": "Recherche avancée",

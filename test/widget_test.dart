@@ -246,7 +246,7 @@ void main() {
     await settleLoading(tester);
     await tester.tap(find.byKey(const Key('editCard')));
     await settleLoading(tester);
-    expect(find.byKey(const ValueKey('field-card.name.en')), findsNothing, reason: 'the names are not edited');
+    expect(find.byKey(const ValueKey('field-card.name.en')), findsOneWidget, reason: 'the name of the data language');
     expect(find.byKey(const ValueKey('field-card.colors')), findsNothing, reason: 'no color letters on a Yu-Gi-Oh! card');
     await tester.tap(find.byKey(const Key('applyCardEdit')));
     await settleLoading(tester);

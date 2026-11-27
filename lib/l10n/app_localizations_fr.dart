@@ -838,6 +838,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fieldSupertype => 'Supertype';
 
   @override
+  String get fieldName => 'Nom';
+
+  @override
   String get noArchetype => 'Sans archétype';
 
   @override

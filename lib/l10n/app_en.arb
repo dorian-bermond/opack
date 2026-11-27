@@ -342,6 +342,7 @@
   "kindTrap": "Trap",
   "kindSkill": "Skill",
   "fieldSupertype": "Supertype",
+  "fieldName": "Name",
   "noArchetype": "No archetype",
   "nonFoil": "Non-foil",
   "advancedSearch": "Advanced search",

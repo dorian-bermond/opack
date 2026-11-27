@@ -75,8 +75,22 @@ void main() {
 
     // The fields come in the order the card shows them.
     double top(String key) => tester.getTopLeft(find.byKey(ValueKey('field-$key'))).dy;
-    expect(find.byKey(const ValueKey('field-card.name.en')), findsNothing, reason: 'the names are not edited');
-    expect(find.byKey(const ValueKey('field-card.name.fr')), findsNothing);
+    // One name is edited, the data language's, first of the fields.
+    expect(find.byKey(const ValueKey('field-card.name.en')), findsOneWidget);
+    expect(find.byKey(const ValueKey('field-card.name.fr')), findsNothing, reason: 'the other languages stay');
+    expect(find.text('Name'), findsOneWidget);
+    expect(top('card.name.en'), lessThan(top('supertype')));
+    // The drawn card shows the name typed, and a click on it sends the focus there.
+    await tester.tap(find.byKey(const ValueKey('ygoPart-name')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(find.byKey(const ValueKey('field-card.name.en'))).focusNode!.hasFocus, isTrue);
+    await tester.enterText(find.byKey(const ValueKey('field-card.name.en')), 'Horse Zombie');
+    await tester.pumpAndSettle();
+    expect(find.descendant(of: find.byKey(const Key('editDrawnCard')), matching: find.text('Horse Zombie')),
+        findsOneWidget);
+    expect(find.byKey(const ValueKey('custom-card.name.en')), findsOneWidget);
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     // The supertype comes first: the kind, one of the game's four.
     expect(find.text('Supertype'), findsOneWidget);
     expect(tester.widget<TextField>(find.byKey(const ValueKey('field-supertype'))).controller!.text, 'Monster');
@@ -426,6 +440,9 @@ void main() {
     await tester.pumpAndSettle();
 
     String reads(String key) => tester.widget<TextField>(find.byKey(ValueKey('field-$key'))).controller!.text;
+    expect(find.byKey(const ValueKey('field-card.name.fr')), findsOneWidget, reason: 'the French name, the data language');
+    expect(find.byKey(const ValueKey('field-card.name.en')), findsNothing);
+    expect(find.text('Nom'), findsOneWidget);
     expect(reads('supertype'), 'Monstre');
     expect(reads('attribute'), 'TERRE');
     expect(reads('race'), 'Magicien');

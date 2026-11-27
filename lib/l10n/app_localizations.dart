@@ -1484,6 +1484,12 @@ abstract class AppLocalizations {
   /// **'Supertype'**
   String get fieldSupertype;
 
+  /// No description provided for @fieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get fieldName;
+
   /// No description provided for @noArchetype.
   ///
   /// In en, this message translates to:

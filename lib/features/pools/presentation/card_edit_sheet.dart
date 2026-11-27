@@ -97,7 +97,8 @@ const derivedFields = {'race', 'categories', 'frameType', 'type'};
 
 /// The fields the editor keeps as they are, without a line of their own:
 /// the rarities and whether the card has an effect.
-const hiddenFields = {'${cardFieldPrefix}rarity', '${cardFieldPrefix}printedRarity', 'hasEffect'};
+// The details' own name is the card's: the card's name field edits it.
+const hiddenFields = {'${cardFieldPrefix}rarity', '${cardFieldPrefix}printedRarity', 'hasEffect', 'name'};
 
 /// The virtual field standing for a Yu-Gi-Oh! card's type and categories.
 const ygoSubtypesKey = 'subtypes';
@@ -238,7 +239,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     _bases = {
       // The names are not edited here: a card keeps its own.
       for (final key in cardFieldKeys(base))
-        if (fieldAppliesTo(key, _game) && !key.startsWith('${cardFieldPrefix}name')) key: cardFieldValue(base, key),
+        if (fieldAppliesTo(key, _game)) key: cardFieldValue(base, key),
       if (baseInfo != null) ...editableInfoFields(baseInfo),
     };
     // A Yu-Gi-Oh! monster has one tribe, a field of its own, and its
@@ -422,7 +423,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       case YgoCardPart.level:
         await _pickLevel();
       case YgoCardPart.name:
-        break;
+        _focusField(_nameKey);
       case YgoCardPart.type:
         _focusField('race');
       case YgoCardPart.text:
@@ -435,6 +436,19 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
         _focusField('linkRating');
     }
   }
+
+  /// The name field shown: the one of the data language (the others stay
+  /// as they are), English when the card has no name there to edit.
+  String get _nameKey {
+    final own = '${cardFieldPrefix}name.${dataLanguage(ref, context)}';
+    return _controllers.containsKey(own) ? own : '${cardFieldPrefix}name.en';
+  }
+
+  /// The name the drawn card shows: the one typed, else the card's own.
+  String get _drawnName => switch (_controllers[_nameKey]?.text.trim()) {
+    final String name when name.isNotEmpty => name,
+    _ => widget.card.nameFor(dataLanguage(ref, context)),
+  };
 
   /// Sends the focus to the field of [key], which scrolls it into view; a
   /// choice field opens its list.
@@ -618,14 +632,10 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     }
     if (key == ygoSupertypeKey) return AppLocalizations.of(context).fieldSupertype;
     var name = key.startsWith(cardFieldPrefix) ? key.substring(cardFieldPrefix.length) : key;
-    String? suffix;
-    if (name.startsWith('name.')) {
-      suffix = name.substring(5);
-      name = 'name';
-    }
+    // The one name shown is "Name": its language is the data language.
+    if (name.startsWith('name.')) return AppLocalizations.of(context).fieldName;
     final words = name.replaceAllMapped(RegExp(r'([a-z0-9])([A-Z])'), (m) => '${m[1]} ${m[2]!.toLowerCase()}');
-    final label = words[0].toUpperCase() + words.substring(1);
-    return suffix == null ? label : '$label ($suffix)';
+    return words[0].toUpperCase() + words.substring(1);
   }
 
   @override
@@ -878,7 +888,10 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                       // Not edited here: what follows other fields, the rarities
                       // (a matter of the pool's tags) and whether the card has
                       // an effect (its subtypes say it). DEF sits on ATK's line.
-                      if (_isDerived(key) || hiddenFields.contains(key) || (key == 'def' && _keys.contains('atk')))
+                      // The names of other languages than the data one are not edited.
+                      if (key.startsWith('${cardFieldPrefix}name') && key != _nameKey)
+                        const SizedBox.shrink()
+                      else if (_isDerived(key) || hiddenFields.contains(key) || (key == 'def' && _keys.contains('atk')))
                         const SizedBox.shrink()
                       else if (_isMultiChoice(key))
                         row(key, multiChoiceField(key))
@@ -974,7 +987,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                             key: const Key('editDrawnCard'),
                             card: widget.card,
                             info: drawn,
-                            name: widget.card.nameFor(dataLanguage(ref, context)),
+                            name: _drawnName,
                             onPart: _editPart,
                           ),
                         ),
