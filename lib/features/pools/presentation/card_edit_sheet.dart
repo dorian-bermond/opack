@@ -293,8 +293,14 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     final baseId = baseCardId(_id);
     final seen = <String>{};
     final versions = <CardVersion>[];
+    // Another printing of the card: the same base id (One Piece's version
+    // suffix), the same passcode (Yu-Gi-Oh!) or the same English name.
+    bool sameCard(CardData card) =>
+        baseCardId(card.id) == baseId ||
+        (widget.card.passcode != null && card.passcode == widget.card.passcode) ||
+        (widget.card.names['en'] != null && card.names['en'] == widget.card.names['en']);
     for (final (:card, listed: _) in widget.play.entries) {
-      if (card.id == _id || baseCardId(card.id) != baseId) continue;
+      if (card.id == _id || !sameCard(card)) continue;
       final info = infos[card.id];
       if (info == null) continue;
       final fields = {
@@ -307,7 +313,8 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
           if (fields.containsKey(key)) key: fields[key]!,
       };
       if (!seen.add(edited.entries.map((e) => '${e.key}=${e.value}').join('\u0000'))) continue;
-      final suffix = card.id.length > baseId.length ? card.id.substring(baseId.length + 1) : card.id;
+      // Named by what tells it apart: the version suffix, else the print code.
+      final suffix = card.id.length > baseId.length && card.id.startsWith(baseId) ? card.id.substring(baseId.length + 1) : card.id;
       final rarity = card.printed.name;
       versions.add((id: card.id, label: '$suffix · $rarity', fields: edited));
     }

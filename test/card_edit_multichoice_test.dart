@@ -289,7 +289,7 @@ void main() {
     const cards = [
       CardData(id: 'X-1', names: {'en': 'Mezuki'}, rarity: Rarity.common),
       CardData(id: 'X-1_p1', names: {'en': 'Mezuki'}, rarity: Rarity.rare),
-      CardData(id: 'X-1_p2', names: {'en': 'Mezuki'}, rarity: Rarity.rare),
+      CardData(id: 'Y-9', names: {'en': 'Mezuki'}, rarity: Rarity.rare, passcode: '1'),
       CardData(id: 'X-2', names: {'en': 'Other'}, rarity: Rarity.common),
     ];
     final pool = Pool.empty(Game.ygo, name: 'p', id: 'p').withSource(const CardsSource(cards), cards: cards);
@@ -307,9 +307,10 @@ void main() {
     final store = MemoryCardInfoStore();
     await store.save('p', {
       'X-1': info('Send 1 card from your Deck to the GY.', 'EARTH'),
-      // Two printings reading the same are one; the other card is no version.
+      // Two printings reading the same are one (the second is a version by
+      // its name, its set code unrelated); the other card is no version.
       'X-1_p1': info('Send 1 card from your hand to the GY.', 'DARK'),
-      'X-1_p2': info('Send 1 card from your hand to the GY.', 'DARK'),
+      'Y-9': info('Send 1 card from your hand to the GY.', 'DARK'),
       'X-2': info('Other.', 'FIRE'),
     });
     final container = ProviderContainer(overrides: [
