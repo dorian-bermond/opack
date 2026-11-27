@@ -39,4 +39,21 @@ void main() {
     expect(cardInfoLine(info, language: 'fr'), 'TÉNÈBRES · Magicien · ★7 · ATK 2500 / DEF 2100');
     expect(cardInfoLine(info), 'DARK · Spellcaster · ★7 · ATK 2500 / DEF 2100');
   });
+
+  test('a monster with an effect its type does not name prints Effect', () {
+    final tuner = YgoCardInfo.fromYgoprodeck(const {
+      'name': 'Plaguespreader Zombie', 'type': 'Tuner Monster', 'frameType': 'effect', 'race': 'Zombie',
+      'attribute': 'DARK', 'level': 2, 'misc_info': [{'has_effect': 1}],
+    });
+    expect(tuner.categories, ['Tuner', 'Effect']);
+    expect(YgoCardInfo.fromJson(tuner.toJson()).categories, ['Tuner', 'Effect']);
+    // A card cached from before carries no Effect: it is told from the flag.
+    final cached = YgoCardInfo.fromJson({...tuner.toJson(), 'categories': ['Tuner']});
+    expect(cached.categories, ['Tuner', 'Effect']);
+    final normal = YgoCardInfo.fromYgoprodeck(const {
+      'name': 'N', 'type': 'Normal Tuner Monster', 'frameType': 'normal', 'race': 'Zombie',
+      'misc_info': [{'has_effect': 0}],
+    });
+    expect(normal.categories, ['Normal', 'Tuner']);
+  });
 }

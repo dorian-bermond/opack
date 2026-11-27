@@ -454,11 +454,26 @@ class YgoCardInfo extends CardInfo {
         _ => (null, null),
       };
 
+  /// [categories] with `Effect` where the card has an effect but its type
+  /// does not say so (YGOPRODeck types Plaguespreader Zombie a `Tuner
+  /// Monster`): a monster that is no normal one nor a token prints Effect.
+  static List<String> withEffect(List<String> categories, {required YgoKind kind, required bool? hasEffect}) {
+    if (kind != YgoKind.monster || hasEffect != true) return categories;
+    if (categories.contains('Effect') || categories.contains('Normal') || categories.contains('Token')) {
+      return categories;
+    }
+    return [...categories, 'Effect'];
+  }
+
   factory YgoCardInfo.fromJson(Map<String, dynamic> json) => YgoCardInfo(
         name: json['name'] as String,
         kind: YgoKind.fromLabel(json['kind'] as String) ?? YgoKind.monster,
         type: json['type'] as String,
-        categories: (json['categories'] as List? ?? const []).cast<String>(),
+        categories: withEffect(
+          (json['categories'] as List? ?? const []).cast<String>(),
+          kind: YgoKind.fromLabel(json['kind'] as String) ?? YgoKind.monster,
+          hasEffect: json['hasEffect'] as bool?,
+        ),
         frameType: json['frameType'] as String,
         race: json['race'] as String?,
         attribute: json['attribute'] as String?,
@@ -498,7 +513,11 @@ class YgoCardInfo extends CardInfo {
       name: json['name'] as String? ?? '',
       kind: kind,
       type: type,
-      categories: [for (final c in ygoCategories) if (words.contains(c)) c],
+      categories: withEffect(
+        [for (final c in ygoCategories) if (words.contains(c)) c],
+        kind: kind,
+        hasEffect: misc == null ? null : misc['has_effect'] == 1,
+      ),
       frameType: json['frameType'] as String? ?? '',
       race: json['race'] as String?,
       attribute: json['attribute'] as String?,
