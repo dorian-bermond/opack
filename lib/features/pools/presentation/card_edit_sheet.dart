@@ -14,6 +14,9 @@ import '../../card_info/domain/ygo_words.dart';
 import '../../card_render/generated_card.dart';
 import '../../card_render/ygo_card_face.dart';
 import '../../card_text/data/card_text_repository.dart';
+import '../../card_text/domain/card_text.dart';
+import '../../card_text/presentation/card_details_sheet.dart';
+import '../../../shared/images/artwork_picker.dart';
 import '../../catalog/domain/models.dart';
 import '../data/pool_repository.dart';
 import '../domain/card_customs.dart';
@@ -227,6 +230,28 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
 
   /// The drawn card, to take a picture of; drawn sharp while one is taken.
   final _renderKey = GlobalKey();
+
+  /// The artwork chosen for the card while the sheet is open, when it
+  /// changed here (`null` for the card's own print); unset before.
+  String? _artwork;
+  bool _artworkChanged = false;
+
+  /// The card as shown: with the artwork chosen here, if any.
+  CardData get _shownCard => _artworkChanged ? widget.card.withArtwork(_artwork) : widget.card;
+
+  /// The pool as it is now: the artwork may have been chosen meanwhile.
+  Pool get _latestPool =>
+      ref.read(poolsProvider).value?.where((p) => p.id == widget.play.pool.id).firstOrNull ?? widget.play.pool;
+
+  /// Opens the artwork picker for the card; the drawn card follows the choice.
+  Future<void> _pickArtwork() async {
+    final changed = await pickArtwork(context, poolId: widget.play.pool.id, card: _shownCard);
+    if (!changed || !mounted) return;
+    setState(() {
+      _artwork = _latestPool.artworks[_id];
+      _artworkChanged = true;
+    });
+  }
   bool _capturing = false;
 
   /// The fields whose words read in [_language].
@@ -308,6 +333,32 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     }
     _language = language;
     _versions = _otherVersions(_infos);
+    _seedName();
+  }
+
+  /// Gives the name field of the data language the name the card is
+  /// listed under when the card's own names lack it: the fetched texts
+  /// know translations. Once the texts are loaded, or at once when they are.
+  void _seedName() {
+    final data = ref.read(cardLanguagesProvider).data ?? _language;
+    final nameKey = '${cardFieldPrefix}name.$data';
+    final controller = _controllers[nameKey];
+    if (controller == null || fieldText(_bases[nameKey]).isNotEmpty) return;
+    final card = widget.play.bases[_id] ?? widget.card;
+    final passcode = card.passcode;
+    if (passcode == null) return;
+    final versions = ref.read(cardTextsProvider).value?[textKey(passcode)]?[data];
+    if (versions == null || versions.isEmpty) return;
+    final prefs = ref.read(textPreferencesProvider);
+    final shown = versions[chooseVersion(
+      versions,
+      printCode: card.id,
+      mode: prefs.mode,
+      override: prefs.overrideFor(passcode, data),
+    )].name;
+    if (shown == null || shown.isEmpty) return;
+    _bases[nameKey] = shown;
+    if (controller.text.isEmpty) controller.text = shown;
   }
 
   /// The other printings of the card (same base id) with details, as the
@@ -354,9 +405,16 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   /// Takes fields from another printing: every field, or [field] alone,
   /// each change shown before it is made.
   Future<void> _prefill({String? field}) async {
+    final split = _controllers.containsKey(ygoSetKey);
     final keys = [
       for (final key in _keys)
-        if (_controllers.containsKey(key) && !_isDerived(key) && !hiddenFields.contains(key)) key,
+        if (split && key == 'setCode')
+          key
+        else if (!(split && (key == ygoSetKey || key == ygoCodeKey)) &&
+            _controllers.containsKey(key) &&
+            !_isDerived(key) &&
+            !hiddenFields.contains(key))
+          key,
     ];
     final picked = await showPrefillDialog(
       context,
@@ -369,6 +427,12 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     if (picked == null || !mounted) return;
     setState(() {
       for (final MapEntry(:key, :value) in picked.entries) {
+        if (key == 'setCode' && split) {
+          final (:set, :code) = splitPrintCode(value);
+          _controllers[ygoSetKey]!.text = set;
+          _controllers[ygoCodeKey]!.text = code;
+          continue;
+        }
         _controllers[key]?.text = value;
         if (_isMultiChoice(key)) _refreshOptions(key);
       }
@@ -482,7 +546,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   /// The name the drawn card shows: the one typed, else the card's own.
   String get _drawnName => switch (_controllers[_nameKey]?.text.trim()) {
     final String name when name.isNotEmpty => name,
-    _ => widget.card.nameFor(dataLanguage(ref, context)),
+    _ => shownName(ref, widget.card, dataLanguage(ref, context)),
   };
 
   /// Sends the focus to the field of [key], which scrolls it into view; a
@@ -607,6 +671,10 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       _rarity = '${_bases[key]}';
     } else if (key == '${cardFieldPrefix}printedRarity') {
       _printedRarity = _bases[key] as String?;
+    } else if (key == 'setCode' && _controllers.containsKey(ygoSetKey)) {
+      final (:set, :code) = splitPrintCode('${_bases[key] ?? ''}');
+      _controllers[ygoSetKey]!.text = set;
+      _controllers[ygoCodeKey]!.text = code;
     } else {
       _controllers[key]!.text = _shown(key, _bases[key]);
     }
@@ -614,7 +682,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
 
   /// The pool with the fields as they read now kept as customs.
   Pool _customized() {
-    var pool = widget.play.pool;
+    var pool = _latestPool;
     for (final key in _keys) {
       // The subtypes field is the editor's own: its parts are what is kept.
       if ((key == ygoSubtypesKey || key == ygoSetKey || key == ygoCodeKey) && _game == Game.ygo) continue;
@@ -711,13 +779,15 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // The texts may load after the sheet opened: the name follows.
+    ref.listen(cardTextsProvider, (_, _) => setState(_seedName));
 
     // What leads a field on its line: its icon and name, then the custom
     // flag and the way back to the original.
     List<Widget> leading(String key, {double nameWidth = 150}) {
       final custom = _isCustom(key);
       final base = _shown(key, _bases[key]);
-      final prefill = _controllers.containsKey(key) && _hasPrefill(key);
+      final prefill = (_controllers.containsKey(key) || key == 'setCode') && _hasPrefill(key);
       return [
         SizedBox(
           width: nameWidth,
@@ -955,6 +1025,12 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                             icon: const Icon(Icons.file_download_outlined, size: 18),
                             label: Text(l10n.prefillFromVersion),
                           ),
+                        TextButton.icon(
+                          key: const Key('editArtwork'),
+                          onPressed: _pickArtwork,
+                          icon: const Icon(Icons.image_outlined, size: 18),
+                          label: Text(l10n.swapArtwork),
+                        ),
                         if (_drawnInfo != null && ref.watch(cardImageCacheProvider) != null)
                           Tooltip(
                             message: l10n.saveRenderHint,
@@ -973,6 +1049,21 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                       // an effect (its subtypes say it). DEF sits on ATK's line.
                       // The names of other languages than the data one are not edited.
                       if (key.startsWith('${cardFieldPrefix}name') && key != _nameKey)
+                        const SizedBox.shrink()
+                      else if (key == ygoSetKey && _controllers.containsKey(ygoCodeKey))
+                        // The set code as one line: its set, a dash, its number.
+                        row(
+                          'setCode',
+                          Row(
+                            key: const Key('setCodeRow'),
+                            children: [
+                              Expanded(child: textField(ygoSetKey)),
+                              const Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text('-')),
+                              Expanded(child: textField(ygoCodeKey)),
+                            ],
+                          ),
+                        )
+                      else if (key == ygoCodeKey && _controllers.containsKey(ygoSetKey))
                         const SizedBox.shrink()
                       else if (_isDerived(key) || hiddenFields.contains(key) || (key == 'def' && _keys.contains('atk')))
                         const SizedBox.shrink()
@@ -1070,7 +1161,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                             key: _renderKey,
                             child: GeneratedYgoCard(
                               key: const Key('editDrawnCard'),
-                              card: widget.card,
+                              card: _shownCard,
                               info: drawn,
                               name: _drawnName,
                               code: _valueOf('setCode') as String? ?? '',

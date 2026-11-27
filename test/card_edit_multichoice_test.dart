@@ -8,6 +8,7 @@ import 'package:http/testing.dart';
 import 'package:opack/features/card_info/data/card_info_repository.dart';
 import 'package:opack/features/card_info/domain/card_info.dart';
 import 'package:opack/features/card_text/data/card_text_repository.dart';
+import 'package:opack/features/card_text/domain/card_text.dart';
 import 'package:opack/features/catalog/domain/models.dart';
 import 'package:opack/features/pools/domain/play_pool.dart';
 import 'package:opack/features/pools/data/pool_repository.dart';
@@ -152,10 +153,15 @@ void main() {
     String? tribeNow() => tester.widget<TextField>(tribe).controller!.text;
     expect(find.text('Tribe'), findsOneWidget);
     expect(tribeNow(), 'Zombie');
-    // The set and its number sit above the tribe; the set name is not edited.
+    // The set code sits above the tribe, one line labelled once, its set
+    // and number typed as set-code; the set name is not edited.
     expect(top('level'), lessThan(top('set')));
-    expect(top('set'), lessThan(top('code')));
+    expect(top('set'), top('code'), reason: 'on one line');
+    expect(tester.getTopLeft(find.byKey(const ValueKey('field-set'))).dx,
+        lessThan(tester.getTopLeft(find.byKey(const ValueKey('field-code'))).dx));
     expect(top('code'), lessThan(top('race')));
+    expect(find.text('Set code'), findsOneWidget);
+    expect(find.text('Set'), findsNothing);
     expect(find.byKey(const ValueKey('field-setName')), findsNothing);
     expect(find.byKey(const ValueKey('field-setCode')), findsNothing, reason: 'edited as its two parts');
     // A click on either part of the drawn print code sends the focus there,
@@ -435,7 +441,7 @@ void main() {
     addTearDown(tester.view.reset);
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    const card = CardData(id: 'X-1', names: {'en': 'Mezuki'}, rarity: Rarity.common);
+    const card = CardData(id: 'X-1', names: {'en': 'Mezuki'}, rarity: Rarity.common, passcode: '92826944');
     final pool = Pool.empty(Game.ygo, name: 'p', id: 'p').withSource(const CardsSource([card]), cards: [card]);
     final store = MemoryCardInfoStore();
     await store.save('p', {
@@ -449,6 +455,11 @@ void main() {
       cardInfoStoreProvider.overrideWithValue(store),
       cardInfoFetcherProvider.overrideWithValue(null),
       cardImageCacheProvider.overrideWithValue(null),
+      cardTextsProvider.overrideWith((ref) async => {
+        '92826944': {
+          'fr': [const TextVersion(text: 'Texte.', name: 'Chariot de Feu')],
+        },
+      }),
     ]);
     addTearDown(container.dispose);
     await tester.runAsync(() => container.read(poolCardInfoProvider('p').future));
@@ -469,6 +480,12 @@ void main() {
     expect(find.byKey(const ValueKey('field-card.name.fr')), findsOneWidget, reason: 'the French name, the data language');
     expect(find.byKey(const ValueKey('field-card.name.en')), findsNothing);
     expect(find.text('Nom'), findsOneWidget);
+    // The card has no French name of its own: the texts know it, as the
+    // list shows it, and it is no custom change.
+    expect(reads('card.name.fr'), 'Chariot de Feu');
+    expect(find.byKey(const ValueKey('custom-card.name.fr')), findsNothing);
+    expect(find.descendant(of: find.byKey(const Key('editDrawnCard')), matching: find.text('Chariot de Feu')),
+        findsOneWidget);
     expect(reads('supertype'), 'Monstre');
     expect(reads('attribute'), 'TERRE');
     expect(reads('race'), 'Magicien');
