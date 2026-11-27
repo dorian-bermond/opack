@@ -28,9 +28,13 @@ class SearchQuery {
     this.level,
     this.atk,
     this.def,
+    this.ids = const [],
   });
 
   final String text;
+
+  /// Passcodes asked for by themselves (Yu-Gi-Oh!): the text is then not sent.
+  final List<String> ids;
   final Set<Rarity> rarities;
 
   /// Color letters, `C` for colorless (MtG).
@@ -118,7 +122,8 @@ class SearchQuery {
   /// YGOPRODeck query parameters; ranges keep their low bound only, the
   /// high bound is checked on the answers.
   Map<String, String> get ygoprodeck => {
-        if (text.trim().isNotEmpty) 'fname': text.trim(),
+        if (ids.isNotEmpty) 'id': ids.join(','),
+        if (text.trim().isNotEmpty && ids.isEmpty) 'fname': text.trim(),
         if (ygoTypes.isNotEmpty) 'type': ygoTypes.join(','),
         if (attributes.isNotEmpty) 'attribute': attributes.join(','),
         if (race.trim().isNotEmpty) 'race': race.trim(),
@@ -161,7 +166,8 @@ class CardSearch {
 
   static const _headers = {'User-Agent': 'Opack/1.0', 'Accept': 'application/json'};
 
-  /// The cards matching [query] and whether more exist. MtG French names
+  /// The cards matching [query] and whether more exist. The text is looked
+  /// for in the English names and in the [language] ones. MtG French names
   /// come from [frenchNames] (English name to French); Yu-Gi-Oh! names come
   /// in English and, when different, in [language].
   Future<({List<FoundCard> cards, bool hasMore})> search(
@@ -175,6 +181,17 @@ class CardSearch {
         Game.ygo => _ygoprodeck(query, language),
         Game.opc => _opc(query),
       };
+
+  /// The English names whose French name holds [text], at most [limit]:
+  /// what a French search asks Scryfall for.
+  static List<String> englishNamesFor(String text, Map<String, String> frenchNames, {int limit = 40}) {
+    final query = text.trim().toLowerCase();
+    if (query.isEmpty) return const [];
+    return [
+      for (final MapEntry(key: en, value: fr) in frenchNames.entries)
+        if (fr.toLowerCase().contains(query)) en,
+    ].take(limit).toList();
+  }
 
   /// Every One Piece card, from onepiece.gg's list, loaded once.
   List<FoundCard>? _opcAll;
@@ -230,9 +247,15 @@ class CardSearch {
 
   Future<({List<FoundCard> cards, bool hasMore})> _scryfall(
       SearchQuery query, Map<String, String> frenchNames) async {
+    // The text may be a French name: the English names it stands for are
+    // asked for too, by exact name.
+    final english = englishNamesFor(query.text, frenchNames);
+    final q = english.isEmpty
+        ? query.scryfall
+        : query.copyWith(text: '(${[query.text.trim(), for (final name in english) '!"$name"'].join(' or ')})').scryfall;
     final response = await _client.get(
       Uri.https('api.scryfall.com', '/cards/search', {
-        'q': query.scryfall,
+        'q': q,
         'order': 'name',
         'unique': 'cards',
       }),
@@ -251,12 +274,19 @@ class CardSearch {
   }
 
   Future<({List<FoundCard> cards, bool hasMore})> _ygoprodeck(SearchQuery query, String language) async {
-    final english = await _ygoPage(query, null);
-    if (english == null) return (cards: <FoundCard>[], hasMore: false);
+    final english = await _ygoPage(query, null) ?? <Map<String, dynamic>>[];
+    // The text is looked for in the localized names too: the cards only
+    // they match are fetched in English by passcode, after the others.
     final localized = language == 'en' ? null : await _ygoPage(query, language);
     final namesByPasscode = {
       for (final card in localized ?? const <Map<String, dynamic>>[]) '${card['id']}': card['name'] as String,
     };
+    final known = {for (final card in english) '${card['id']}'};
+    final missing = [for (final id in namesByPasscode.keys) if (!known.contains(id)) id];
+    if (missing.isNotEmpty) {
+      english.addAll(await _ygoPage(SearchQuery(ids: missing), null) ?? const []);
+    }
+    if (english.isEmpty) return (cards: <FoundCard>[], hasMore: false);
     bool within((int, int)? range, int? value) =>
         range == null || (value != null && value >= range.$1 && value <= range.$2);
     final cards = <FoundCard>[
@@ -266,7 +296,7 @@ class CardSearch {
             within(query.def, card['def'] as int?))
           ygoFound(card, localizedName: namesByPasscode['${card['id']}'], language: language),
     ];
-    return (cards: cards, hasMore: english.length >= pageSize);
+    return (cards: cards, hasMore: english.length - missing.length >= pageSize);
   }
 
   /// One page of YGOPRODeck answers, `null` when nothing matched.

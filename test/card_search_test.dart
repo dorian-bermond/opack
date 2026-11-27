@@ -111,6 +111,50 @@ void main() {
     expect(found.hasMore, isTrue);
   });
 
+  test('a Yu-Gi-Oh! search finds a card by its French name too', () async {
+    final calls = <Map<String, String>>[];
+    final search = CardSearch(pageSize: 2, client: MockClient((request) async {
+      final params = request.url.queryParameters;
+      calls.add(params);
+      Map<String, Object> card(int id, String name) =>
+          {'id': id, 'name': name, 'type': 'Effect Monster', 'frameType': 'effect', 'atk': 1000, 'level': 4};
+      final data = switch ((params['language'], params['fname'], params['id'])) {
+        // Nothing in English is named like the French word...
+        (null, 'sombre', null) => null,
+        // ...two cards are in French...
+        ('fr', 'sombre', null) => [card(1, 'Magicien Sombre'), card(2, 'Sombre Paladin')],
+        // ...and they are fetched in English by passcode.
+        (null, null, '1,2') => [card(1, 'Dark Magician'), card(2, 'Dark Paladin')],
+        _ => throw StateError('unexpected $params'),
+      };
+      return data == null
+          ? http.Response('{"error":"No card matching your query was found"}', 400)
+          : http.Response.bytes(utf8.encode(jsonEncode({'data': data})), 200);
+    }));
+    final found = await search.search(Game.ygo, const SearchQuery(text: 'sombre'), language: 'fr');
+    expect(calls.length, 3);
+    expect(calls.last.containsKey('fname'), isFalse, reason: 'by passcode alone');
+    expect(found.cards.map((f) => f.card.nameFor('en')), ['Dark Magician', 'Dark Paladin']);
+    expect(found.cards.map((f) => f.card.nameFor('fr')), ['Magicien Sombre', 'Sombre Paladin']);
+    expect(found.hasMore, isFalse, reason: 'the English page was empty');
+  });
+
+  test('a Magic search asks Scryfall for the English names behind a French one', () async {
+    String? q;
+    final search = CardSearch(client: MockClient((request) async {
+      q = request.url.queryParameters['q'];
+      return http.Response('{"code":"not_found"}', 404);
+    }));
+    const names = {'Llanowar Elves': 'Elfes de Llanowar', 'Elvish Mystic': 'Mystique elfe', 'Giant Growth': 'Croissance gigantesque'};
+    expect(CardSearch.englishNamesFor('elf', names), ['Llanowar Elves', 'Elvish Mystic']);
+    expect(CardSearch.englishNamesFor('  ', names), isEmpty);
+    await search.search(Game.mtg, const SearchQuery(text: 'elf', types: {'Creature'}), frenchNames: names);
+    expect(q, '(elf or !"Llanowar Elves" or !"Elvish Mystic") t:creature');
+    // Without a French match, the text goes as it is.
+    await search.search(Game.mtg, const SearchQuery(text: 'zzz'), frenchNames: names);
+    expect(q, 'zzz');
+  });
+
   test('a Scryfall search with no match is an empty result, not an error', () async {
     final search = CardSearch(client: MockClient((_) async => http.Response('{"code":"not_found"}', 404)));
     final found = await search.search(Game.mtg, const SearchQuery(text: 'zzz'));
