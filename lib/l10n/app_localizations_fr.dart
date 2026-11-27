@@ -832,6 +832,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get kindTrap => 'Piège';
 
   @override
+  String get kindSkill => 'Compétence';
+
+  @override
+  String get fieldSupertype => 'Supertype';
+
+  @override
   String get noArchetype => 'Sans archétype';
 
   @override
@@ -935,6 +941,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get customOption => 'Personnalisé…';
+
+  @override
+  String get prefillFromVersion => 'Préremplir depuis une version';
+
+  @override
+  String get prefillField => 'Prendre ce champ d\'une autre version';
+
+  @override
+  String get prefillTitle => 'Remplacer les étiquettes et emplacements ?';
+
+  @override
+  String get prefillNoChange => 'Cette version se lit pareil.';
+
+  @override
+  String get prefillSame => 'Identique';
 
   @override
   String get addWord => 'Ajouter…';
@@ -1473,9 +1494,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Remplace toutes les étiquettes et tous les emplacements par le booster d\'une extension ou des boosters aléatoires. Vos étiquettes et emplacements sont perdus.';
 
   @override
-  String get prefillTitle => 'Remplacer les étiquettes et emplacements ?';
-
-  @override
   String prefillWarning(int slots, int tags) {
     return 'Le pool reçoit $slots emplacements et $tags étiquettes de ce préremplissage ; les actuels sont abandonnés.';
   }
@@ -1731,9 +1749,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get exportCardListDone => 'Liste de cartes exportée';
-
-  @override
-  String get pickTribe => 'Changer le type du monstre';
 
   @override
   String get fieldTribe => 'Tribu';

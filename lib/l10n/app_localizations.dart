@@ -1472,6 +1472,18 @@ abstract class AppLocalizations {
   /// **'Trap'**
   String get kindTrap;
 
+  /// No description provided for @kindSkill.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill'**
+  String get kindSkill;
+
+  /// No description provided for @fieldSupertype.
+  ///
+  /// In en, this message translates to:
+  /// **'Supertype'**
+  String get fieldSupertype;
+
   /// No description provided for @noArchetype.
   ///
   /// In en, this message translates to:
@@ -1633,6 +1645,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom…'**
   String get customOption;
+
+  /// No description provided for @prefillFromVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefill from a version'**
+  String get prefillFromVersion;
+
+  /// No description provided for @prefillField.
+  ///
+  /// In en, this message translates to:
+  /// **'Take this field from another version'**
+  String get prefillField;
+
+  /// No description provided for @prefillTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace tags and slots?'**
+  String get prefillTitle;
+
+  /// No description provided for @prefillNoChange.
+  ///
+  /// In en, this message translates to:
+  /// **'This version reads the same.'**
+  String get prefillNoChange;
+
+  /// No description provided for @prefillSame.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as now'**
+  String get prefillSame;
 
   /// No description provided for @addWord.
   ///
@@ -2552,12 +2594,6 @@ abstract class AppLocalizations {
   /// **'Replaces every tag and slot with a set\'s booster or random packs. Your own tags and slots are lost.'**
   String get prefillHint;
 
-  /// No description provided for @prefillTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Replace tags and slots?'**
-  String get prefillTitle;
-
   /// No description provided for @prefillWarning.
   ///
   /// In en, this message translates to:
@@ -2965,12 +3001,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Card list exported'**
   String get exportCardListDone;
-
-  /// No description provided for @pickTribe.
-  ///
-  /// In en, this message translates to:
-  /// **'Change the monster type'**
-  String get pickTribe;
 
   /// No description provided for @fieldTribe.
   ///

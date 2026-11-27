@@ -828,6 +828,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kindTrap => 'Trap';
 
   @override
+  String get kindSkill => 'Skill';
+
+  @override
+  String get fieldSupertype => 'Supertype';
+
+  @override
   String get noArchetype => 'No archetype';
 
   @override
@@ -930,6 +936,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customOption => 'Custom…';
+
+  @override
+  String get prefillFromVersion => 'Prefill from a version';
+
+  @override
+  String get prefillField => 'Take this field from another version';
+
+  @override
+  String get prefillTitle => 'Replace tags and slots?';
+
+  @override
+  String get prefillNoChange => 'This version reads the same.';
+
+  @override
+  String get prefillSame => 'Same as now';
 
   @override
   String get addWord => 'Add…';
@@ -1465,9 +1486,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Replaces every tag and slot with a set\'s booster or random packs. Your own tags and slots are lost.';
 
   @override
-  String get prefillTitle => 'Replace tags and slots?';
-
-  @override
   String prefillWarning(int slots, int tags) {
     return 'The pool gets $slots slots and $tags tags from this prefill; the current ones are discarded.';
   }
@@ -1721,9 +1739,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportCardListDone => 'Card list exported';
-
-  @override
-  String get pickTribe => 'Change the monster type';
 
   @override
   String get fieldTribe => 'Tribe';

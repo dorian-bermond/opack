@@ -348,7 +348,21 @@ class MtgCardInfo extends CardInfo {
   int? get toughnessValue => int.tryParse(toughness ?? '');
 }
 
-enum YgoKind { monster, spell, trap }
+/// What a Yu-Gi-Oh! card is above all, its supertype: a monster, a
+/// spell, a trap or a skill (the Speed Duel cards).
+enum YgoKind {
+  monster, spell, trap, skill;
+
+  /// The supertype as the user reads and edits it: `Monster`, `Skill`.
+  String get label => name[0].toUpperCase() + name.substring(1);
+
+  /// The kind named by [label] in any case, `null` for none.
+  static YgoKind? fromLabel(String label) =>
+      values.where((k) => k.name == label.trim().toLowerCase()).firstOrNull;
+}
+
+/// The supertypes as the editor offers them.
+final ygoSupertypes = [for (final k in YgoKind.values) k.label];
 
 /// The frame a Yu-Gi-Oh! card is sorted, grouped and filtered under:
 /// spell, trap, and monster, told apart by frame (normal, effect, ritual,
@@ -358,7 +372,7 @@ class YgoKinds {
   static bool splitNormalEffect = true;
 
   /// The frames in deck order, as keys the labels know.
-  static const order = ['normal', 'effect', 'ritual', 'fusion', 'synchro', 'xyz', 'link', 'monster', 'spell', 'trap'];
+  static const order = ['normal', 'effect', 'ritual', 'fusion', 'synchro', 'xyz', 'link', 'monster', 'spell', 'trap', 'skill'];
 
   static String keyOf(YgoCardInfo info) {
     if (info.kind != YgoKind.monster) return info.kind.name;
@@ -439,7 +453,7 @@ class YgoCardInfo extends CardInfo {
 
   factory YgoCardInfo.fromJson(Map<String, dynamic> json) => YgoCardInfo(
         name: json['name'] as String,
-        kind: YgoKind.values.byName(json['kind'] as String),
+        kind: YgoKind.fromLabel(json['kind'] as String) ?? YgoKind.monster,
         type: json['type'] as String,
         categories: (json['categories'] as List? ?? const []).cast<String>(),
         frameType: json['frameType'] as String,
@@ -468,7 +482,9 @@ class YgoCardInfo extends CardInfo {
         ? YgoKind.spell
         : type.contains('Trap')
             ? YgoKind.trap
-            : YgoKind.monster;
+            : type.contains('Skill')
+                ? YgoKind.skill
+                : YgoKind.monster;
     final words = type.split(' ');
     final sets = (json['card_sets'] as List? ?? const []).cast<Map<String, dynamic>>();
     final wanted = printCode == null ? null : _printKey(printCode);

@@ -16,6 +16,7 @@ IconData? fieldIcon(String key) {
     'rarity' || 'printedRarity' => Icons.diamond_outlined,
     'colors' || 'colorIdentity' || 'producedMana' => Icons.palette_outlined,
     'attribute' => Icons.auto_awesome_outlined,
+    'supertype' => Icons.style_outlined,
     'race' || 'type' || 'types' || 'subtypes' || 'supertypes' || 'typeLine' => Icons.category_outlined,
     'categories' || 'frameType' || 'layout' => Icons.crop_portrait,
     'archetype' => Icons.groups_outlined,
@@ -47,7 +48,8 @@ FieldIcon? valueIcon(Game game, String key, String value) {
   if (word.isEmpty) return null;
   return switch (field) {
     'attribute' => _attributes[word],
-    'race' || 'subtypes' || 'categories' || 'frameType' when game == Game.ygo => _ygoTypes[word] ?? _ygoKinds[word],
+    'race' || 'subtypes' || 'categories' || 'frameType' || 'supertype' when game == Game.ygo =>
+      _ygoTypes[word] ?? _ygoKinds[word],
     'types' || 'supertypes' when game == Game.mtg => _mtgTypes[word],
     'type' when game == Game.opc => _opcTypes[word],
     _ => null,
@@ -114,6 +116,8 @@ const _ygoKinds = <String, FieldIcon>{
   'link': (icon: Icons.link, color: Color(0xFF1976D2)),
   'ritual': (icon: Icons.crop_portrait, color: Color(0xFF5C8DD6)),
   'token': (icon: Icons.crop_portrait, color: Color(0xFF9E9E9E)),
+  'monster': (icon: Icons.crop_portrait, color: Color(0xFFD9763D)),
+  'skill': (icon: Icons.crop_portrait, color: Color(0xFF3F6E9E)),
   'spell': (icon: Icons.crop_portrait, color: Color(0xFF26A69A)),
   'trap': (icon: Icons.crop_portrait, color: Color(0xFFC2185B)),
   'pendulum': (icon: Icons.balance, color: null),

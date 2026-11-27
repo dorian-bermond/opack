@@ -281,6 +281,8 @@
   "kindMonster": "Monstre",
   "kindSpell": "Magie",
   "kindTrap": "Piège",
+  "kindSkill": "Compétence",
+  "fieldSupertype": "Supertype",
   "noArchetype": "Sans archétype",
   "nonFoil": "Non premium",
   "advancedSearch": "Recherche avancée",
@@ -322,6 +324,11 @@
   "revertField": "Revenir à l'original : {value}",
   "fieldEmpty": "(aucun)",
   "customOption": "Personnalisé…",
+  "prefillFromVersion": "Préremplir depuis une version",
+  "prefillField": "Prendre ce champ d'une autre version",
+  "prefillTitle": "Préremplir depuis une version",
+  "prefillNoChange": "Cette version se lit pareil.",
+  "prefillSame": "Identique",
   "addWord": "Ajouter…",
   "typeLine": "Ligne de type",
   "customOptionTitle": "Nouveau {field}",
@@ -625,7 +632,6 @@
   "exportCardList": "Exporter en liste de cartes",
   "exportCardListHint": "Enregistre les cartes en texte simple, une par ligne avec ses exemplaires (« 3 Nom »), pour un outil de deck ou l'import par lot. Les étiquettes, boosters et formats n'y sont pas.",
   "exportCardListDone": "Liste de cartes exportée",
-  "pickTribe": "Changer le type du monstre",
   "fieldTribe": "Tribu",
   "fieldSpellKind": "Genre"
 }

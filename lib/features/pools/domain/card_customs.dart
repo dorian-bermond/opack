@@ -62,9 +62,15 @@ CardData customizeCard(CardData card, CardCustoms customs) {
   return card.foil ? custom.asFoil() : custom;
 }
 
+/// The field a Yu-Gi-Oh! card's kind edits as: its supertype (Monster,
+/// Spell, Trap, Skill), the kind's name capitalized.
+const ygoSupertypeKey = 'supertype';
+
 /// The detail fields a user may edit on [info], with their values: every
-/// scalar or list of words, nested records (an MtG card's faces) left out.
+/// scalar or list of words, nested records (an MtG card's faces) left out;
+/// a Yu-Gi-Oh! card's kind as its supertype.
 Map<String, Object?> editableInfoFields(CardInfo info) => {
+      if (info is YgoCardInfo) ygoSupertypeKey: info.kind.label,
       for (final MapEntry(key: key, value: value) in info.toJson().entries)
         if (key != 'game' && key != 'kind' && (value is! List || value.every((e) => e is String))) key: value,
     };
@@ -78,6 +84,14 @@ CardInfo? customizeInfo(CardInfo? info, CardCustoms customs) {
   for (final MapEntry(key: key, value: value) in customs.entries) {
     if (key.startsWith(cardFieldPrefix)) continue;
     changed = true;
+    if (key == ygoSupertypeKey) {
+      // The supertype is the kind: one of the game's, else left as it was.
+      if (value is String) {
+        final kind = YgoKind.fromLabel(value);
+        if (kind != null) json['kind'] = kind.name;
+      }
+      continue;
+    }
     if (value == null) {
       json.remove(key);
     } else {

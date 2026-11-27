@@ -66,7 +66,7 @@ void main() {
     expect(find.byKey(const Key('editDrawnCard')), findsOneWidget);
     // It takes the height there is, the fields keeping their width.
     final drawnSize = tester.getSize(find.byKey(const Key('editDrawnCard')));
-    expect(drawnSize.width, closeTo(1200 - 16 - 440, 1), reason: 'the fields keep 440 px');
+    expect(drawnSize.width, closeTo(1200 - 16 - 480, 1), reason: 'the fields keep 480 px');
     expect(drawnSize.height, greaterThan(1000));
     expect(find.descendant(of: find.byKey(const Key('editDrawnCard')), matching: find.text('1700')), findsOneWidget);
     await tester.enterText(find.byKey(const ValueKey('field-atk')), '2400');
@@ -75,7 +75,12 @@ void main() {
 
     // The fields come in the order the card shows them.
     double top(String key) => tester.getTopLeft(find.byKey(ValueKey('field-$key'))).dy;
-    expect(top('card.name.en'), lessThan(top('attribute')));
+    expect(find.byKey(const ValueKey('field-card.name.en')), findsNothing, reason: 'the names are not edited');
+    expect(find.byKey(const ValueKey('field-card.name.fr')), findsNothing);
+    // The supertype comes first: the kind, one of the game's four.
+    expect(find.text('Supertype'), findsOneWidget);
+    expect(tester.widget<TextField>(find.byKey(const ValueKey('field-supertype'))).controller!.text, 'Monster');
+    expect(top('supertype'), lessThan(top('attribute')));
     expect(top('attribute'), lessThan(top('level')));
     expect(top('level'), lessThan(top(ygoSubtypesKey)));
     expect(top(ygoSubtypesKey), lessThan(top('text')));
@@ -89,14 +94,20 @@ void main() {
       expect(find.byKey(ValueKey('field-$key')), findsNothing, reason: key);
     }
 
-    // The drawn card is edited by clicking it: the attribute in a dialog...
+    // The drawn card is edited by clicking it: the attribute sends the
+    // focus to its field, an autocomplete list like the other choices...
     await tester.tap(find.byKey(const ValueKey('ygoPart-attribute')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('pickAttribute')), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('attribute-FIRE')));
+    expect(find.byKey(const Key('pickAttribute')), findsNothing);
+    expect(tester.widget<TextField>(find.byKey(const ValueKey('field-attribute'))).focusNode!.hasFocus, isTrue);
+    await tester.enterText(find.byKey(const ValueKey('field-attribute')), 'FI');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'FIRE'));
     await tester.pumpAndSettle();
     expect(tester.widget<TextField>(find.byKey(const ValueKey('field-attribute'))).controller!.text, 'FIRE');
-    // ...the level too...
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    // ...the level in a dialog...
     await tester.tap(find.byKey(const ValueKey('ygoPart-level')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('level-7')));
@@ -115,7 +126,7 @@ void main() {
 
     // The tribe is a field of its own, above the subtypes: a monster has one.
     final tribe = find.byKey(const ValueKey('field-race'));
-    String? tribeNow() => tester.widget<DropdownButton<String>>(tribe).value;
+    String? tribeNow() => tester.widget<TextField>(tribe).controller!.text;
     expect(find.text('Tribe'), findsOneWidget);
     expect(tribeNow(), 'Zombie');
     expect(top('level'), lessThan(top('race')));
@@ -150,27 +161,37 @@ void main() {
     expect(line, greaterThan(tester.getTopLeft(subtypes).dy));
     expect(line, lessThan(tester.getTopLeft(find.byKey(const ValueKey('field-text'))).dy));
 
-    // The tribe is changed in its field, a plain list of every tribe of the game...
+    // The tribe is changed in its field, an autocomplete list of every
+    // tribe of the game, filtered as one types...
     await tester.ensureVisible(tribe);
-    await tester.tap(tribe);
+    await tester.enterText(tribe, 'winged');
     await tester.pumpAndSettle();
-    expect(find.text('Winged Beast'), findsWidgets, reason: 'every tribe, also one no card of the pool has');
-    await tester.tap(find.text('Dragon').last);
+    expect(find.widgetWithText(ListTile, 'Winged Beast'), findsOneWidget,
+        reason: 'every tribe, also one no card of the pool has');
+    await tester.enterText(tribe, 'Drag');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Dragon'));
     await tester.pumpAndSettle();
     expect(tribeNow(), 'Dragon');
     expect(chips(), ['Synchro', 'Tuner', 'Effect'], reason: 'the subtypes stay');
     expect(tester.widget<Text>(find.byKey(const Key('typeLine'))).data, 'Dragon / Synchro / Tuner / Effect');
     expect(find.descendant(of: find.byKey(const Key('editDrawnCard')), matching: find.textContaining('Dragon')),
         findsOneWidget, reason: 'the drawn type line follows');
-    // ...or by a click on the drawn card's type line, in a dialog.
+    // ...or by a click on the drawn card's type line, which sends the focus
+    // to the tribe field, an autocomplete list too.
     tester.binding.focusManager.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('ygoPart-type')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('pickTribe')), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('tribe-Zombie')));
+    expect(find.byKey(const Key('pickTribe')), findsNothing);
+    expect(tester.widget<TextField>(tribe).focusNode!.hasFocus, isTrue);
+    await tester.enterText(tribe, 'Zom');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Zombie'));
     await tester.pumpAndSettle();
     expect(tribeNow(), 'Zombie');
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
 
     Future<void> remove(String word) async {
       tester.widget<InputChip>(find.byKey(ValueKey('pick-$ygoSubtypesKey-$word'))).onDeleted!();
@@ -234,10 +255,7 @@ void main() {
     expect(picture(find.byKey(const ValueKey('valueIcon-attribute'))).assetName,
         'assets/ygo_template/attribute-fire.png', reason: "the template's own attribute");
     expect(
-      picture(find.descendant(
-        of: find.byKey(const ValueKey('valueIcon-race-Zombie')),
-        matching: find.byType(Image),
-      ).first).assetName,
+      picture(find.byKey(const ValueKey('valueIcon-race'))).assetName,
       'assets/ygo_types/zombie.png',
       reason: "the tribe's own icon",
     );
@@ -258,5 +276,113 @@ void main() {
     expect(valueImage(Game.opc, 'attribute', 'Slash'), isNull);
     expect(fieldIcon('card.name.fr'), Icons.badge_outlined);
     expect(fieldIcon('passcode'), isNull);
+  });
+
+  testWidgets('fields are prefilled from another printing of the card, each change shown first', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    const cards = [
+      CardData(id: 'X-1', names: {'en': 'Mezuki'}, rarity: Rarity.common),
+      CardData(id: 'X-1_p1', names: {'en': 'Mezuki'}, rarity: Rarity.rare),
+      CardData(id: 'X-1_p2', names: {'en': 'Mezuki'}, rarity: Rarity.rare),
+      CardData(id: 'X-2', names: {'en': 'Other'}, rarity: Rarity.common),
+    ];
+    final pool = Pool.empty(Game.ygo, name: 'p', id: 'p').withSource(const CardsSource(cards), cards: cards);
+    YgoCardInfo info(String text, String attribute) => YgoCardInfo.fromYgoprodeck({
+          'name': 'Mezuki',
+          'type': 'Effect Monster',
+          'frameType': 'effect',
+          'race': 'Zombie',
+          'attribute': attribute,
+          'level': 4,
+          'atk': 1700,
+          'def': 800,
+          'desc': text,
+        });
+    final store = MemoryCardInfoStore();
+    await store.save('p', {
+      'X-1': info('Send 1 card from your Deck to the GY.', 'EARTH'),
+      // Two printings reading the same are one; the other card is no version.
+      'X-1_p1': info('Send 1 card from your hand to the GY.', 'DARK'),
+      'X-1_p2': info('Send 1 card from your hand to the GY.', 'DARK'),
+      'X-2': info('Other.', 'FIRE'),
+    });
+    final container = ProviderContainer(overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      cardInfoStoreProvider.overrideWithValue(store),
+      cardInfoFetcherProvider.overrideWithValue(null),
+      cardImageCacheProvider.overrideWithValue(null),
+    ]);
+    addTearDown(container.dispose);
+    await tester.runAsync(() => container.read(poolCardInfoProvider('p').future));
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: CardEditSheet(play: PlayPool.resolve(pool, sets: const {}, cubes: const {}), card: cards[0]),
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    // A field another printing reads otherwise offers to take it; one every
+    // printing reads the same does not.
+    expect(find.byKey(const ValueKey('prefill-text')), findsOneWidget);
+    expect(find.byKey(const ValueKey('prefill-attribute')), findsOneWidget);
+    expect(find.byKey(const ValueKey('prefill-level')), findsNothing);
+
+    // The whole card: the one version (the two alike printings are one),
+    // its changed fields picked, shown as a diff, the others not pickable.
+    await tester.tap(find.byKey(const Key('prefillCard')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('prefillDialog')), findsOneWidget);
+    expect(find.text('p1 · rare'), findsOneWidget);
+    expect(find.byType(ChoiceChip), findsNothing, reason: 'one version: nothing to choose');
+    CheckboxListTile tile(String key) => tester.widget(find.byKey(ValueKey('prefillField-$key')));
+    expect(tile('text').value, isTrue);
+    expect(tile('attribute').value, isTrue);
+    expect(tile('level').enabled, isFalse);
+    expect(tile('level').value, isFalse);
+    final diff = tester.widget<Text>(find.descendant(
+      of: find.byKey(const ValueKey('prefillField-text')),
+      matching: find.byType(Text),
+    ).last).textSpan! as TextSpan;
+    final parts = [
+      for (final span in diff.children!.cast<TextSpan>())
+        (span.text, span.style?.decoration == TextDecoration.lineThrough),
+    ];
+    expect(parts, [
+      ('Send 1 card from your ', false),
+      ('Deck ', true),
+      ('hand ', false),
+      ('to the GY.', false),
+    ]);
+    expect((diff.children![2] as TextSpan).style?.color, const Color(0xFF2E7D32), reason: 'added reads green');
+    expect((diff.children![1] as TextSpan).style?.color, const Color(0xFFC62828), reason: 'removed reads red');
+    // The attribute is left out: only the text is taken.
+    await tester.tap(find.byKey(const ValueKey('prefillField-attribute')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('applyPrefill')));
+    await tester.pumpAndSettle();
+    String reads(String key) => tester.widget<TextField>(find.byKey(ValueKey('field-$key'))).controller!.text;
+    expect(reads('text'), 'Send 1 card from your hand to the GY.');
+    expect(reads('attribute'), 'EARTH');
+    expect(find.byKey(const ValueKey('custom-text')), findsOneWidget, reason: 'flagged custom like any change');
+    expect(find.byKey(const ValueKey('prefill-text')), findsNothing, reason: 'now reads like the version');
+
+    // One field alone, from its own button.
+    await tester.tap(find.byKey(const ValueKey('prefill-attribute')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('prefillField-attribute')), findsOneWidget);
+    expect(find.byKey(const ValueKey('prefillField-text')), findsNothing, reason: 'that field alone');
+    await tester.tap(find.byKey(const Key('applyPrefill')));
+    await tester.pumpAndSettle();
+    expect(reads('attribute'), 'DARK');
   });
 }

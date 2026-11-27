@@ -170,6 +170,7 @@ String valueLabel(AppLocalizations l10n, String value) {
     'link' => l10n.kindLink,
     'spell' => l10n.kindSpell,
     'trap' => l10n.kindTrap,
+    'skill' => l10n.kindSkill,
     'foil' => l10n.foil,
     'nonfoil' => l10n.nonFoil,
     _ => value,

@@ -90,7 +90,7 @@ class YgoCardFace extends StatelessWidget {
   /// The frame drawn for [info]: its own (a pendulum's base frame), a
   /// spell's or a trap's, the effect one when it is unknown.
   static String frameOf(YgoCardInfo info) {
-    if (info.kind == YgoKind.spell) return 'spell';
+    if (info.kind == YgoKind.spell || info.kind == YgoKind.skill) return 'spell';
     if (info.kind == YgoKind.trap) return 'trap';
     final frame = info.frameType.replaceFirst('_pendulum', '');
     if (_frames.contains(frame)) return frame;
@@ -176,6 +176,7 @@ class YgoCardFace extends StatelessWidget {
     final attribute = switch (info.kind) {
       YgoKind.spell => 'spell',
       YgoKind.trap => 'trap',
+      YgoKind.skill => null,
       YgoKind.monster => info.attribute?.toLowerCase(),
     };
     final attributeAsset = attribute == null

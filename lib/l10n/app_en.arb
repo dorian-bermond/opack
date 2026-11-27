@@ -340,6 +340,8 @@
   "kindMonster": "Monster",
   "kindSpell": "Spell",
   "kindTrap": "Trap",
+  "kindSkill": "Skill",
+  "fieldSupertype": "Supertype",
   "noArchetype": "No archetype",
   "nonFoil": "Non-foil",
   "advancedSearch": "Advanced search",
@@ -382,6 +384,11 @@
   "@revertField": { "placeholders": { "value": { "type": "String" } } },
   "fieldEmpty": "(none)",
   "customOption": "Custom…",
+  "prefillFromVersion": "Prefill from a version",
+  "prefillField": "Take this field from another version",
+  "prefillTitle": "Prefill from a version",
+  "prefillNoChange": "This version reads the same.",
+  "prefillSame": "Same as now",
   "addWord": "Add…",
   "typeLine": "Type line",
   "customOptionTitle": "New {field}",
@@ -705,7 +712,6 @@
   "exportCardList": "Export as a card list",
   "exportCardListHint": "Saves the cards as plain text, one per line with its copies (\"3 Name\"), for a deck tool or the batch import. Tags, boosters and formats are not in it.",
   "exportCardListDone": "Card list exported",
-  "pickTribe": "Change the monster type",
   "fieldTribe": "Tribe",
   "fieldSpellKind": "Kind"
 }

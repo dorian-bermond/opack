@@ -128,7 +128,7 @@ List<MetricSection> _ygo(List<CardWithInfo> cards) {
   final withAtk = monsters.where((i) => i.atk != null).toList();
   final withDef = monsters.where((i) => i.def != null).toList();
   return [
-    MetricSection(Metric.kind, _ordered([for (final i in infos) i.kind.name], order: const ['monster', 'spell', 'trap'])),
+    MetricSection(Metric.kind, _ordered([for (final i in infos) i.kind.name], order: const ['monster', 'spell', 'trap', 'skill'])),
     MetricSection(Metric.categories, _ordered([for (final i in monsters) ...i.categories], order: ygoCategories)),
     MetricSection(
       Metric.levels,
