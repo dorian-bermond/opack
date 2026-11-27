@@ -1676,12 +1676,6 @@ abstract class AppLocalizations {
   /// **'This version reads the same.'**
   String get prefillNoChange;
 
-  /// No description provided for @prefillNoVersion.
-  ///
-  /// In en, this message translates to:
-  /// **'No other printing of this card in the pool with its details: nothing to prefill from.'**
-  String get prefillNoVersion;
-
   /// No description provided for @prefillSame.
   ///
   /// In en, this message translates to:

@@ -953,10 +953,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prefillNoChange => 'This version reads the same.';
 
   @override
-  String get prefillNoVersion =>
-      'No other printing of this card in the pool with its details: nothing to prefill from.';
-
-  @override
   String get prefillSame => 'Same as now';
 
   @override

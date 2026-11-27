@@ -327,11 +327,6 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   /// Takes fields from another printing: every field, or [field] alone,
   /// each change shown before it is made.
   Future<void> _prefill({String? field}) async {
-    if (_versions.isEmpty) {
-      // Nothing to take from: say so, rather than hide the way in.
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).prefillNoVersion)));
-      return;
-    }
     final keys = [
       for (final key in _keys)
         if (_controllers.containsKey(key) && !_isDerived(key) && !hiddenFields.contains(key)) key,
@@ -869,7 +864,8 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Align(
+                    if (_versions.isNotEmpty)
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton.icon(
                           key: const Key('prefillCard'),
