@@ -958,6 +958,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get prefillNoChange => 'Cette version se lit pareil.';
 
   @override
+  String get prefillNoVersion =>
+      'Aucune autre impression de cette carte dans le pool avec ses détails : rien à préremplir.';
+
+  @override
   String get prefillSame => 'Identique';
 
   @override

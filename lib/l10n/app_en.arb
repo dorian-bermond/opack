@@ -389,6 +389,7 @@
   "prefillField": "Take this field from another version",
   "prefillTitle": "Prefill from a version",
   "prefillNoChange": "This version reads the same.",
+  "prefillNoVersion": "No other printing of this card in the pool with its details: nothing to prefill from.",
   "prefillSame": "Same as now",
   "addWord": "Add…",
   "typeLine": "Type line",

@@ -329,6 +329,7 @@
   "prefillField": "Prendre ce champ d'une autre version",
   "prefillTitle": "Préremplir depuis une version",
   "prefillNoChange": "Cette version se lit pareil.",
+  "prefillNoVersion": "Aucune autre impression de cette carte dans le pool avec ses détails : rien à préremplir.",
   "prefillSame": "Identique",
   "addWord": "Ajouter…",
   "typeLine": "Ligne de type",
