@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 
 import '../../catalog/domain/models.dart';
 import '../domain/card_info.dart';
+
+export '../domain/card_info.dart' show ygoAttributes;
 import 'dotgg_one_piece.dart';
 
 /// A card found online, ready to join a pool with its details.
@@ -150,7 +152,6 @@ const ygoSearchTypes = [
   'Trap Card',
 ];
 
-const ygoAttributes = ['DARK', 'LIGHT', 'EARTH', 'WATER', 'FIRE', 'WIND', 'DIVINE'];
 
 const mtgSearchTypes = [
   'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Battle',

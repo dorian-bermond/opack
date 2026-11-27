@@ -256,11 +256,23 @@ class _PoolDetails extends ConsumerWidget {
                   const SizedBox(height: 16),
                   Text(l10n.exportCardListHint, style: theme.textTheme.bodySmall),
                   const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    key: const Key('exportCardList'),
-                    icon: const Icon(Icons.format_list_numbered),
-                    label: Text(l10n.exportCardList),
-                    onPressed: () => exportPoolCardList(context, ref, play),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      OutlinedButton.icon(
+                        key: const Key('exportCardList'),
+                        icon: const Icon(Icons.format_list_numbered),
+                        label: Text(l10n.exportCardList),
+                        onPressed: () => exportPoolCardList(context, ref, play),
+                      ),
+                      OutlinedButton.icon(
+                        key: const Key('copyCardList'),
+                        icon: const Icon(Icons.content_copy),
+                        label: Text(l10n.copyCardList),
+                        onPressed: () => copyPoolCardList(context, ref, play),
+                      ),
+                    ],
                   ),
                 ],
               ),

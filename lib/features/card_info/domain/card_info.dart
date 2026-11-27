@@ -395,6 +395,9 @@ const ygoCategories = [
   'Tuner', 'Flip', 'Gemini', 'Spirit', 'Toon', 'Union', 'Token',
 ];
 
+/// The attributes a Yu-Gi-Oh! monster is of.
+const ygoAttributes = ['DARK', 'LIGHT', 'EARTH', 'WATER', 'FIRE', 'WIND', 'DIVINE'];
+
 /// The types (tribes) a Yu-Gi-Oh! monster is of.
 const ygoMonsterTypes = [
   'Aqua', 'Beast', 'Beast-Warrior', 'Creator-God', 'Cyberse', 'Dinosaur', 'Divine-Beast', 'Dragon', 'Fairy', 'Fiend',

@@ -276,7 +276,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                       items: items,
                       actions: actions,
                       labelOf: (item) => [stackLabel(_sort, item, language, nameOf: nameOf)],
-                      header: (label) => valueLabel(l10n, label),
+                      header: (label) => valueLabel(l10n, label, game: _game),
                     ),
                   PoolView.spoiler => PoolSpoilerSliver(items: items, actions: actions, language: language),
                 },

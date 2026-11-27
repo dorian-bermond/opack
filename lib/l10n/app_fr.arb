@@ -630,6 +630,8 @@
   "generatedCardsHint": "Une carte dont les champs ont été modifiés pour un pool est dessinée d'après ses détails au lieu de son scan.",
   "editOnCardHint": "Cliquez sur une partie de la carte pour la modifier.",
   "exportCardList": "Exporter en liste de cartes",
+  "copyCardList": "Copier la liste de cartes",
+  "copyCardListDone": "Liste de cartes copiée",
   "exportCardListHint": "Enregistre les cartes en texte simple, une par ligne avec ses exemplaires (« 3 Nom »), pour un outil de deck ou l'import par lot. Les étiquettes, boosters et formats n'y sont pas.",
   "exportCardListDone": "Liste de cartes exportée",
   "fieldTribe": "Tribu",

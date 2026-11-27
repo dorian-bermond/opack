@@ -1734,6 +1734,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportCardList => 'Export as a card list';
 
   @override
+  String get copyCardList => 'Copy the card list';
+
+  @override
+  String get copyCardListDone => 'Card list copied';
+
+  @override
   String get exportCardListHint =>
       'Saves the cards as plain text, one per line with its copies (\"3 Name\"), for a deck tool or the batch import. Tags, boosters and formats are not in it.';
 

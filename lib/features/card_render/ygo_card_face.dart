@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../card_info/domain/card_info.dart';
+import '../card_info/domain/ygo_words.dart';
 import '../pools/domain/card_customs.dart';
 
 /// The parts of a drawn card that stand for a field: what a click on the
@@ -102,25 +103,10 @@ class YgoCardFace extends StatelessWidget {
   /// user's own is printed as typed.
   static String monsterTypeLine(YgoCardInfo info, {String language = 'en'}) {
     final words = ygoSubtypes(race: info.race, categories: info.categories);
-    final known = _typeWords[language] ?? const <String, String>{};
+    final known = ygoWords[language] ?? const <String, String>{};
     // Hair spaces around the bars, as the template sets them.
     return '[${[for (final w in words) known[w.toLowerCase()] ?? w].join(' / ')}]';
   }
-
-  /// The words of a type line in other languages than English.
-  static const _typeWords = <String, Map<String, String>>{
-    'fr': {
-      'aqua': 'Aqua', 'beast': 'Bête', 'beast-warrior': 'Bête-Guerrier', 'creator-god': 'Dieu Créateur',
-      'creator god': 'Dieu Créateur', 'cyberse': 'Cyberse', 'dinosaur': 'Dinosaure', 'divine-beast': 'Bête Divine',
-      'dragon': 'Dragon', 'fairy': 'Elfe', 'fiend': 'Démon', 'fish': 'Poisson', 'illusion': 'Illusion',
-      'insect': 'Insecte', 'machine': 'Machine', 'plant': 'Plante', 'psychic': 'Psychique', 'pyro': 'Pyro',
-      'reptile': 'Reptile', 'rock': 'Rocher', 'sea serpent': 'Serpent de Mer', 'spellcaster': 'Magicien',
-      'thunder': 'Tonnerre', 'warrior': 'Guerrier', 'winged beast': 'Bête Ailée', 'wyrm': 'Wyrm', 'zombie': 'Zombie',
-      'fusion': 'Fusion', 'synchro': 'Synchro', 'xyz': 'Xyz', 'ritual': 'Rituel', 'link': 'Lien',
-      'pendulum': 'Pendule', 'gemini': 'Gémeau', 'spirit': 'Spirit', 'toon': 'Toon', 'union': 'Union',
-      'flip': 'Flip', 'tuner': 'Syntoniseur', 'effect': 'Effet', 'normal': 'Normal', 'token': 'Jeton',
-    },
-  };
 
   /// A card text as printed: each `●` starts its own line.
   static String printedText(String text) =>

@@ -7,7 +7,7 @@ import '../../../core/settings/card_languages.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../card_info/data/card_info_repository.dart';
 import '../../card_info/domain/card_info.dart';
-import '../../card_info/data/card_search.dart' show ygoAttributes;
+import '../../card_info/domain/ygo_words.dart';
 import '../../card_render/generated_card.dart';
 import '../../card_render/ygo_card_face.dart';
 import '../../card_text/data/card_text_repository.dart';
@@ -201,7 +201,27 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
 
   /// The other printings of the card in the pool that have details, two
   /// reading the same kept once: what a field may be prefilled from.
-  late final List<CardVersion> _versions;
+  List<CardVersion> _versions = const [];
+
+  /// The details of the pool's cards, to tell the other printings.
+  late final Map<String, CardInfo> _infos;
+
+  /// The language the Yu-Gi-Oh! words (attributes, types…) read in, once
+  /// known from the widget tree: the data keeps the English ones.
+  String _language = 'en';
+  bool _languageKnown = false;
+
+  /// The fields whose words read in [_language].
+  static const _wordFields = {'attribute', 'race', ygoSupertypeKey};
+
+  bool _isWordField(String key) => _game == Game.ygo && _wordFields.contains(key);
+
+  /// [value] of [key] as it reads in the editor.
+  String _shown(String key, Object? value) =>
+      _isWordField(key) ? ygoWord(_language, fieldText(value)) : fieldText(value);
+
+  /// What the editor reads for [key] as the data keeps it.
+  String _kept(String key, String shown) => _isWordField(key) ? ygoCanonical(_language, shown) : shown;
 
   String get _id => widget.card.id;
   Game get _game => widget.play.pool.game;
@@ -246,7 +266,24 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     }
     _rarity = '${current['${cardFieldPrefix}rarity']}';
     _printedRarity = current['${cardFieldPrefix}printedRarity'] as String?;
-    _versions = _otherVersions(infos);
+    _infos = infos;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final language = Localizations.localeOf(context).languageCode;
+    if (_languageKnown && language == _language) return;
+    _languageKnown = true;
+    // The words turn to the language, and the other printings read in it.
+    for (final key in _keys) {
+      if (!_isWordField(key)) continue;
+      final controller = _controllers[key];
+      if (controller == null) continue;
+      controller.text = ygoWord(language, ygoCanonical(_language, controller.text));
+    }
+    _language = language;
+    _versions = _otherVersions(_infos);
   }
 
   /// The other printings of the card (same base id) with details, as the
@@ -260,7 +297,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       final info = infos[card.id];
       if (info == null) continue;
       final fields = {
-        for (final MapEntry(:key, :value) in editableInfoFields(info).entries) key: fieldText(value),
+        for (final MapEntry(:key, :value) in editableInfoFields(info).entries) key: _shown(key, value),
         if (info is YgoCardInfo && info.kind == YgoKind.monster)
           ygoSubtypesKey: fieldText(ygoSubtypes(categories: info.categories)),
       };
@@ -277,7 +314,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   }
 
   /// Whether some other printing reads [key] otherwise than this card now.
-  bool _hasPrefill(String key) => _versions.any((v) => (v.fields[key] ?? '') != fieldText(_valueOf(key)));
+  bool _hasPrefill(String key) => _versions.any((v) => (v.fields[key] ?? '') != _shown(key, _valueOf(key)));
 
   /// Takes fields from another printing: every field, or [field] alone,
   /// each change shown before it is made.
@@ -289,7 +326,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     final picked = await showPrefillDialog(
       context,
       versions: _versions,
-      current: {for (final key in keys) key: fieldText(_valueOf(key))},
+      current: {for (final key in keys) key: _shown(key, _valueOf(key))},
       keys: keys,
       label: _label,
       field: field,
@@ -340,7 +377,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
         _ => ygoTypeString(categories, '${_bases[key] ?? ''}'),
       };
     }
-    return parseFieldText(_controllers[key]!.text, _bases[key]);
+    return parseFieldText(_kept(key, _controllers[key]!.text), _bases[key]);
   }
 
   /// The fields told from the subtypes rather than edited; the tribe (or a
@@ -426,7 +463,11 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     if (picked != null && mounted) setState(() => controller.text = picked == 0 ? '' : '$picked');
   }
 
-  String get _typeLine => computedTypeLine(_game, {for (final key in _keys) key: _valueOf(key)});
+  String get _typeLine {
+    final line = computedTypeLine(_game, {for (final key in _keys) key: _valueOf(key)});
+    // A Yu-Gi-Oh! type line reads in the language, as on the drawn card.
+    return _game == Game.ygo ? line.split(' / ').map((w) => ygoWord(_language, w)).join(' / ') : line;
+  }
 
   /// The words picked in a multiple-choice field.
   List<String> _picked(String key) => [
@@ -455,7 +496,8 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
   /// or a trap), as its supertype field reads now: its subtypes are a
   /// tribe and categories.
   bool get _ygoMonster => switch (_controllers[ygoSupertypeKey]?.text) {
-    final String typed when typed.trim().isNotEmpty => YgoKind.fromLabel(typed) == YgoKind.monster,
+    final String typed when typed.trim().isNotEmpty =>
+      YgoKind.fromLabel(_kept(ygoSupertypeKey, typed)) == YgoKind.monster,
     _ => _baseInfo is! YgoCardInfo || (_baseInfo as YgoCardInfo).kind == YgoKind.monster,
   };
 
@@ -485,7 +527,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     } else if (key == '${cardFieldPrefix}printedRarity') {
       _printedRarity = _bases[key] as String?;
     } else {
-      _controllers[key]!.text = fieldText(_bases[key]);
+      _controllers[key]!.text = _shown(key, _bases[key]);
     }
   });
 
@@ -517,7 +559,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
       ...?_poolOptions[key],
       if (base is String && base.isNotEmpty) base,
       ...added,
-    }.toList()..sort();
+    }.map((option) => _shown(key, option)).toSet().toList()..sort();
   }
 
   /// Asks for a new option of [key], kept for good, and picks it.
@@ -561,7 +603,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
     // flag and the way back to the original.
     List<Widget> leading(String key, {double nameWidth = 150}) {
       final custom = _isCustom(key);
-      final base = fieldText(_bases[key]);
+      final base = _shown(key, _bases[key]);
       final prefill = _controllers.containsKey(key) && _hasPrefill(key);
       return [
         SizedBox(
@@ -769,7 +811,7 @@ class _CardEditSheetState extends ConsumerState<CardEditSheet> {
             prefixIcon: switch (valueIconWidget(
               _game,
               key,
-              controller.text,
+              _kept(key, controller.text),
               size: 22,
               key: ValueKey('valueIcon-$key'),
             )) {

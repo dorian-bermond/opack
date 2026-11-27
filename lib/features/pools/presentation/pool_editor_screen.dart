@@ -941,7 +941,7 @@ class _PoolEditorState extends ConsumerState<_PoolEditor> {
                   ? (a.$1 == '?' ? 1 : b.$1 == '?' ? -1 : _sort.compare(a.$2.first, b.$2.first, language, nameOf: nameOf))
                   : compareGroups(_groupBy, _pool, language, quality: _groupQuality, a: a, b: b),
               header: (label) => _groupBy == GroupBy.none
-                  ? valueLabel(l10n, label)
+                  ? valueLabel(l10n, label, game: _pool.game)
                   : groupHeader(l10n, _groupBy, label, game: _pool.game),
               onHeaderMenu: _groupMenu,
             )

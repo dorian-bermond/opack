@@ -2990,6 +2990,18 @@ abstract class AppLocalizations {
   /// **'Export as a card list'**
   String get exportCardList;
 
+  /// No description provided for @copyCardList.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the card list'**
+  String get copyCardList;
+
+  /// No description provided for @copyCardListDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Card list copied'**
+  String get copyCardListDone;
+
   /// No description provided for @exportCardListHint.
   ///
   /// In en, this message translates to:

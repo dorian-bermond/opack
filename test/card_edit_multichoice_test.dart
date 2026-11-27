@@ -385,4 +385,63 @@ void main() {
     await tester.pumpAndSettle();
     expect(reads('attribute'), 'DARK');
   });
+
+  testWidgets('in French, the attribute and the tribe read and are typed in French, kept in English', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    const card = CardData(id: 'X-1', names: {'en': 'Mezuki'}, rarity: Rarity.common);
+    final pool = Pool.empty(Game.ygo, name: 'p', id: 'p').withSource(const CardsSource([card]), cards: [card]);
+    final store = MemoryCardInfoStore();
+    await store.save('p', {
+      'X-1': YgoCardInfo.fromYgoprodeck(const {
+        'name': 'Mezuki', 'type': 'Effect Monster', 'frameType': 'effect', 'race': 'Spellcaster',
+        'attribute': 'EARTH', 'level': 4, 'atk': 1700, 'def': 800, 'desc': 'Text.',
+      }),
+    });
+    final container = ProviderContainer(overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      cardInfoStoreProvider.overrideWithValue(store),
+      cardInfoFetcherProvider.overrideWithValue(null),
+      cardImageCacheProvider.overrideWithValue(null),
+    ]);
+    addTearDown(container.dispose);
+    await tester.runAsync(() => container.read(poolCardInfoProvider('p').future));
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(
+        locale: const Locale('fr'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: CardEditSheet(play: PlayPool.resolve(pool, sets: const {}, cubes: const {}), card: card),
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    String reads(String key) => tester.widget<TextField>(find.byKey(ValueKey('field-$key'))).controller!.text;
+    expect(reads('supertype'), 'Monstre');
+    expect(reads('attribute'), 'TERRE');
+    expect(reads('race'), 'Magicien');
+    expect(find.byKey(const ValueKey('custom-attribute')), findsNothing, reason: 'the French word is no change');
+
+    // A French word typed is the English one kept: the icon follows it.
+    await tester.enterText(find.byKey(const ValueKey('field-attribute')), 'fe');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'FEU'));
+    await tester.pumpAndSettle();
+    expect(reads('attribute'), 'FEU');
+    expect(find.byKey(const ValueKey('custom-attribute')), findsOneWidget);
+    expect((tester.widget<Image>(find.byKey(const ValueKey('valueIcon-attribute'))).image as AssetImage).assetName,
+        'assets/ygo_template/attribute-fire.png');
+    // The tribe list reads in French too, and the type line follows.
+    await tester.enterText(find.byKey(const ValueKey('field-race')), 'zom');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Zombie'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<Text>(find.byKey(const Key('typeLine'))).data, 'Zombie / Effet');
+  });
 }

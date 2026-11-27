@@ -9,6 +9,7 @@ import '../../catalog/domain/models.dart';
 import '../../cube/data/cube_repository.dart';
 import '../data/card_search.dart';
 import '../domain/card_info.dart';
+import '../domain/ygo_words.dart';
 import 'labels.dart';
 
 /// `null` disables online search (tests).
@@ -122,7 +123,7 @@ class _CardSearchState extends ConsumerState<_CardSearch> {
                       title: Text(found.card.nameFor(language)),
                       subtitle: Text([
                         '${found.card.id} · ${found.card.rarity.label(l10n)}',
-                        ?cardInfoLine(found.info),
+                        ?cardInfoLine(found.info, language: l10n.localeName),
                       ].join('\n')),
                       isThreeLine: true,
                       onChanged: (checked) => setState(() {
@@ -284,7 +285,8 @@ class SearchFacets extends StatelessWidget {
         _section(l10n.facetKind, theme,
             _chips(ygoSearchTypes, _query.ygoTypes, (t) => t, (v) => _update(_query.copyWith(ygoTypes: v)))),
         _section(l10n.facetAttribute, theme,
-            _chips(ygoAttributes, _query.attributes, (a) => a, (v) => _update(_query.copyWith(attributes: v)))),
+            _chips(ygoAttributes, _query.attributes, (a) => ygoWord(l10n.localeName, a),
+                (v) => _update(_query.copyWith(attributes: v)))),
         _section(
           l10n.facetRace,
           theme,

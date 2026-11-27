@@ -1744,6 +1744,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get exportCardList => 'Exporter en liste de cartes';
 
   @override
+  String get copyCardList => 'Copier la liste de cartes';
+
+  @override
+  String get copyCardListDone => 'Liste de cartes copiée';
+
+  @override
   String get exportCardListHint =>
       'Enregistre les cartes en texte simple, une par ligne avec ses exemplaires (« 3 Nom »), pour un outil de deck ou l\'import par lot. Les étiquettes, boosters et formats n\'y sont pas.';
 

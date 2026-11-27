@@ -385,8 +385,8 @@ String groupHeader(AppLocalizations l10n, GroupBy group, String label, {Game? ga
       GroupBy.def ||
       GroupBy.cost ||
       GroupBy.collector =>
-        '${groupLabel(l10n, group, game: game)} ${valueLabel(l10n, label)}',
-      _ => valueLabel(l10n, label),
+        '${groupLabel(l10n, group, game: game)} ${valueLabel(l10n, label, game: game)}',
+      _ => valueLabel(l10n, label, game: game),
     };
 
 /// What the views need to show and change copies.
@@ -963,7 +963,7 @@ class PoolSpoilerSliver extends ConsumerWidget {
                       ].join(' · '),
                       style: theme.textTheme.bodySmall,
                     ),
-                    if (cardInfoLine(info) case final line?)
+                    if (cardInfoLine(info, language: l10n.localeName) case final line?)
                       Text(line, style: theme.textTheme.labelMedium),
                     for (final text in texts)
                       Padding(
@@ -1051,7 +1051,7 @@ class PoolListSliver extends ConsumerWidget {
               if (listedTimes > 1) l10n.listedTimes(listedTimes),
               if (tags.isNotEmpty) tags.join(', '),
             ].join(' · '),
-            ?cardInfoLine(info),
+            ?cardInfoLine(info, language: l10n.localeName),
           ].join('\n')),
           isThreeLine: info != null,
           trailing: actions.trailing?.call(card) ??

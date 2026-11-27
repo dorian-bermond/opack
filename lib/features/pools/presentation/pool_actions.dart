@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -115,6 +116,16 @@ Future<void> exportPool(BuildContext context, WidgetRef ref, Pool pool) async {
   );
   if (saved != null && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.exportPoolDone)));
+  }
+}
+
+/// Puts the cards of [play] as a text list (see [poolCardList]) on the
+/// clipboard, their names in the data language.
+Future<void> copyPoolCardList(BuildContext context, WidgetRef ref, PlayPool play) async {
+  final l10n = AppLocalizations.of(context);
+  await Clipboard.setData(ClipboardData(text: poolCardList(play, dataLanguage(ref, context))));
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.copyCardListDone)));
   }
 }
 

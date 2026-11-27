@@ -114,7 +114,7 @@ class _FilterSheetState extends State<_FilterSheet> {
         children: [
           for (final value in shown)
             FilterChip(
-              label: Text('${valueLabel(l10n, value)} · ${counts[value] ?? 0}'),
+              label: Text('${valueLabel(l10n, value, game: widget.game)} · ${counts[value] ?? 0}'),
               selected: chosen.contains(value),
               onSelected: (_) => _update(_filter.toggle(facet, value)),
             ),

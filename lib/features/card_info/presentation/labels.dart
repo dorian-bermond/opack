@@ -3,6 +3,7 @@ import '../../../shared/widgets/card_tile.dart';
 import '../../catalog/domain/models.dart';
 import '../domain/card_filter.dart';
 import '../domain/card_info.dart';
+import '../domain/ygo_words.dart';
 import '../domain/pool_metrics.dart';
 import '../../pools/domain/pool.dart';
 
@@ -107,8 +108,9 @@ String qualityLabel(AppLocalizations l10n, String quality) => switch (quality) {
     };
 
 /// One line of details under a card: cost and type line, or attribute,
-/// monster type, level and ATK/DEF; `null` without details.
-String? cardInfoLine(CardInfo? info) => switch (info) {
+/// monster type, level and ATK/DEF (their words in [language]); `null`
+/// without details.
+String? cardInfoLine(CardInfo? info, {String language = 'en'}) => switch (info) {
       OpcCardInfo(:final type, :final colors, :final cost, :final power, :final counter, :final life, :final attribute) => [
           [type, if (colors.isNotEmpty) colors.join('/')].join(' · '),
           if (cost != null) 'Cost $cost',
@@ -128,28 +130,32 @@ String? cardInfoLine(CardInfo? info) => switch (info) {
         :final defLabel,
       ) =>
         [
-          ?attribute,
-          ?race,
+          if (attribute != null) ygoWord(language, attribute),
+          if (race != null) ygoWord(language, race),
           if (linkRating case final link?) 'LINK-$link' else if (level case final lvl?) '★$lvl',
           if (atkLabel != null || defLabel != null) 'ATK ${atkLabel ?? '?'} / DEF ${defLabel ?? '?'}',
         ].join(' · '),
-      YgoCardInfo(:final type, :final race) => [type, ?race].join(' · '),
+      YgoCardInfo(:final type, :final race) => [type, if (race != null) ygoWord(language, race)].join(' · '),
       null => null,
     };
 
 /// A raw facet or metric value (`W`, `mono`, `spell:Quick-Play`, a rarity
-/// name…) as the user reads it; most values are shown as they are.
-String valueLabel(AppLocalizations l10n, String value) {
+/// name…) as the user reads it; most values are shown as they are, a
+/// Yu-Gi-Oh! word (an attribute, a type…) in the interface's language
+/// when [game] is Yu-Gi-Oh!.
+String valueLabel(AppLocalizations l10n, String value, {Game? game}) {
   if (value.isEmpty) return l10n.noArchetype;
   if (value == 'ø') return value;
   final rarity = Rarity.values.where((r) => r.name == value).firstOrNull;
   if (rarity != null) return rarity.label(l10n);
-  if (value.startsWith('rarity:')) return valueLabel(l10n, value.substring(7));
-  if (value.startsWith('$printedRarityQuality:')) return valueLabel(l10n, value.substring(printedRarityQuality.length + 1));
+  if (value.startsWith('rarity:')) return valueLabel(l10n, value.substring(7), game: game);
+  if (value.startsWith('$printedRarityQuality:')) {
+    return valueLabel(l10n, value.substring(printedRarityQuality.length + 1), game: game);
+  }
   if (value == 'pool') return l10n.allCards;
   if (value.contains(':')) {
     final [kind, property] = value.split(':');
-    return '${valueLabel(l10n, kind)} · $property';
+    return '${valueLabel(l10n, kind, game: game)} · ${game == Game.ygo ? ygoWord(l10n.localeName, property) : property}';
   }
   return switch (value) {
     'W' => l10n.colorWhite,
@@ -173,6 +179,6 @@ String valueLabel(AppLocalizations l10n, String value) {
     'skill' => l10n.kindSkill,
     'foil' => l10n.foil,
     'nonfoil' => l10n.nonFoil,
-    _ => value,
+    _ => game == Game.ygo ? ygoWord(l10n.localeName, value) : value,
   };
 }
